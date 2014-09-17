@@ -1,0 +1,28 @@
+<div>
+	<h2>
+		{{clusterName}} cluster
+		<div class="btn-group pull-right">
+			<button id="choose-topology-to-deploy-button" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+				Deploy <span class="caret"></span> 
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li ng-repeat="topology in topologies">
+					<a ng-click="deploy(topology)">{{topology.name}}</a>
+				</li>
+			</ul>
+		</div>
+	</h2>
+	<table class="table table-hover">
+		<tbody>
+            <tr ng-repeat="state in states">
+                <td id="{{state.id}}-name">{{state.name}}</td>
+                <td id="{{state.id}}-status">{{state.status}}</td>
+                <td>
+                	<button id="undeploy-{{state.id}}" class="btn btn-danger" ng-click="undeploy(state)" ng-disabled="state.status != 'DEPLOYED'">
+						<i class="fa fa-power-off"></i>
+					</button>
+                </td>
+            </tr>
+        </tbody>
+	</table>
+</div>

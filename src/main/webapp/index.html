@@ -1,0 +1,80 @@
+<!doctype html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="img/favicon.ico" />
+<link rel="stylesheet" href="styles/bootstrap.min.css">
+<link rel="stylesheet" href="vendors/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="vendors/bootstrap-notify/bootstrap-notify.css">
+<link rel="stylesheet" href="vendors/bootstrap-switch/bootstrap-switch.css">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body ng-app="app">
+	<!--[if lt IE 9]>
+		<p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser
+		    today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better
+		    experience this site.</p>
+		<![endif]-->
+
+	<ui-include src="'views/navigation-bar.html'"></ui-include>
+	<div class="container" ng-view></div>
+	<div id="notifications" class='notifications bottom-right'></div>
+
+	<footer>
+		<p>&copy; Stormy-Pythia 2013</p>
+	</footer>
+
+	<script src="vendors/jquery/jquery.js"></script>
+	<script src="vendors/jquery/jquery-ui.js"></script>
+	<script src="vendors/jsplumb/jquery.jsPlumb-1.5.4.js"></script>
+	<script src="vendors/angular/angular.js"></script>
+	<script src="vendors/angular/angular-mocks.js"></script>
+	<script src="vendors/angular/angular-resource.min.js"></script>
+	<script src="vendors/angular/angular-route.js"></script>
+	<script src="vendors/ui-utils/include.js"></script>
+	<script src="vendors/bootstrap/bootstrap.js"></script>
+	<script src="vendors/angular-ui/ui-bootstrap-tpls-0.10.0.min.js"></script>
+	<script src="vendors/bootstrap-notify/bootstrap-notify.js"></script>
+	<script src="vendors/bootstrap-switch/bootstrap-switch.js"></script>
+
+	<script src="utils/array-utils.js"></script>
+	<script src="utils/string-utils.js"></script>
+
+	<script src="app/app.js"></script>
+
+    <script src="model/property.js"></script>
+    <script src="model/stream.js"></script>
+    <script src="model/component.js"></script>
+    <script src="model/connection.js"></script>
+    <script src="model/topology.js"></script>
+
+	<script src="resources/cluster-topology-state-resources.js"></script>
+
+	<script src="services/jsplumb-service.js"></script>
+	<script src="services/notification.js"></script>
+	
+	<script src="directives/component.js"></script>
+    <script src="directives/property-editor.js"></script>
+    <script src="directives/stream-editor.js"></script>
+    <script src="directives/switch.js"></script>
+    <script src="directives/rpattern.js"></script>
+
+	<script src="app/controllers/navigation-bar.js"></script>
+	<script src="app/controllers/edit-topology.js"></script>
+	<script src="app/controllers/list-topologies.js"></script>
+	<script src="app/controllers/edit-component.js"></script>
+	<script src="app/controllers/cluster-topology-states.js"></script>
+</body>
+</html>
