@@ -11,7 +11,7 @@ app.controller('ListTopologiesCtrl', function ($scope, $location, Topology) {
 
     $scope.deleteTopology = function() {
     	var id = this.topology.id;
-    	Topology.delete(this.topology.id, function() {
+    	Topology.delete(id).then(function() {
             $scope.refreshTopologies();
             console.log("Deleted " + id);
 		}, function() {

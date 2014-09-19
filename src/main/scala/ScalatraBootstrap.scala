@@ -5,11 +5,11 @@ import org.scalatra.LifeCycle
 import org.scalatra.servlet.ScalatraListener
 import pythia.config._
 import PythiaConfig._
-import pythia.web.resource.{ComponentResource, TopologyResource}
+import pythia.web.resource.{ComponentResource, PipelineResource}
 
 class ScalatraBootstrap extends LifeCycle with Bindings {
   override def init(context: ServletContext) {
-    context.mount(new TopologyResource, "/api/topologies")
+    context.mount(new PipelineResource, "/api/topologies")
     context.mount(new ComponentResource, "/api/components")
   }
 }

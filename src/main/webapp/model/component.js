@@ -1,11 +1,12 @@
 app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadata) {
 
-    function ComponentMetadata(name, description, properties, inputStreams, outputStreams) {
+    function ComponentMetadata(id, name, description, properties, inputs, outputs) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.properties = properties;
-        this.inputStreams = inputStreams;
-        this.outputStreams = outputStreams;
+        this.inputs = inputs;
+        this.outputs = outputs;
     };
 
     ComponentMetadata.prototype.property = function(name) {
@@ -13,20 +14,21 @@ app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadat
     };
 
     ComponentMetadata.prototype.inputStream = function(name) {
-        return $.grep(this.inputStreams, function (inputStream) { return inputStream.name == name })[0]
+        return $.grep(this.inputs, function (inputStream) { return inputStream.name == name })[0]
     };
 
     ComponentMetadata.prototype.outputStream = function(name) {
-        return $.grep(this.outputStreams, function (outputStream) { return outputStream.name == name })[0]
+        return $.grep(this.outputs, function (outputStream) { return outputStream.name == name })[0]
     };
 
     ComponentMetadata.build = function (data) {
         return new ComponentMetadata(
+            data.id,
             data.name,
             data.description,
             data.properties.map(PropertyMetadata.build),
-            data.inputStreams.map(StreamMetadata.build),
-            data.outputStreams.map(StreamMetadata.build)
+            data.inputs.map(StreamMetadata.build),
+            data.outputs.map(StreamMetadata.build)
         );
     };
 
@@ -41,14 +43,14 @@ app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadat
 
 app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 
-	function Component(metadata, id, name, inputStreams, outputStreams, properties, x, y) {
+	function Component(metadata, id, name, inputs, outputs, properties, x, y) {
 		this.metadata = metadata;
 
 		this.id = id;
 		this.name = name;
 
-		this.inputStreams = inputStreams;
-		this.outputStreams = outputStreams;
+		this.inputs = inputs;
+		this.outputs = outputs;
 		this.properties = properties;
 
 		this.x = x;
@@ -58,12 +60,12 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 	Component.build = function (data) {
 	    var metadata = ComponentMetadata.build(data.metadata);
 
-        var outputStreams = data.outputStreams.map(function(streamData) {
+        var outputs = data.outputs.map(function(streamData) {
             var streamMetadata = metadata.outputStream(streamData.name);
             return Stream.build(streamMetadata, streamData);
         });
 
-        var inputStreams = data.inputStreams.map(function(streamData) {
+        var inputs = data.inputs.map(function(streamData) {
             var streamMetadata = metadata.inputStream(streamData.name);
             return Stream.build(streamMetadata, streamData);
         });
@@ -73,25 +75,25 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 	        return Property.build(propertyMetadata, propertyData);
 	    });
 
-        return new Component(metadata, data.id, data.name, inputStreams, outputStreams, properties, data.x, data.y);
+        return new Component(metadata, data.id, data.name, inputs, outputs, properties, data.x, data.y);
     };
 
     Component.newComponent = function(metadata) {
         var id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
         var name = metadata.name;
-        var inputStreams = metadata.inputStreams.map(Stream.newStream)
-        var outputStreams = metadata.outputStreams.map(Stream.newStream)
+        var inputs = metadata.inputs.map(Stream.newStream)
+        var outputs = metadata.outputs.map(Stream.newStream)
         var properties = metadata.properties.map(Property.newProperty)
 
-        return new Component(metadata, id, name, inputStreams, outputStreams, properties, 50, 50);
+        return new Component(metadata, id, name, inputs, outputs, properties, 50, 50);
     };
 
     Component.prototype.hasInputs = function () {
-        return this.inputStreams.length > 0;
+        return this.inputs.length > 0;
     };
 
     Component.prototype.hasOutputs = function () {
-        return this.outputStreams.length > 0;
+        return this.outputs.length > 0;
     };
 
     Component.prototype.hasProperties = function () {
@@ -99,11 +101,11 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
     };
 
     Component.prototype.inputStream = function(name) {
-        return $.grep(this.inputStreams, function (inputStream) { return inputStream.name == name })[0]
+        return $.grep(this.inputs, function (inputStream) { return inputStream.name == name })[0]
     };
 
     Component.prototype.outputStream = function(name) {
-        return $.grep(this.outputStreams, function (outputStream) { return outputStream.name == name })[0]
+        return $.grep(this.outputs, function (outputStream) { return outputStream.name == name })[0]
     };
 
     return Component;

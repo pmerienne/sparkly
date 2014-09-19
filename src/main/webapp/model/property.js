@@ -12,6 +12,10 @@ app.factory('PropertyMetadata', function() {
         return new PropertyMetadata (data.name, data.defaultValue, data.propertyType, data.mandatory, data.acceptedValues);
     };
 
+    PropertyMetadata.prototype.hasLimitedValues = function() {
+        return this.acceptedValues != null && this.acceptedValues.length > 0;
+    };
+
     return PropertyMetadata;
 });
 

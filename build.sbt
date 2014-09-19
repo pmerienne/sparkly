@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze-natives" % "0.8.1",
   // Scalatra
   "org.scalatra" %% "scalatra" % "2.3.0",
+  "org.eclipse.jetty" % "jetty-server" % "8.1.8.v20121106",
   "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106",
   "org.scalatra" %% "scalatra-json" % "2.3.0",
   "org.json4s"   %% "json4s-jackson" % "3.2.9",
