@@ -1,3 +1,5 @@
+import scoverage.ScoverageSbtPlugin
+
 name := "sparkly-pythia"
 
 version := "1.0"
@@ -26,6 +28,8 @@ libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra-scalatest" % "2.3.0" % "test"
 )
 
+// Packaging
+
 packAutoSettings
 
 packMain := Map("boot" -> "Boot")
@@ -35,3 +39,7 @@ packResourceDir += (baseDirectory.value / "src/main/webapp" -> "web-content")
 packExtraClasspath := Map("boot" -> Seq("${PROG_HOME}/conf"))
 
 packJvmOpts := Map("boot" -> Seq("-Dpythia.home=${PROG_HOME}"))
+
+// Test coverage
+
+ScoverageSbtPlugin.instrumentSettings
