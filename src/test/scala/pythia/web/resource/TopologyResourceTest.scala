@@ -1,7 +1,7 @@
 package pythia.web.resource
 
 class TopologyResourceTest extends ResourceSpec {
-  addServlet(new TopologyResource(), "/topologies")
+  addServlet(new PipelineResource(), "/topologies")
 
   "Topology resource" should "find topologies" in {
     get("/topologies") {

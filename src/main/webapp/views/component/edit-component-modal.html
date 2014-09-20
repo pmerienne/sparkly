@@ -19,16 +19,16 @@
 			<tab ng-if="component.hasInputs()">
 				<tab-heading id="input-mapping-tab-heading"><i class="fa fa-link fa-lg"></i> Inputs </tab-heading>
 				
-				<form role="form" ng-repeat="inputStream in component.inputStreams" ng-show="inputStream.metadata.type != 'NONE'">
-                    <input-stream-editor stream="inputStream" component="component" topology="topology" />
+				<form role="form" ng-repeat="input in component.inputs" ng-show="input.metadata.type != 'NONE'">
+                    <input-stream-editor stream="input" component="component" topology="topology" />
 				</form>
 			</tab>
 
 			<tab ng-if="component.hasOutputs()">
 				<tab-heading id="output-mapping-tab-heading"><i class="fa fa-link fa-lg"></i> Outputs </tab-heading>
 
-				<form role="form" ng-repeat="outputStream in component.outputStreams" ng-show="outputStream.metadata.type != 'NONE'">
-                    <output-stream-editor stream="outputStream" component="component" topology="topology" />
+				<form role="form" ng-repeat="output in component.outputs" ng-show="output.metadata.type != 'NONE'">
+                    <output-stream-editor stream="output" component="component" topology="topology" />
 				</form>
 			</tab>
 		</tabset>

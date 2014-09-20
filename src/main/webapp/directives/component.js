@@ -12,6 +12,7 @@ app.directive('component', function() {
         },
         link: function (scope, element, attrs) {
         	var component = scope.model;
+        	var metadata = component.metadata;
         	var diagram = scope.$parent.diagram;
         	
         	element.attr("id", component.id);
@@ -30,14 +31,14 @@ app.directive('component', function() {
         		}
         	});
 
-			var inputStreamsCount = component.inputStreams.length;
-			var outputStreamsCount = component.outputStreams.length;
-			element.css("height", COMPONENT_BASE_SIZE + Math.max(inputStreamsCount, outputStreamsCount) * ENDPOINT_SIZE);
+			var inputsCount = metadata.inputs.length;
+			var outputsCount = metadata.outputs.length;
+			element.css("height", COMPONENT_BASE_SIZE + Math.max(inputsCount, outputsCount) * ENDPOINT_SIZE);
 
 			// Create endpoints for input streams
-			for(var i = 0; i < inputStreamsCount; i++) {
-				var inputStream = component.inputStreams[i];
-				var yOffset =  (i + 1) / (inputStreamsCount + 1);
+			for(var i = 0; i < inputsCount; i++) {
+				var inputStream = metadata.inputs[i];
+				var yOffset =  (i + 1) / (inputsCount + 1);
 				var endpointUUID = diagram.getInputStreamId(component.id, inputStream.name);
 				var e = diagram.jsPlumbInstance.addEndpoint(element, {
 					uuid: endpointUUID,
@@ -50,9 +51,9 @@ app.directive('component', function() {
 			}
 			
 			// Create endpoints for output streams
-			for(var i = 0; i < outputStreamsCount; i++) {
-				var outputStream = component.outputStreams[i];
-				var yOffset =  (i + 1) / (outputStreamsCount + 1);
+			for(var i = 0; i < outputsCount; i++) {
+				var outputStream = metadata.outputs[i];
+				var yOffset =  (i + 1) / (outputsCount + 1);
 				var endpointUUID =  diagram.getOutputStreamId(component.id, outputStream.name);
 				var e = diagram.jsPlumbInstance.addEndpoint(element, {
 					uuid:  endpointUUID,

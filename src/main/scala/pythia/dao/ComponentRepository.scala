@@ -1,5 +1,7 @@
 package pythia.dao
 
+import java.lang.reflect.Modifier
+
 import pythia.core._
 import org.reflections.Reflections
 import scala.collection.JavaConversions._
@@ -10,10 +12,11 @@ class ComponentRepository(implicit val componentBasePackage: String) {
 
   private val metadatas = reflections
     .getSubTypesOf(classOf[Component])
+    .filter(clazz => !clazz.isInterface && !Modifier.isAbstract(clazz.getModifiers()))
     .map(clazz => (clazz.getName() , clazz.newInstance.metadata))
     .toMap
 
-  def components(): Map[String, Metadata] = metadatas
+  def components(): Map[String, ComponentMetadata] = metadatas
   def component(name: String) = metadatas.get(name)
-
+  def findByClassName(name: String) = metadatas(name)
 }
