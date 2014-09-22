@@ -21,10 +21,10 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
   override def beforeEach() {
     val conf = new SparkConf()
       .setMaster("local")
-      .setAppName("Test")
+      .setAppName("test-" + this.getClass.getSimpleName)
 
     ssc = new StreamingContext(conf, Milliseconds(200))
-    ssc.checkpoint(Files.createTempDirectory("tmp").toString)
+    ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
   }
 
   override def afterEach() {

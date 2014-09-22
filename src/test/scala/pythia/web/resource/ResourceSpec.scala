@@ -2,11 +2,11 @@ package pythia.web.resource
 
 import org.scalatest._
 import org.scalatra.test.scalatest._
-import org.eclipse.jetty.server.Connector
 import pythia.config.Bindings
 
 trait ResourceSpec extends ScalatraFlatSpec with Matchers with Bindings {
 
+  /*
   override def baseUrl: String =
     server.getConnectors.headOption match {
       case Some(conn: Connector) =>
@@ -18,4 +18,5 @@ trait ResourceSpec extends ScalatraFlatSpec with Matchers with Bindings {
       case None =>
         sys.error("can't calculate base URL: no connector")
     }
+    */
 }
