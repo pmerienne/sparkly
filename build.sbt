@@ -66,3 +66,5 @@ packJvmOpts := Map("boot" -> Seq("-Dpythia.home=${PROG_HOME}"))
 // Test coverage
 
 ScoverageSbtPlugin.instrumentSettings
+
+CoverallsPlugin.coverallsSettings
