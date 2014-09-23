@@ -16,4 +16,8 @@ object PythiaConfig {
 
   val DB_DIRECTORY = DATA_DIRECTORY + "/db"
   new File(DB_DIRECTORY).mkdirs()
+
+  val SPARK_CONFIG = ConfigFactory.load().getConfig("spark")
+  val CHECKPOINTS_DIRECTORY = SPARK_CONFIG.getString("checkpoint-directory")
+  new File(CHECKPOINTS_DIRECTORY).mkdirs()
 }
