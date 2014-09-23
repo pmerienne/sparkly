@@ -15,7 +15,7 @@ class PropertySpec extends FlatSpec with Matchers {
     Property("STRING", selectedValue = Some("bar")).as[String] should be ("bar")
     Property("INTEGER",selectedValue = Some("42")).as[Int] should be (42)
     Property("DECIMAL", selectedValue = Some("0.25")).as[Double] should be (0.25)
-    Property("DATE", selectedValue = Some("1610-07-10")).as[Date].getTime should be (-11344061361000L)
+    Property("DATE", selectedValue = Some("1610-07-10T00:00:00.000+00:00")).as[Date].getTime should be (-11344060800000L)
     Property("BOOLEAN", selectedValue = Some("true")).as[Boolean] should be (true)
   }
 

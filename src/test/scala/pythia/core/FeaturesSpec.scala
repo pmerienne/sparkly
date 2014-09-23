@@ -28,7 +28,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(Some("42.42")).as[Double] should be (42.42)
     Feature(Some("42")).as[Int] should be (42)
     Feature(Some("42")).as[Long] should be (42L)
-    Feature(Some("1610-07-10")).as[Date].getTime should be (-11344061361000L)
+    Feature(Some("1610-07-10T00:00:00.000+00:00")).as[Date].getTime should be (-11344060800000L)
     Feature(Some("true")).as[Boolean] should be (true)
   }
 
