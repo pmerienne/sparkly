@@ -1,7 +1,14 @@
 package pythia.component
 
+import org.apache.spark.Logging
+import org.apache.spark.rdd.RDD
+import org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK_2
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.receiver.Receiver
 import pythia.core._
+
+import scala.collection.mutable
+import scala.io.Source
 
 class CsvSource extends Component {
 
@@ -22,7 +29,9 @@ class CsvSource extends Component {
 
     val featureNames = context.outputMappers("Instances").featuresNames("Features")
 
-    val stream = context.ssc.textFileStream(file)
+    val queue = new mutable.SynchronizedQueue[RDD[String]]()
+    val fileStream = context.ssc.queueStream(queue)
+    val stream = fileStream
       .map(line => line.split(separator).toList)
       .map(values => {
         val entries = values.zipWithIndex
@@ -33,6 +42,20 @@ class CsvSource extends Component {
         Instance(entries)
       })
 
+    val lines = Source.fromFile(file).getLines().toList
+    queue += context.ssc.sparkContext.makeRDD(lines)
+
     Map("Instances" -> stream)
   }
+}
+
+class CustomReceiver(filename: String) extends Receiver[String](MEMORY_AND_DISK_2) with Logging {
+
+  def onStart() {
+    Source.fromFile(filename).getLines().foreach(line => store(line))
+  }
+
+  def onStop() {
+  }
+
 }
