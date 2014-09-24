@@ -1,12 +1,13 @@
 package pythia.core
 
+import java.nio.file.Files
+
 import org.apache.spark.streaming._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 import pythia.component.classifier.Perceptron
 import pythia.component.{CsvSource, Normalizer}
-import pythia.core._
 import pythia.testing._
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
@@ -64,7 +65,7 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
     // System init
     val ssc = new StreamingContext("local", "Test", Seconds(1))
-    ssc.checkpoint("/tmp")
+    ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
 
     val availableStreams = pipeline.build(ssc)
     val accuracies = InspectedStream(availableStreams(("perceptron" ,"Accuracy")))
