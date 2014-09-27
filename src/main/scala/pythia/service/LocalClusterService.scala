@@ -32,7 +32,7 @@ class LocalClusterService(implicit val pipelineRepository: PipelineRepository) {
       val ssc = streamingContext.get
       try {
         ssc.stop(stopSparkContext = false, stopGracefully = stopGracefully)
-        ssc.awaitTermination()
+        ssc.awaitTermination(5000)
         streamingContext = None
       } catch {
         case e: Exception => println("Unable to stop streaming context")  // TODO : should log!!

@@ -51,4 +51,5 @@ case class OutputStreamMetadataModel(name: String, from: Option[String] = None, 
 
 case class PropertyConfigurationModel(name: String, value: String)
 
-case class ClusterStatusModel(action: String, time: Option[Date], pipeline: Option[PipelineConfigurationModel])
+case class ClusterModel(id: String, name: String, status: ClusterStatusModel)
+case class ClusterStatusModel(state: String, time: Option[Date], pipeline: Option[PipelineConfigurationModel])

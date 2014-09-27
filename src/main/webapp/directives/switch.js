@@ -10,7 +10,7 @@ app.directive('switch', function() {
 			// element.attr("data-off-text", "<i class='fa fa-times'></i>");
 			element.attr("data-on-text", "ON");
 			element.attr("data-off-text", "OFF");
-			element.attr("checked", scope.property.value);
+			element.attr("checked", scope.property.value == "true");
 
 			$(element).bootstrapSwitch();
 			$(element).on('switchChange', function(e, data) {

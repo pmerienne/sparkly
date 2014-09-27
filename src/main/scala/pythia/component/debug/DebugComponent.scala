@@ -1,4 +1,4 @@
-package pythia.testing.component
+package pythia.component.debug
 
 import org.apache.spark.streaming.dstream.DStream
 import pythia.core._
@@ -9,6 +9,9 @@ class DebugComponent extends Component {
     name = "Debug",
     inputs = Map[String, InputStreamMetadata] (
       "Input" -> InputStreamMetadata(listedFeatures = List("Features"))
+    ),
+    properties = Map (
+      "Log component name" -> PropertyMetadata("BOOLEAN", defaultValue = Some(true))
     )
   )
 

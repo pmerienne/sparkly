@@ -8,7 +8,7 @@ import pythia.core._
 import pythia.dao._
 import pythia.service.ClusterState._
 import pythia.testing.SpamData
-import pythia.testing.component.DebugComponent
+import pythia.component.debug.DebugComponent
 
 class LocalClusterServiceSpec  extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach with BeforeAndAfterAll {
 

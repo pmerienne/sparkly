@@ -102,7 +102,7 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
   )
   
   def convert(status: ClusterStatus): ClusterStatusModel = ClusterStatusModel (
-    action = status.action.toString,
+    state = status.action.toString,
     time = status.time,
     pipeline = status.pipeline.map(pipeline => convert(pipeline))
   )

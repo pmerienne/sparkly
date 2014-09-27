@@ -60,20 +60,20 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 	Component.build = function (data) {
 	    var metadata = ComponentMetadata.build(data.metadata);
 
-        var outputs = data.outputs.map(function(streamData) {
-            var streamMetadata = metadata.outputStream(streamData.name);
-            return Stream.build(streamMetadata, streamData);
+        var outputs = metadata.outputs.map(function(streamMetadata) {
+            var streamData = data.outputs.tryFind(function(output){return output.name == streamMetadata.name});
+            return streamData == null ? Stream.newStream(streamMetadata) : Stream.build(streamMetadata, streamData);
         });
 
-        var inputs = data.inputs.map(function(streamData) {
-            var streamMetadata = metadata.inputStream(streamData.name);
-            return Stream.build(streamMetadata, streamData);
+        var inputs = metadata.inputs.map(function(streamMetadata) {
+            var streamData = data.inputs.tryFind(function(input){return input.name == streamMetadata.name});
+            return streamData == null ? Stream.newStream(streamMetadata) : Stream.build(streamMetadata, streamData);
         });
 
-	    var properties = data.properties.map(function(propertyData) {
-	        var propertyMetadata = metadata.property(propertyData.name);
-	        return Property.build(propertyMetadata, propertyData);
-	    });
+        var properties = metadata.properties.map(function(propertyMetadata) {
+            var propertyData = data.properties.tryFind(function(property){return property.name == propertyMetadata.name});
+            return propertyData == null ? Property.newProperty(propertyMetadata) : Property.build(propertyMetadata, propertyData);
+        });
 
         return new Component(metadata, data.id, data.name, inputs, outputs, properties, data.x, data.y);
     };
