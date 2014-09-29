@@ -1,23 +1,26 @@
 package pythia.dao
 
 import org.scalatest._
-import pythia.core._
+import pythia.testing.component.{TestClassifier, TestComponent}
 
 class ComponentRepositorySpec extends FlatSpec with Matchers {
 
-  implicit val componentBasePackage = "pythia.dao.component"
+  implicit val componentBasePackage = "pythia.testing.component"
+
+  val testComponentMetadata = new TestComponent().metadata
+  val testClassifierMetadata = new TestClassifier().metadata
 
   "Component repository" should "load component's metadata" in {
     val repository = new ComponentRepository()
 
     repository.components() should contain only (
-      "pythia.dao.component.TestClassifier" -> ComponentMetadata("Test classifier", "Only for test purpose"),
-      "pythia.dao.component.TestComponent" -> ComponentMetadata("Test component", "Only for test purpose")
+      "pythia.testing.component.TestClassifier" -> testClassifierMetadata,
+      "pythia.testing.component.TestComponent" -> testComponentMetadata
     )
   }
 
   "Component repository" should "load component metadata" in {
     val repository = new ComponentRepository()
-    repository.component("pythia.dao.component.TestClassifier").get should equal(ComponentMetadata("Test classifier", "Only for test purpose"))
+    repository.component("pythia.testing.component.TestClassifier").get should equal(testClassifierMetadata)
   }
 }

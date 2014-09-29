@@ -2,7 +2,7 @@ package pythia.web.model
 
 import pythia.core._
 import pythia.dao.ComponentRepository
-import pythia.service.ClusterStatus
+import pythia.service.{ValidationMessage, ValidationReport, ClusterStatus}
 
 class ModelMapper(implicit val componentRepository: ComponentRepository) {
 
@@ -105,5 +105,14 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     state = status.action.toString,
     time = status.time,
     pipeline = status.pipeline.map(pipeline => convert(pipeline))
+  )
+
+  def convert(report: ValidationReport): ValidationReportModel = ValidationReportModel (
+    messages = report.messages.map(message => convert(message))
+  )
+
+  def convert(message: ValidationMessage): ValidationMessageModel = ValidationMessageModel (
+    text = message.text,
+    level = message.level.toString
   )
 }

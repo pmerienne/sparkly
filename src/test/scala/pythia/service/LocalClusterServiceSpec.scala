@@ -13,6 +13,7 @@ import pythia.component.debug.DebugComponent
 class LocalClusterServiceSpec  extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach with BeforeAndAfterAll {
 
   implicit val pipelineRepository = mock[PipelineRepository]
+  implicit val pipelineValidationService = mock[PipelineValidationService]
   val localClusterService: LocalClusterService = new LocalClusterService()
 
   override def afterEach(): Unit = {
@@ -26,6 +27,7 @@ class LocalClusterServiceSpec  extends FlatSpec with Matchers with MockitoSugar 
   "Local cluster" should "deploy pipeline" in {
     // Given
     when(pipelineRepository.get("pipeline1")).thenReturn(Some(pipeline))
+    when(pipelineValidationService.validate(pipeline)).thenReturn(ValidationReport())
 
     // When
     localClusterService.deploy("pipeline1", false)
@@ -38,9 +40,25 @@ class LocalClusterServiceSpec  extends FlatSpec with Matchers with MockitoSugar 
     localClusterService.streamingContext should not be empty
   }
 
+  "Local cluster" should "not deploy pipeline when not valid" in {
+    // Given
+    when(pipelineRepository.get("pipeline1")).thenReturn(Some(pipeline))
+    when(pipelineValidationService.validate(pipeline)).thenReturn(ValidationReport(List(ValidationMessage("", MessageLevel.Error))))
+
+    // When
+    intercept[IllegalArgumentException] {
+      localClusterService.deploy("pipeline1", false)
+    }
+
+    // Then
+    val state = localClusterService.status
+    state.action should be (Stopped)
+  }
+
   "Local cluster" should "redeploy pipeline" in {
     // Given
     when(pipelineRepository.get("pipeline1")).thenReturn(Some(pipeline))
+    when(pipelineValidationService.validate(pipeline)).thenReturn(ValidationReport())
     localClusterService.deploy("pipeline1", false)
 
     // When

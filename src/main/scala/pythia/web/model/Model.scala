@@ -53,3 +53,6 @@ case class PropertyConfigurationModel(name: String, value: String)
 
 case class ClusterModel(id: String, name: String, status: ClusterStatusModel)
 case class ClusterStatusModel(state: String, time: Option[Date], pipeline: Option[PipelineConfigurationModel])
+
+case class ValidationReportModel(messages: List[ValidationMessageModel] = List())
+case class ValidationMessageModel(text: String, level: String)

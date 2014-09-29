@@ -8,7 +8,9 @@ import pythia.config.PythiaConfig._
 import pythia.core.{Pipeline, PipelineConfiguration}
 import pythia.dao.PipelineRepository
 
-class LocalClusterService(implicit val pipelineRepository: PipelineRepository) {
+class LocalClusterService(
+  implicit val pipelineValidationService: PipelineValidationService,
+  implicit val pipelineRepository: PipelineRepository) {
 
   val sparkContext = new SparkContext("local", "pythia")
   var streamingContext: Option[StreamingContext] = None
@@ -19,9 +21,17 @@ class LocalClusterService(implicit val pipelineRepository: PipelineRepository) {
     pipelineRepository.get(pipelineId) match {
       case None => throw new IllegalArgumentException("Pipeline with id " + pipelineId + " does not exists")
       case Some(pipeline) => {
+        check(pipeline)
         stop(stopGracefully)
         start(pipeline)
       }
+    }
+  }
+
+  def check(pipeline: PipelineConfiguration): Unit = {
+    val report = pipelineValidationService.validate(pipeline)
+    if(report.containsErrors) {
+      throw new IllegalArgumentException(s"Pipeline with id ${pipeline.id} is not valid. Validation report : \n${report}")
     }
   }
 
