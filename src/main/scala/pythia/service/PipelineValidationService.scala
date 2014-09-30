@@ -36,7 +36,7 @@ class ComponentValidator(implicit val componentRepository: ComponentRepository) 
       .map{case (name, metadata) => (name, metadata, componentConfiguration.properties.get(name))}
       .filter{case (name, metadata, value) =>
         val property = Property(metadata, value)
-        Try(property.as[Double]).isFailure
+        Try(property.get).isFailure
       }
       .map{case (name, metadata, value) => ValidationMessage(s"'${name}' property of '${componentName}' component is a ${metadata.propertyType} property. Value '${value.getOrElse(null)}' is not supported.", MessageLevel.Error)}
 
@@ -72,5 +72,5 @@ case class ValidationMessage(text: String, level: MessageLevel)
 
 object MessageLevel extends Enumeration {
   type MessageLevel = Value
-  val Info, Warning, Error = Value
+  val Warning, Error = Value
 }

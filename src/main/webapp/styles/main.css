@@ -19,6 +19,12 @@ body {
 	border: 1px solid #e3e3e3;
 }
 
+footer {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
 /** DISABLE TEXT SELECTION (SET ON BODY WHEN DRAGGING IS OCCURRING) **/
 .jsplumb-container * {
 	-webkit-touch-callout: none;
@@ -33,6 +39,17 @@ body {
 	position: absolute;
 	top: 5px;
 	left: 5px;
+}
+
+.validation-report-panel {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	width: 100%;
+}
+
+.validation-report-messages {
+    width: 100%;
 }
 
 .diagram-component {
