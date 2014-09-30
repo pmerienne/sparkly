@@ -3,7 +3,7 @@ package pythia.dao
 import org.scalatest._
 import pythia.core._
 
-class ComponentRepositoryTest extends FlatSpec with Matchers {
+class ComponentRepositorySpec extends FlatSpec with Matchers {
 
   implicit val componentBasePackage = "pythia.dao.component"
 

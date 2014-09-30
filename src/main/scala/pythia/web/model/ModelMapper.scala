@@ -2,8 +2,7 @@ package pythia.web.model
 
 import pythia.core._
 import pythia.dao.ComponentRepository
-
-import scala.util.Random
+import pythia.service.ClusterStatus
 
 class ModelMapper(implicit val componentRepository: ComponentRepository) {
 
@@ -100,5 +99,11 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
   def convert(connection: ConnectionModel): ConnectionConfiguration = ConnectionConfiguration (
     from = ConnectionPoint(connection.from.component, connection.from.stream),
     to = ConnectionPoint(connection.to.component, connection.to.stream)
+  )
+  
+  def convert(status: ClusterStatus): ClusterStatusModel = ClusterStatusModel (
+    state = status.action.toString,
+    time = status.time,
+    pipeline = status.pipeline.map(pipeline => convert(pipeline))
   )
 }

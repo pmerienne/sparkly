@@ -22,3 +22,12 @@ Array.prototype.pushAll = function() {
         }
     }
 }
+
+Array.prototype.tryFind = function(predicate) {
+    var values = $.grep(this, predicate );
+    return values.isEmpty() ? null : values[0];
+}
+
+Array.prototype.isEmpty = function() {
+    return !this.length > 0;
+}

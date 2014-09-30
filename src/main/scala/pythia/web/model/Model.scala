@@ -1,5 +1,7 @@
 package pythia.web.model
 
+import java.util.Date
+
 case class PipelineConfigurationModel (
   id: String,
   name: String,
@@ -48,3 +50,6 @@ case class InputStreamMetadataModel(name: String, namedFeatures: List[String] = 
 case class OutputStreamMetadataModel(name: String, from: Option[String] = None, namedFeatures: List[String] = List(), listedFeatures: List[String] = List())
 
 case class PropertyConfigurationModel(name: String, value: String)
+
+case class ClusterModel(id: String, name: String, status: ClusterStatusModel)
+case class ClusterStatusModel(state: String, time: Option[Date], pipeline: Option[PipelineConfigurationModel])

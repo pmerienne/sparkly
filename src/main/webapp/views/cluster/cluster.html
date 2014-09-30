@@ -1,0 +1,26 @@
+<div>
+    <div>
+        <h3>
+            {{cluster.name}} cluster
+            <span class="pull-right btn-group">
+                <button type="button" class="btn btn-{{stateCss}} btn-lg">
+                    {{cluster.status.state}}
+                </button>
+                <button type="button" class="btn btn-{{stateCss}} btn-lg dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                <ul class="dropdown-menu dropdown-inverse" role="menu">
+                    <li ng-class="{'disabled' : !cluster.isRunning()}">
+                        <a ng-click="cluster.stop()">Stop {{topology.name}}</a>
+                    <li ng-repeat="topology in topologies" ng-class="{'disabled' : !cluster.isReadyToDeploy()}">
+                        <a ng-click="deploy(topology)">Deploy {{topology.name}}</a>
+                    </li>
+                </ul>
+            </span>
+        </h3>
+    </div>
+
+
+</div>
