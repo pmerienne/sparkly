@@ -1,9 +1,18 @@
 app.controller('EditTopologyCtrl', function($scope, $location, $route, $routeParams, $modal,
-		NotificationService, JsPlumbService, Topology, Component, ComponentMetadata) {
+		NotificationService, JsPlumbService, Topology, Component, ComponentMetadata, ValidationReport) {
 
 	var REDRAW_TIMEOUT = 50;
 
 	$scope.topology = {};
+	$scope.validationReport = new ValidationReport([]);
+
+	$scope.validate = function() {
+	    Topology.validate($scope.topology).then(function(report) {
+    	    $scope.validationReport = report;
+        }, function(error) {
+            NotificationService.notify("Unable to validate topology", "danger");
+        });
+	};
 
 	$scope.displayTopology = function(topology) {
 		$scope.topology = topology;
@@ -13,6 +22,8 @@ app.controller('EditTopologyCtrl', function($scope, $location, $route, $routePar
 			$scope.diagram.bindTopologyConnections($scope.topology);
 			$scope.redraw();
 		}, REDRAW_TIMEOUT);
+
+		$scope.validate();
 	};
 
     Topology.findById($routeParams.topologyId).then(function(topology) {
@@ -41,6 +52,7 @@ app.controller('EditTopologyCtrl', function($scope, $location, $route, $routePar
 			} else {
 				console.log("'" + component.name + "' saved");
 			}
+			$scope.validate();
 		}, function(component) {
 			// Edition canceled
 		});
@@ -74,6 +86,7 @@ app.controller('EditTopologyCtrl', function($scope, $location, $route, $routePar
 		var component = Component.newComponent(metadata);
 		$scope.topology.components.push(component);
 		$scope.redraw(true);
+		$scope.validate();
 	};
 
 	$scope.redraw = function(deffered) {

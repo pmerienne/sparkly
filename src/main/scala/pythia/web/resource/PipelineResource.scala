@@ -16,7 +16,7 @@ class PipelineResource(
   get("/:id") {
     val id = params("id")
     pipelineRepository.get(id) match {
-      case Some(topology) => modelMapper.convert(topology)
+      case Some(pipeline) => modelMapper.convert(pipeline)
       case None => halt(404)
     }
   }
@@ -27,8 +27,8 @@ class PipelineResource(
   }
 
   put("/") {
-    val topology = parsedBody.extract[PipelineConfigurationModel]
-    pipelineRepository.store(topology.id, modelMapper.convert(topology))
+    val pipeline = parsedBody.extract[PipelineConfigurationModel]
+    pipelineRepository.store(pipeline.id, modelMapper.convert(pipeline))
   }
 
 }

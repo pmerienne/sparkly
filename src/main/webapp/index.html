@@ -30,7 +30,8 @@
 		<![endif]-->
 
 	<ui-include src="'views/navigation-bar.html'"></ui-include>
-	<div class="container" ng-view></div>
+	<div class="container-fluid" ng-view></div>
+    <ui-include src="'views/footer.html'"></ui-include>
 	<div id="notifications" class='notifications bottom-right'></div>
 
 	<script src="vendors/jquery/jquery.js"></script>
@@ -41,7 +42,8 @@
 	<script src="vendors/angular/angular-resource.min.js"></script>
 	<script src="vendors/angular/angular-route.js"></script>
 	<script src="vendors/ui-utils/include.js"></script>
-	<script src="vendors/bootstrap/bootstrap.js"></script>
+    <script src="vendors/bootstrap/bootstrap.js"></script>
+    <script src="vendors/bootstrap/collapse.js"></script>
 	<script src="vendors/angular-ui/ui-bootstrap-tpls-0.10.0.min.js"></script>
 	<script src="vendors/bootstrap-notify/bootstrap-notify.js"></script>
     <script src="vendors/bootstrap-switch/bootstrap-switch.js"></script>

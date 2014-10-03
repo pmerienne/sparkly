@@ -82,7 +82,7 @@ case class Property (
   def isDefined(): Boolean = selectedValue.isDefined || defaultValue.isDefined
   def isEmpty(): Boolean = selectedValue.isEmpty
 
-  private def get(): Any = selectedValue match {
+  def get(): Any = selectedValue match {
     case None => defaultValue.getOrElse(null)
     case Some(str: String) => propertyType match {
       case "DECIMAL" => str.toDouble

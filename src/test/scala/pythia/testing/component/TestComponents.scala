@@ -1,4 +1,4 @@
-package pythia.dao.component
+package pythia.testing.component
 
 import org.apache.spark.streaming.dstream.DStream
 import pythia.core._

@@ -1,4 +1,4 @@
-app.factory('Topology', function($http, Component, Connection) {
+app.factory('Topology', function($http, Component, Connection, ValidationReport) {
 
     function Topology(id, name, components, connections) {
         this.id = id;
@@ -36,6 +36,12 @@ app.factory('Topology', function($http, Component, Connection) {
         return $http.put('api/topologies/' , this);
     };
 
+    Topology.validate = function(topology) {
+        return $http.post('api/pipeline-validation', topology).then(function(report) {
+            return ValidationReport.build(report.data);
+        });
+    };
+
     Topology.prototype.retrieveAvailableFeatures = function(component, stream) {
         var self = this;
         var features = [];
@@ -69,8 +75,43 @@ app.factory('Topology', function($http, Component, Connection) {
     };
 
     Topology.prototype.component = function(componentId) {
-        return $.grep(this.components, function (component) { return component.id == componentId})[0]
+        return $.grep(this.components, function (component) { return component.id == componentId})[0];
     };
 
     return Topology;
+});
+
+app.factory('ValidationReport', function(ValidationMessage) {
+
+    function ValidationReport(messages) {
+        this.messages = messages;
+        this.errorCount = $.grep(this.messages, function (message) { return message.level == "Error"}).length;
+        this.warningCount = $.grep(this.messages, function (message) { return message.level == "Warning"}).length;
+    }
+
+    ValidationReport.build = function (data) {
+        var messages = data.messages.map(ValidationMessage.build)
+        return new ValidationReport(messages);
+    };
+
+    ValidationReport.prototype.isEmpty = function() {
+        return this.messages.length <= 0;
+    };
+
+    return ValidationReport;
+});
+
+
+app.factory('ValidationMessage', function() {
+
+    function ValidationMessage(level, text) {
+        this.level = level;
+        this.text = text;
+    }
+
+    ValidationMessage.build = function (data) {
+        return new ValidationMessage(data.level, data.text);
+    };
+
+    return ValidationMessage;
 });

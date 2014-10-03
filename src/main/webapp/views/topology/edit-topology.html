@@ -63,7 +63,21 @@
 				</div>
 			</div>
 		</div>
+
+
+        <div class="validation-report-panel">
+            <span class="label label-warning clickable" ng-if="!validationReport.isEmpty()" data-toggle="collapse" data-target="#validation-report-messages">
+                {{validationReport.warningCount}} warnings, {{validationReport.errorCount}} errors
+                <i class="fa fa-warning"></i>
+            </span>
+            <div id="validation-report-messages" class="collapse validation-report-messages bg-warning">
+                <div ng-repeat="message in validationReport.messages">
+                    {{message.level}} : {{message.text}}
+                </div>
+            </div>
+        </div>
 		
 		<component model="component" ng-repeat="component in topology.components" ng-click="editComponent(component)"></component>
 	</div>
+
 </div>
