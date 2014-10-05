@@ -21,7 +21,7 @@ app.controller('ListTopologiesCtrl', function ($scope, $location, Topology) {
     
     $scope.createNewTopology = function() {
         var id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
-        var topology = new Topology(id, "New topology", [], []);
+        var topology = new Topology(id, "New topology", "", [], []);
         topology.save().then(function() {
     		$location.path("topologies/" + id);
 		});

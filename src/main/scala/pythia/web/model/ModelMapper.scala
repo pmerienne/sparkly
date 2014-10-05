@@ -9,6 +9,7 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
   def convert(pipeline: PipelineConfiguration): PipelineConfigurationModel =  PipelineConfigurationModel (
     id = pipeline.id,
     name = pipeline.name,
+    description = pipeline.description,
     components = pipeline.components.map(convert),
     connections = pipeline.connections.map(convert)
   )
@@ -74,6 +75,7 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
   def convert(pipeline: PipelineConfigurationModel): PipelineConfiguration =  PipelineConfiguration (
     id = pipeline.id,
     name = pipeline.name,
+    description = pipeline.description,
     components = pipeline.components.map(convert),
     connections = pipeline.connections.map(convert)
   )

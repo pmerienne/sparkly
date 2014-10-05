@@ -4,7 +4,7 @@ import scala.util.Random
 
 case class PipelineConfiguration (
   id: String = Random.nextString(10),
-  name: String,
+  name: String, description: String = "",
   components: List[ComponentConfiguration] = List(),
   connections: List[ConnectionConfiguration] = List()
 )

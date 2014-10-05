@@ -2,6 +2,14 @@ String.prototype.removeSpaces = function() {
 	return this.replace(/\s+/g, '');
 };
 
+String.prototype.removeDots = function() {
+	return this.replace(/\./g, '');
+};
+
+String.prototype.toId = function() {
+    return this.removeDots().removeSpaces();
+}
+
 String.prototype.hashCode = function(){
 	var hash = 0;
     if (this.length == 0) return hash;

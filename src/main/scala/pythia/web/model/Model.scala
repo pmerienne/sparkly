@@ -5,6 +5,7 @@ import java.util.Date
 case class PipelineConfigurationModel (
   id: String,
   name: String,
+  description: String,
   components: List[ComponentConfigurationModel] = List(),
   connections: List[ConnectionModel] = List()
 )
