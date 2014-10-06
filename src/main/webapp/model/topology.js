@@ -1,8 +1,9 @@
 app.factory('Topology', function($http, Component, Connection, ValidationReport) {
 
-    function Topology(id, name, components, connections) {
+    function Topology(id, name, description, components, connections) {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.components = components;
         this.connections = connections;
     };
@@ -11,6 +12,7 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
         return new Topology(
             data.id,
             data.name,
+            data.description,
             data.components.map(Component.build),
             data.connections.map(Connection.build)
         );

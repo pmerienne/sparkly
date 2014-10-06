@@ -1,9 +1,10 @@
 app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadata) {
 
-    function ComponentMetadata(id, name, description, properties, inputs, outputs) {
+    function ComponentMetadata(id, name, description, category, properties, inputs, outputs) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.category = category;
         this.properties = properties;
         this.inputs = inputs;
         this.outputs = outputs;
@@ -26,6 +27,7 @@ app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadat
             data.id,
             data.name,
             data.description,
+            data.category,
             data.properties.map(PropertyMetadata.build),
             data.inputs.map(StreamMetadata.build),
             data.outputs.map(StreamMetadata.build)

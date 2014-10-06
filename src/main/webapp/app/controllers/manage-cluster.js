@@ -20,7 +20,6 @@ app.controller('ManageClusterCtrl', function($scope, $route, $location, $routePa
         $scope.cluster.deploy(topology.id).then(function(success) {
             NotificationService.notify("Topology " + topology.name + " deployed on " + $scope.cluster.name);
          }, function(error) {
-            console.log(error);
             NotificationService.notify("Unable to deploy topology " + topology.name + " on " + $scope.cluster.name, "danger");
          });
     };

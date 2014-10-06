@@ -29,10 +29,47 @@ header {
 	border: 1px solid #e3e3e3;
 }
 
+.component-list {
+    overflow: auto;
+    height: 750px;
+}
+
+.component-list .panel-body {
+    padding: 0px;
+}
+
+.component-list .list-group {
+    margin: 0px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: -moz-none;
+	-ms-user-select: none;
+	user-select: none
+}
+
 footer {
     position: absolute;
     bottom: 0px;
     width: 100%;
+}
+
+.nav, .pagination, .carousel, .panel-title a {
+    cursor: pointer;
+}
+
+#add-component-panel {
+    position: absolute;
+    width: 100%;
+    height: 750px;
+    z-index: 9999999;
+}
+
+.glow {
+    box-shadow: 2px 2px 19px #e0e0e0;
+    -o-box-shadow: 2px 2px 19px #e0e0e0;
+    -webkit-box-shadow: 2px 2px 19px #e0e0e0;
+    -moz-box-shadow: 2px 2px 19px #e0e0e0;
 }
 
 /** DISABLE TEXT SELECTION (SET ON BODY WHEN DRAGGING IS OCCURRING) **/

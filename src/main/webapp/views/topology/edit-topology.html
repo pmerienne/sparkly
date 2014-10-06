@@ -1,83 +1,73 @@
-<div class="container-fluid">
-	<form class="form-inline" role="form" style="margin: 10px">
-		<div class="form-group">
-			<input id="topology-name-input" class="form-control input-lg" ng-model="topology.name" placeholder="Topology's name"/>
-		</div>
+<div>
+    <header>
+        <form class="form-inline" role="form" style="margin: 10px">
+            <div class="form-group">
+                <input id="topology-name-input" class="form-control input-lg" ng-model="topology.name" placeholder="Topology's name"/>
 
-		<div class="pull-right">
-			<button id="delete-topology" class="btn btn-danger" ng-click="remove()">
-				<i class="fa fa-trash-o fa-2x"></i>
-			</button>
-			<button id="revert-change" class="btn" ng-click="revert()">
-				<i class="fa fa-undo fa-2x"></i>
-			</button>
-			<button id="save-topology" class="btn btn-primary" ng-click="save()">
-				<i class="fa fa-save fa-2x"></i>
-			</button>
-		</div>
-	</form>
-
-	<div id="jsplumb-container" class="jsplumb-container">
-		<div class="diagram-toolbar btn-toolbar pull-right" role="toolbar">
-			<!--  Components : STREAM_SOURCE-->
-			<div class="btn-group">
-				<div class="btn-group">
-					<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-						Stream source <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li ng-repeat="description in streamSourcesDescriptions"><a ng-click="addNewComponent(description)">{{description.name}}</a></li>
-					</ul>
-				</div>
-			</div>
-
-			<!-- Components : LEARNER, NO_TYPE, ANALYTICS-->
-			<div class="btn-group">
-				<div class="btn-group">
-					<div class="btn-group">
-						<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-							Learner <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li ng-repeat="description in learnersDescriptions"><a ng-click="addNewComponent(description)">{{description.name}}</a></li>
-						</ul>
-					</div>
-
-					<div class="btn-group">
-						<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-							Analytics <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li ng-repeat="description in analyticsDescriptions"><a ng-click="addNewComponent(description)">{{description.name}}</a></li>
-						</ul>
-					</div>
-
-					<div class="btn-group">
-						<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-							Other <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li ng-repeat="description in othersDescriptions"><a ng-click="addNewComponent(description)">{{description.name}}</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-        <div class="validation-report-panel">
-            <span class="label label-warning clickable" ng-if="!validationReport.isEmpty()" data-toggle="collapse" data-target="#validation-report-messages">
-                {{validationReport.warningCount}} warnings, {{validationReport.errorCount}} errors
-                <i class="fa fa-warning"></i>
-            </span>
-            <div id="validation-report-messages" class="collapse validation-report-messages bg-warning">
-                <div ng-repeat="message in validationReport.messages">
-                    {{message.level}} : {{message.text}}
+                <div class="btn-group">
+                    <button id="launch-topology" class="btn btn-primary" ng-click="launch('local')">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <!--
+                    <button id="debug-topology" class="btn btn-warning" ng-click="launch()">
+                        <i class="fa fa-bug"></i>
+                    </button>
+                    -->
                 </div>
             </div>
+
+            <div class="pull-right">
+                <div class="btn-group">
+                    <button id="delete-topology" class="btn btn-danger" ng-click="remove()">
+                        <i class="fa fa-trash-o fa-2x"></i>
+                    </button>
+                    <button id="revert-change" class="btn" ng-click="revert()">
+                        <i class="fa fa-undo fa-2x"></i>
+                    </button>
+                    <button id="save-topology" class="btn btn-primary" ng-click="save()">
+                        <i class="fa fa-save fa-2x"></i>
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </header>
+
+
+
+    <div class="container-fluid">
+        <div class="col-xs-12 col-sm-6 col-md-8" style="padding-right:0px;">
+            <div id="add-component-panel" class="ng-hide" />
+            <div id="jsplumb-container" class="jsplumb-container">
+                <div class="validation-report-panel">
+                    <span class="label label-warning clickable" ng-if="!validationReport.isEmpty()" data-toggle="collapse" data-target="#validation-report-messages">
+                        {{validationReport.warningCount}} warnings, {{validationReport.errorCount}} errors
+                        <i class="fa fa-warning"></i>
+                    </span>
+                    <div id="validation-report-messages" class="collapse validation-report-messages bg-warning">
+                        <div ng-repeat="message in validationReport.messages">
+                            {{message.level}} : {{message.text}}
+                        </div>
+                    </div>
+                </div>
+
+                <component model="component" ng-repeat="component in topology.components" ng-click="editComponent(component)"></component>
+            </div>
         </div>
-		
-		<component model="component" ng-repeat="component in topology.components" ng-click="editComponent(component)"></component>
-	</div>
+
+        <div class="col-xs-6 col-md-4 component-list" style="padding-left:0px;">
+            <accordion close-others="false">
+                <accordion-group ng-repeat="(category, metadataList) in metadataByCategories" heading="{{category}}">
+                    <ul class="list-group">
+                        <li ng-repeat="metadata in metadataList"
+                            id="{{metadata.id.toId()}}" metadata-id="{{metadata.id}}" class="list-group-item"
+                            popover-placement="bottom" popover-trigger="mouseenter" popover="{{metadata.description}}">
+                            {{metadata.name}}
+                        </li>
+                    </ul>
+                </accordion-group>
+            </accordion>
+        </div>
+    </div>
 
 </div>
