@@ -1,17 +1,24 @@
 <div>
 	<h3>Topologies</h3>
 
-	<table class="table table-hover">
-		<tbody>
-            <tr ng-repeat="topology in topologies">
-                <td id="topology-{{topology.id}}-name">{{topology.name}}</td>
-                <td>
-                	<a id="edit-topology-{{topology.id}}" ng-href="#/topologies/{{topology.id}}"><i class="fa fa-edit fa-lg"></i></a>
-                	<i id="delete-topology-{{topology.id}}" class="fa fa-trash-o fa-lg clickable" ng-click="deleteTopology();"></i>
-               	</td>
-            </tr>
-        </tbody>
-	</table>
+    <div class="row">
+        <div class="col-xs-2" ng-repeat="topology in topologies" style="margin-bottom: 10px;">
+            <div class="tile">
+                <h3 class="tile-title">{{topology.name}}</h3>
+                <p>{{topology.description}}</p>
+
+                <a class="btn btn-primary" ng-href="#/topologies/{{topology.id}}">
+                    <i class="fa fa-edit fa-lg"></i>
+                </a>
+                <a class="btn btn-danger" ng-click="deleteTopology();">
+                    <i class="fa fa-trash-o fa-lg"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <br />
 	
 	<button id="create-new-topology" class="btn btn-primary" ng-click="createNewTopology();">
 		<i class="fa fa-plus"></i> Create new
