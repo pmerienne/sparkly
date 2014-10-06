@@ -1,6 +1,16 @@
 body {
 	/* 60px to make the container go all the way to the bottom of the topbar */
-	padding-top: 60px;
+	padding-top: 52px;
+}
+
+header {
+    font-weight: 700;
+    line-height: 2;
+    font-size: 22px;
+    padding: 10px;
+    color: #ffffff;
+    background-color: #5dade2;
+    margin-bottom: 10px;
 }
 
 [tab-heading-transclude] {

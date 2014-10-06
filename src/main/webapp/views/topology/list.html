@@ -1,26 +1,29 @@
 <div>
-	<h3>Topologies</h3>
+    <header>
+        Topologies
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-2" ng-repeat="topology in topologies" style="margin-bottom: 10px;">
+                <div class="tile">
+                    <h3 class="tile-title">{{topology.name}}</h3>
+                    <p>{{topology.description}}</p>
 
-    <div class="row">
-        <div class="col-xs-2" ng-repeat="topology in topologies" style="margin-bottom: 10px;">
-            <div class="tile">
-                <h3 class="tile-title">{{topology.name}}</h3>
-                <p>{{topology.description}}</p>
-
-                <a class="btn btn-primary" ng-href="#/topologies/{{topology.id}}">
-                    <i class="fa fa-edit fa-lg"></i>
-                </a>
-                <a class="btn btn-danger" ng-click="deleteTopology();">
-                    <i class="fa fa-trash-o fa-lg"></i>
-                </a>
+                    <a class="btn btn-primary" ng-href="#/topologies/{{topology.id}}">
+                        <i class="fa fa-edit fa-lg"></i>
+                    </a>
+                    <a class="btn btn-danger" ng-click="deleteTopology();">
+                        <i class="fa fa-trash-o fa-lg"></i>
+                    </a>
+                </div>
             </div>
+
         </div>
 
-    </div>
+        <br />
 
-    <br />
-	
-	<button id="create-new-topology" class="btn btn-primary" ng-click="createNewTopology();">
-		<i class="fa fa-plus"></i> Create new
-	</button>
+        <button id="create-new-topology" class="btn btn-primary" ng-click="createNewTopology();">
+            <i class="fa fa-plus"></i> Create new
+        </button>
+    </div>
 </div>
