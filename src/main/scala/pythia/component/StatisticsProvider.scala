@@ -26,7 +26,7 @@ class StatisticsProvider extends Component {
       "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures =  List("Result"))
     ),
     properties = Map (
-      "Operation" -> PropertyMetadata("STRING"),
+      "Operation" -> PropertyMetadata("STRING", acceptedValues = List("Mean", "Count")),
       "Window length (in ms)" -> PropertyMetadata("INTEGER"),
       "Slide interval (in ms)" -> PropertyMetadata("INTEGER")
     )
