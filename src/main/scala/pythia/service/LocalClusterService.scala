@@ -12,7 +12,7 @@ class LocalClusterService(
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val sparkContext = new SparkContext("local", "pythia")
+  val sparkContext = new SparkContext("local[4]", "pythia")
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)

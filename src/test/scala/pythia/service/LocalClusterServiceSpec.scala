@@ -3,7 +3,7 @@ package pythia.service
 import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.mock.MockitoSugar
-import pythia.component.CsvSource
+import pythia.component.source.CsvSource
 import pythia.core._
 import pythia.dao._
 import pythia.service.ClusterState._

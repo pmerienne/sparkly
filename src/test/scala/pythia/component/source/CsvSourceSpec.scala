@@ -1,7 +1,8 @@
-package pythia.component
+package pythia.component.source
 
 import java.io.{File, FileWriter}
 
+import pythia.component.ComponentSpec
 import pythia.core._
 import pythia.testing.InspectedStream
 
