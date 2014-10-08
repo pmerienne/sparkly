@@ -1,8 +1,7 @@
 import scoverage.ScoverageSbtPlugin
+import sbtrelease.ReleasePlugin.ReleaseKeys._
 
 name := "sparkly-pythia"
-
-version := "1.0"
 
 scalaVersion := "2.10.4"
 
@@ -68,3 +67,11 @@ packJvmOpts := Map("boot" -> Seq("-Dpythia.home=${PROG_HOME}"))
 ScoverageSbtPlugin.instrumentSettings
 
 CoverallsPlugin.coverallsSettings
+
+// Release
+
+releaseSettings
+
+useGlobalVersion := false
+
+publishTo := Some(Resolver.file("file",  new File( "." )) )
