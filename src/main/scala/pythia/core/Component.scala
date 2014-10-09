@@ -84,6 +84,7 @@ case class Property (
 
   def get(): Any = selectedValue match {
     case None => defaultValue.getOrElse(null)
+    case Some(null) => defaultValue.getOrElse(null)
     case Some(str: String) => propertyType match {
       case "DECIMAL" => str.toDouble
       case "STRING" => str

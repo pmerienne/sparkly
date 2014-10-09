@@ -1,0 +1,43 @@
+package pythia.component.source
+
+
+import java.util.Properties
+
+import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.twitter._
+import pythia.core._
+import twitter4j.auth.OAuthAuthorization
+import twitter4j.conf._
+
+class TwitterSource extends Component {
+
+  def metadata = ComponentMetadata (
+    name = "Tweet source", description = "Use twitter as a stream source", category = "Source",
+    properties = Map(
+      "Consumer key" -> PropertyMetadata("STRING"),
+      "Consumer secret" -> PropertyMetadata("STRING"),
+      "Access token" -> PropertyMetadata("STRING"),
+      "Access token secret" -> PropertyMetadata("STRING")
+    ),
+    outputs = Map(
+      "Tweets" -> OutputStreamMetadata(namedFeatures = List("User id", "Text"))
+    )
+  )
+
+
+  override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
+    val properties = new Properties()
+    properties.put("oauth.consumerKey", context.property("Consumer key").as[String])
+    properties.put("oauth.consumerSecret", context.property("Consumer secret").as[String])
+    properties.put("oauth.accessToken", context.property("Access token").as[String])
+    properties.put("oauth.accessTokenSecret", context.property("Access token secret").as[String])
+
+    val auth = new OAuthAuthorization(new PropertyConfiguration(properties))
+
+    val tweets = TwitterUtils
+      .createStream(context.ssc, Some(auth))
+      .map(status => Instance("User id" -> status.getUser.getId, "Text" -> status.getText))
+
+    Map("Tweets" -> tweets)
+  }
+}

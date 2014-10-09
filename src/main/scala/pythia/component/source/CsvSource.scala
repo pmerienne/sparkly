@@ -1,4 +1,4 @@
-package pythia.component
+package pythia.component.source
 
 import org.apache.spark.Logging
 import org.apache.spark.rdd.RDD

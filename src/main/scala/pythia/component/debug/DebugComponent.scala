@@ -11,13 +11,15 @@ class DebugComponent extends Component {
       "Input" -> InputStreamMetadata(listedFeatures = List("Features"))
     ),
     properties = Map (
-      "Log component name" -> PropertyMetadata("BOOLEAN", defaultValue = Some(true))
+      "Log component name (fake)" -> PropertyMetadata("BOOLEAN", defaultValue = Some(true))
     )
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
+    val features = context.inputMappers("Input").featuresNames("Features")
     context
       .dstream("Input")
+      .map(instance => instance.rawFeatures.filterKeys(features.contains).toString)
       .print()
 
     Map()

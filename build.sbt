@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
   // Spark
   "org.apache.spark" %% "spark-core" % "1.1.0",
   "org.apache.spark" %% "spark-streaming" % "1.1.0",
+  "org.apache.spark" %% "spark-streaming-twitter" % "1.1.0",
   // Breeze for linear algebra
   "org.scalanlp" %% "breeze" % "0.8.1",
   "org.scalanlp" %% "breeze-natives" % "0.8.1",
@@ -74,4 +75,4 @@ releaseSettings
 
 useGlobalVersion := false
 
-publishTo := Some(Resolver.file("file",  new File( "." )) )
+publishTo := Some(Resolver.file("file",  new File( "target/releases" )) )
