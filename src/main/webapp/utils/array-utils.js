@@ -14,6 +14,12 @@ Array.prototype.remove = function(obj) {
 	}
 };
 
+Array.prototype.clear = function() {
+    while(this.length > 0) {
+        this.pop();
+    }
+}
+
 Array.prototype.pushAll = function() {
     for (var a = 0;  a < arguments.length;  a++) {
         arr = arguments[a];

@@ -8,10 +8,6 @@
 
     <div class="form-group" ng-repeat="(componentName, features) in stream.selectedFeatures">
         <label>{{componentName}}</label>
-        <div class="input-group form-group" ng-repeat="feature in features track by $index">
-            <input id="listed-feature-{{stream.metadata.name.removeSpaces()}}-componentName-{{$index}}" class="form-control" ng-model="features[$index]" type="text"/>
-            <span class="input-group-addon btn" ng-click="features.splice($index, 1)">x</span>
-        </div>
-        <button id="add-feature-to-{{stream.metadata.name.removeSpaces()}}-componentName" class="btn btn-default" ng-click="features.push('')"><i class="fa fa-plus"></i></button>
+        <input tags values="features" />
     </div>
 </div>

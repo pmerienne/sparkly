@@ -12,10 +12,6 @@
 
     <div class="form-group" ng-repeat="(componentName, features) in stream.selectedFeatures">
         <label>{{componentName}}</label>
-            <select id="{{stream.metadata.name.removeSpaces()}}-mapping" class="form-control" multiple
-                    ng-model="stream.selectedFeatures[componentName]"
-                    ng-required="true"
-                    ng-options="value as value for value in topology.retrieveAvailableFeatures(component, stream)">
-            </select>
+        <input tags values="stream.selectedFeatures[componentName]" options="availableFeatures"/>
     </div>
 </div>

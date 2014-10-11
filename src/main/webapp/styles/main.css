@@ -231,3 +231,8 @@ input.ng-invalid {
 select.form-control {
     -webkit-appearance: menulist;
 }
+
+
+.bootstrap-tagsinput .tag>span:after {
+    content: "x";
+}

@@ -7,6 +7,9 @@ app.directive('inputStreamEditor', function($compile) {
 		    topology : "=topology",
 			component : "=component",
 			stream : "=stream",
+		},
+		link : function(scope, element, attrs) {
+		    scope.availableFeatures = scope.topology.retrieveAvailableFeatures(scope.component, scope.stream);
 		}
 	};
 });
