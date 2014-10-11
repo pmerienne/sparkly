@@ -100,6 +100,10 @@ app.factory('ValidationReport', function(ValidationMessage) {
         return this.messages.length <= 0;
     };
 
+    ValidationReport.prototype.size = function() {
+        return this.messages.length;
+    };
+
     return ValidationReport;
 });
 
