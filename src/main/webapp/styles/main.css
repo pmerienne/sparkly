@@ -11,6 +11,28 @@ header {
     color: #ffffff;
     background-color: #5dade2;
     margin-bottom: 10px;
+    height: 64px;
+}
+
+header small {
+    color: #ECF0F1;
+    margin-left: 10px;
+}
+
+.bs-callout {
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+
+.bs-callout-error {
+    border-left-color: #C0392B;
+}
+
+.bs-callout-warning {
+    border-left-color: #F39C12;
 }
 
 [tab-heading-transclude] {
@@ -86,17 +108,6 @@ footer {
 	position: absolute;
 	top: 5px;
 	left: 5px;
-}
-
-.validation-report-panel {
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
-	width: 100%;
-}
-
-.validation-report-messages {
-    width: 100%;
 }
 
 .diagram-component {
