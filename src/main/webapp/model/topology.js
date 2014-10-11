@@ -76,6 +76,12 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
         return outputs;
     };
 
+    Topology.prototype.removeConnectionsOf = function(componentId) {
+        this.connections = $.grep(this.connections, function (connection) {
+            return connection.to.component != componentId && connection.from.component != componentId;
+        });
+    };
+
     Topology.prototype.component = function(componentId) {
         return $.grep(this.components, function (component) { return component.id == componentId})[0];
     };

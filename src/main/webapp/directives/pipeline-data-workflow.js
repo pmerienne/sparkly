@@ -16,10 +16,13 @@ app.directive('pipelineDataWorkflow', function($timeout, $modal, Component, Comp
 
             scope.displayTopology = function(topology) {
                 scope.diagram = JsPlumbService.createDiagram("jsplumb-container");
-                setTimeout(function() {
-                    scope.diagram.bindTopologyConnections(scope.topology);
-                    scope.redraw();
-                }, REDRAW_TIMEOUT);
+
+                if(topology != null && topology.id != null) {
+                    setTimeout(function() {
+                        scope.diagram.bindTopologyConnections(scope.topology);
+                        scope.redraw();
+                    }, REDRAW_TIMEOUT);
+                }
             };
         
             scope.editComponent = function(component) {
@@ -50,6 +53,7 @@ app.directive('pipelineDataWorkflow', function($timeout, $modal, Component, Comp
             scope.removeComponent = function(component) {
                 scope.diagram.clearComponent(component);
                 scope.topology.components.remove(component);
+                scope.topology.removeConnectionsOf(component.id);
             };
 
             scope.addNewComponent = function(metadata, x, y) {

@@ -39,7 +39,7 @@ app.factory('JsPlumbService', function(Connection) {
                 stream: self.getInputStreamName(info.targetEndpoint._jsPlumb.uuid, info.targetId)
             };
 			var connection = new Connection(from, to);
-			
+
 			topology.connections.push(connection);
 		});
 		
