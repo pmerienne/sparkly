@@ -11,7 +11,7 @@
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
             <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-            <ul class="dropdown-menu dropdown-inverse" role="menu">
+            <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
                 <li ng-class="{'disabled' : !cluster.isRunning()}">
                     <a ng-click="cluster.stop()">Stop {{topology.name}}</a>
                 <li ng-repeat="topology in topologies" ng-class="{'disabled' : !cluster.isReadyToDeploy()}">

@@ -13,7 +13,8 @@
                     {{currentView}}
                     <b class="caret"></b>
                 </small>
-                <ul class="dropdown-menu">
+                <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                <ul class="dropdown-menu dropdown-menu-inverse">
                     <li><a ng-click="currentView = 'Data workflow'">Data workflow</a></li>
                     <li>
                         <a ng-click="currentView = 'Messages'" ng-show="!validationReport.isEmpty()">

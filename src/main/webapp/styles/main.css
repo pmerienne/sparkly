@@ -236,3 +236,56 @@ select.form-control {
 .bootstrap-tagsinput .tag>span:after {
     content: "x";
 }
+
+.xsnavbar-nav>li>.dropdown-menu {
+    margin-top: 0;
+}
+.xsdropdown-menu {
+    margin-top: 0;
+}
+
+.dropdown-arrow-inverse {
+  border-bottom-color: #34495e !important;
+  border-top-color: #34495e !important;
+}
+
+.navbar-inverse .navbar-nav > .open > .dropdown-arrow {
+  border-top-color: #34495e;
+  border-bottom-color: #34495e;
+}
+
+.dropup .dropdown-arrow,
+.navbar-fixed-bottom .dropdown .dropdown-arrow {
+  border-bottom: none;
+  border-top: 8px outset #f3f4f5;
+  bottom: 100%;
+  top: auto;
+}
+.open.dropup > .dropdown-arrow {
+  margin-bottom: 10px;
+}
+.open.dropup > .dropdown-arrow.dropdown-arrow-inverse {
+  border-top-color: #34495e;
+}
+.open > .dropdown-arrow {
+  margin-top: 2px;
+  opacity: 1;
+}
+.dropdown-arrow {
+  border-style: solid;
+  border-width: 0 8px 7px;
+  border-color: transparent transparent #f3f4f5 transparent;
+  height: 0;
+  margin-top: 0;
+  opacity: 0;
+  position: absolute;
+  right: 19px;
+  top: 100%;
+  width: 0;
+  z-index: 10;
+  -webkit-transform: rotate(360deg);
+  /*
+  -webkit-transition: 0.25s;
+  transition: 0.25s;
+  */
+}
