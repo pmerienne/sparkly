@@ -1,5 +1,7 @@
 package pythia.core
 
+import pythia.core.PropertyType.PropertyType
+
 case class ComponentMetadata (
   name: String,
   description: String = "", category: String = "Others",
@@ -9,10 +11,15 @@ case class ComponentMetadata (
 )
 
 case class PropertyMetadata (
-  propertyType: String,
+  propertyType: PropertyType,
   defaultValue: Option[_] = None,
   acceptedValues: List[String] = List(),
   mandatory: Boolean = true) {
+}
+
+object PropertyType extends Enumeration {
+  type PropertyType = Value
+  val DECIMAL, STRING, INTEGER, LONG, BOOLEAN  = Value
 }
 
 case class InputStreamMetadata (

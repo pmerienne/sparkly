@@ -3,7 +3,7 @@ package pythia.core
 
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
-import org.joda.time.DateTime
+import pythia.core.PropertyType._
 
 abstract class Component extends Serializable {
   def metadata: ComponentMetadata
@@ -75,7 +75,7 @@ case class Mapper(namedFeatures: Map[String, String] = Map(), listedFeatures: Ma
 }
 
 case class Property (
-  propertyType: String,
+  propertyType: PropertyType,
   defaultValue: Option[_] = None,
   selectedValue: Option[String] = None){
 
@@ -86,12 +86,11 @@ case class Property (
     case None => defaultValue.getOrElse(null)
     case Some(null) => defaultValue.getOrElse(null)
     case Some(str: String) => propertyType match {
-      case "DECIMAL" => str.toDouble
-      case "STRING" => str
-      case "INTEGER" => str.toInt
-      case "LONG" => str.toLong
-      case "DATE" => DateTime.parse(str).toDate
-      case "BOOLEAN" => str.toBoolean
+      case DECIMAL => str.toDouble
+      case STRING => str
+      case INTEGER => str.toInt
+      case LONG => str.toLong
+      case BOOLEAN => str.toBoolean
     }
   }
 

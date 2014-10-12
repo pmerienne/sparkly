@@ -5,7 +5,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK_2
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.receiver.Receiver
+
 import pythia.core._
+import pythia.core.PropertyType._
 
 import scala.collection.mutable
 import scala.io.Source
@@ -18,8 +20,8 @@ class CsvSource extends Component {
       "Instances" -> OutputStreamMetadata(listedFeatures = List("Features"))
     ),
     properties = Map (
-      "File" -> PropertyMetadata("STRING"),
-      "Separator" -> PropertyMetadata("STRING", defaultValue = Some(";"), acceptedValues = List(";", ","))
+      "File" -> PropertyMetadata(STRING),
+      "Separator" -> PropertyMetadata(STRING, defaultValue = Some(";"), acceptedValues = List(";", ","))
     )
   )
 

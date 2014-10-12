@@ -5,13 +5,16 @@ import pythia.core._
 
 import scala.Predef._
 
+import pythia.core.PropertyType._
+
+
 class Perceptron extends ClassifierComponent[Boolean] {
 
   override def metadata = super.metadata.copy(name = "Perceptron classifier", category = "Classifier",
     properties = Map (
-      "Name" -> PropertyMetadata("STRING", defaultValue = Some("Perceptron")),
-      "Bias" -> PropertyMetadata("DECIMAL", defaultValue = Some(0.1)),
-      "Learning rate" -> PropertyMetadata("DECIMAL", defaultValue = Some(0.1))
+      "Name" -> PropertyMetadata(STRING, defaultValue = Some("Perceptron")),
+      "Bias" -> PropertyMetadata(DECIMAL, defaultValue = Some(0.1)),
+      "Learning rate" -> PropertyMetadata(DECIMAL, defaultValue = Some(0.1))
     )
   )
 

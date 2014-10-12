@@ -37,7 +37,7 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
 
   def convert(name: String, metadata: PropertyMetadata): PropertyMetadataModel = PropertyMetadataModel (
     name = name,
-    propertyType = metadata.propertyType,
+    propertyType = metadata.propertyType.toString,
     defaultValue = metadata.defaultValue,
     acceptedValues = metadata.acceptedValues,
     mandatory= metadata.mandatory

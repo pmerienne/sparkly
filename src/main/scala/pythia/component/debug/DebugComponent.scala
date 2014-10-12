@@ -2,6 +2,7 @@ package pythia.component.debug
 
 import org.apache.spark.streaming.dstream.DStream
 import pythia.core._
+import pythia.core.PropertyType._
 
 class DebugComponent extends Component {
 
@@ -11,7 +12,7 @@ class DebugComponent extends Component {
       "Input" -> InputStreamMetadata(listedFeatures = List("Features"))
     ),
     properties = Map (
-      "Log component name (fake)" -> PropertyMetadata("BOOLEAN", defaultValue = Some(true))
+      "Log component name (fake)" -> PropertyMetadata(BOOLEAN, defaultValue = Some(true))
     )
   )
 

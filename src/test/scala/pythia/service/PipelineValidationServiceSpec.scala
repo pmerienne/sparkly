@@ -4,6 +4,7 @@ import org.mockito.BDDMockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FlatSpec}
 import pythia.core._
+import pythia.core.PropertyType._
 import pythia.dao.ComponentRepository
 
 class PipelineValidationServiceSpec extends FlatSpec with Matchers with MockitoSugar {
@@ -28,9 +29,9 @@ class PipelineValidationServiceSpec extends FlatSpec with Matchers with MockitoS
     given(componentRepository.component("Test")).willReturn(Some(
       ComponentMetadata("Test",
         properties = Map (
-          "Not mandatory" -> PropertyMetadata("DECIMAL", mandatory = false),
-          "Mandatory" -> PropertyMetadata("DECIMAL", mandatory = true),
-          "Mandatory 2" -> PropertyMetadata("DECIMAL", defaultValue = Some(0.25), mandatory = true)
+          "Not mandatory" -> PropertyMetadata(DECIMAL, mandatory = false),
+          "Mandatory" -> PropertyMetadata(DECIMAL, mandatory = true),
+          "Mandatory 2" -> PropertyMetadata(DECIMAL, defaultValue = Some(0.25), mandatory = true)
         )
       )
     ))
@@ -52,8 +53,8 @@ class PipelineValidationServiceSpec extends FlatSpec with Matchers with MockitoS
     given(componentRepository.component("TestClass")).willReturn(Some(
       ComponentMetadata("TestClass",
         properties = Map (
-          "Bias 1" -> PropertyMetadata("DECIMAL"),
-          "Bias 2" -> PropertyMetadata("DECIMAL")
+          "Bias 1" -> PropertyMetadata(DECIMAL),
+          "Bias 2" -> PropertyMetadata(DECIMAL)
         )
       )
     ))

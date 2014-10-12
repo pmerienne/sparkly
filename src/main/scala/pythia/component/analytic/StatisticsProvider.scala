@@ -5,6 +5,7 @@ import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.dstream.DStream
 import pythia.core._
 import scala.reflect.ClassTag
+import pythia.core.PropertyType._
 
 class StatisticsProvider extends Component {
 
@@ -17,8 +18,8 @@ class StatisticsProvider extends Component {
       "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures =  List("Result"))
     ),
     properties = Map (
-      "Operation" -> PropertyMetadata("STRING", acceptedValues = List("Mean", "Count")),
-      "Window length (in ms)" -> PropertyMetadata("LONG")
+      "Operation" -> PropertyMetadata(STRING, acceptedValues = List("Mean", "Count")),
+      "Window length (in ms)" -> PropertyMetadata(LONG)
     )
   )
 

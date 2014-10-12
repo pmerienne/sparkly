@@ -5,7 +5,10 @@ import java.util.Properties
 
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter._
+
 import pythia.core._
+import pythia.core.PropertyType._
+
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf._
 
@@ -14,10 +17,10 @@ class TwitterSource extends Component {
   def metadata = ComponentMetadata (
     name = "Tweet source", description = "Use twitter as a stream source", category = "Source",
     properties = Map(
-      "Consumer key" -> PropertyMetadata("STRING"),
-      "Consumer secret" -> PropertyMetadata("STRING"),
-      "Access token" -> PropertyMetadata("STRING"),
-      "Access token secret" -> PropertyMetadata("STRING")
+      "Consumer key" -> PropertyMetadata(STRING),
+      "Consumer secret" -> PropertyMetadata(STRING),
+      "Access token" -> PropertyMetadata(STRING),
+      "Access token secret" -> PropertyMetadata(STRING)
     ),
     outputs = Map(
       "Tweets" -> OutputStreamMetadata(namedFeatures = List("User id", "Text"))
