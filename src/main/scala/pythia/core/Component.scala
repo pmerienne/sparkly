@@ -89,6 +89,7 @@ case class Property (
       case "DECIMAL" => str.toDouble
       case "STRING" => str
       case "INTEGER" => str.toInt
+      case "LONG" => str.toLong
       case "DATE" => DateTime.parse(str).toDate
       case "BOOLEAN" => str.toBoolean
     }
