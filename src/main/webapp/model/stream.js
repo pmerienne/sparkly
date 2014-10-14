@@ -34,13 +34,17 @@ app.factory('Stream', function(StreamMetadata) {
 
     Stream.newStream = function (metadata) {
         var selectedFeatures = {}
-        for(var i = 0; i < metadata.listedFeatures.length; i++) {
-            selectedFeatures[metadata.listedFeatures[i]] = [];
+        for(var featureName in metadata.listedFeatures) {
+            if (metadata.listedFeatures.hasOwnProperty(featureName)){
+                selectedFeatures[featureName] = [];
+            }
         }
 
         var mappedFeatures = {};
-        for(var i = 0; i < metadata.namedFeatures.length; i++) {
-            mappedFeatures[metadata.namedFeatures[i]] = "New feature : " + metadata.namedFeatures[i];
+        for(var featureName in metadata.namedFeatures) {
+            if (metadata.namedFeatures.hasOwnProperty(featureName)){
+                mappedFeatures[featureName] = featureName;
+            }
         }
 
         return new Stream(metadata, metadata.name, selectedFeatures, mappedFeatures);

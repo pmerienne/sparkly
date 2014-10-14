@@ -5,7 +5,7 @@
         <label>{{componentName}}</label>
         <select class="form-control"
                 ng-model="stream.mappedFeatures[componentName]"
-                ng-options="value as value for value in topology.retrieveAvailableFeatures(component, stream)"
+                ng-options="value as value for value in availableFeatures"
                 ng-required="true">
         </select>
     </div>

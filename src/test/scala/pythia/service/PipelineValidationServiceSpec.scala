@@ -3,6 +3,7 @@ package pythia.service
 import org.mockito.BDDMockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FlatSpec}
+import pythia.core.FeatureType.ANY
 import pythia.core._
 import pythia.core.PropertyType._
 import pythia.dao.ComponentRepository
@@ -76,10 +77,10 @@ class PipelineValidationServiceSpec extends FlatSpec with Matchers with MockitoS
     given(componentRepository.component("TestClass")).willReturn(Some(
       ComponentMetadata("TestClass",
         inputs = Map (
-          "Input" -> InputStreamMetadata(namedFeatures = List("Input Feature 1", "Input Feature 2"))
+          "Input" -> InputStreamMetadata(namedFeatures = Map("Input Feature 1" -> ANY, "Input Feature 2" -> ANY))
         ),
         outputs = Map (
-          "Output" -> OutputStreamMetadata(namedFeatures = List("Output Feature 1", "Output Feature 2"))
+          "Output" -> OutputStreamMetadata(namedFeatures = Map("Output Feature 1" -> ANY, "Output Feature 2" -> ANY))
         )
       )
     ))

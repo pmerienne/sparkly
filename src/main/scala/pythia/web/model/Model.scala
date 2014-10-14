@@ -46,9 +46,9 @@ case class PropertyMetadataModel (
   mandatory: Boolean = true
 )
 
-case class InputStreamMetadataModel(name: String, namedFeatures: List[String] = List(),listedFeatures: List[String] = List())
+case class InputStreamMetadataModel(name: String, namedFeatures: Map[String, String] = Map(),listedFeatures: Map[String, String] = Map())
 
-case class OutputStreamMetadataModel(name: String, from: Option[String] = None, namedFeatures: List[String] = List(), listedFeatures: List[String] = List())
+case class OutputStreamMetadataModel(name: String, from: Option[String] = None, namedFeatures: Map[String, String] = Map(), listedFeatures: Map[String, String] = Map())
 
 case class PropertyConfigurationModel(name: String, value: String)
 

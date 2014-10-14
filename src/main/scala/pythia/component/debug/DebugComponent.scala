@@ -1,6 +1,7 @@
 package pythia.component.debug
 
 import org.apache.spark.streaming.dstream.DStream
+import pythia.core.FeatureType.ANY
 import pythia.core._
 import pythia.core.PropertyType._
 
@@ -9,7 +10,7 @@ class DebugComponent extends Component {
   override def metadata: ComponentMetadata = ComponentMetadata (
     name = "Debug",
     inputs = Map[String, InputStreamMetadata] (
-      "Input" -> InputStreamMetadata(listedFeatures = List("Features"))
+      "Input" -> InputStreamMetadata(listedFeatures = Map("Features" -> ANY))
     ),
     properties = Map (
       "Log component name (fake)" -> PropertyMetadata(BOOLEAN, defaultValue = Some(true))

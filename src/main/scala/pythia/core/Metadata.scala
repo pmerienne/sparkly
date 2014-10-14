@@ -1,5 +1,6 @@
 package pythia.core
 
+import pythia.core.FeatureType.FeatureType
 import pythia.core.PropertyType.PropertyType
 
 case class ComponentMetadata (
@@ -23,12 +24,17 @@ object PropertyType extends Enumeration {
 }
 
 case class InputStreamMetadata (
-  namedFeatures: List[String] = List(),
-  listedFeatures: List[String] = List()
+  namedFeatures: Map[String, FeatureType] = Map(),
+  listedFeatures: Map[String, FeatureType] = Map()
 )
 
 case class OutputStreamMetadata (
   from: Option[String] = None,
-  namedFeatures: List[String] = List(),
-  listedFeatures: List[String] = List()
+  namedFeatures: Map[String, FeatureType] = Map(),
+  listedFeatures: Map[String, FeatureType] = Map()
 )
+
+object FeatureType extends Enumeration {
+  type FeatureType = Value
+  val STRING, DOUBLE, INTEGER, LONG, NUMBER, BOOLEAN , DATE, ANY = Value
+}

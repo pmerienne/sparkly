@@ -17,7 +17,7 @@ class CsvSource extends Component {
   override def metadata =  ComponentMetadata (
     name = "Csv source", description = "Read and parse a given csv file", category = "Source",
     outputs = Map (
-      "Instances" -> OutputStreamMetadata(listedFeatures = List("Features"))
+      "Instances" -> OutputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.STRING))
     ),
     properties = Map (
       "File" -> PropertyMetadata(STRING),

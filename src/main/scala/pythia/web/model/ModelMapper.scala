@@ -45,15 +45,15 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
 
   def convert(name: String, metadata: InputStreamMetadata): InputStreamMetadataModel = InputStreamMetadataModel (
     name = name,
-    namedFeatures = metadata.namedFeatures,
-    listedFeatures = metadata.listedFeatures
+    namedFeatures = metadata.namedFeatures.mapValues(_.toString()),
+    listedFeatures = metadata.listedFeatures.mapValues(_.toString())
   )
 
   def convert(name: String, metadata: OutputStreamMetadata): OutputStreamMetadataModel = OutputStreamMetadataModel (
     name = name,
     from = metadata.from,
-    namedFeatures = metadata.namedFeatures,
-    listedFeatures = metadata.listedFeatures
+    namedFeatures = metadata.namedFeatures.mapValues(_.toString()),
+    listedFeatures = metadata.listedFeatures.mapValues(_.toString())
   )
 
   def convert(name: String, value: String): PropertyConfigurationModel = PropertyConfigurationModel (

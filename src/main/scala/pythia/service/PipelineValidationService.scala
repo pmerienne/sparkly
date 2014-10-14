@@ -43,7 +43,7 @@ class ComponentValidator(implicit val componentRepository: ComponentRepository) 
     val missingInputMappings = componentMetadata.inputs
       .flatMap{case (name, metadata) =>
         val mappedFeatures = componentConfiguration.inputs.getOrElse(name, StreamConfiguration()).mappedFeatures.keys.toList
-        metadata.namedFeatures.filter(!mappedFeatures.contains(_)).map(missingMapping => (name, metadata, missingMapping))
+        metadata.namedFeatures.keys.filter(!mappedFeatures.contains(_)).map(missingMapping => (name, metadata, missingMapping))
       }.map{case (name, metadata, missingMapping) =>
         ValidationMessage(s"Missing mapping '${missingMapping}' of input '${name}' in '${componentName}' component.", MessageLevel.Error)
       }
@@ -51,7 +51,7 @@ class ComponentValidator(implicit val componentRepository: ComponentRepository) 
     val missingOutputMappings = componentMetadata.outputs
       .flatMap{case (name, metadata) =>
         val mappedFeatures = componentConfiguration.outputs.getOrElse(name, StreamConfiguration()).mappedFeatures.keys.toList
-        metadata.namedFeatures.filter(!mappedFeatures.contains(_)).map(missingMapping => (name, metadata, missingMapping))
+        metadata.namedFeatures.keys.filter(!mappedFeatures.contains(_)).map(missingMapping => (name, metadata, missingMapping))
       }.map{case (name, metadata, missingMapping) =>
         ValidationMessage(s"Missing mapping '${missingMapping}' of output '${name}' in '${componentName}' component.", MessageLevel.Error)
       }
