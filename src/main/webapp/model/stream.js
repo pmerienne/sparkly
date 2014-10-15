@@ -65,5 +65,13 @@ app.factory('Stream', function(StreamMetadata) {
         return features;
     };
 
+    Stream.prototype.mappedFeatureType = function(name) {
+        return this.metadata.namedFeatures[name].capitalize();
+    };
+
+    Stream.prototype.selectedFeaturesType = function(name) {
+        return this.metadata.listedFeatures[name].capitalize();
+    };
+
     return Stream;
 });
