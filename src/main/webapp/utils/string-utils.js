@@ -20,3 +20,7 @@ String.prototype.hashCode = function(){
     }
     return hash;
 };
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.toLowerCase().slice(1);
+}

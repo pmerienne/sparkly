@@ -3,6 +3,7 @@ package pythia.component.analytic
 import org.apache.spark.streaming.{Duration, Milliseconds}
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.dstream.DStream
+import pythia.core.FeatureType.{DOUBLE, NUMBER, ANY}
 import pythia.core._
 import scala.reflect.ClassTag
 import pythia.core.PropertyType._
@@ -12,10 +13,10 @@ class StatisticsProvider extends Component {
   def metadata = ComponentMetadata (
     name = "Statistic provider", category = "Analytic",
     inputs = Map (
-      "Input" -> InputStreamMetadata(namedFeatures = List("Compute on", "Group by"))
+      "Input" -> InputStreamMetadata(namedFeatures = Map("Compute on" -> NUMBER, "Group by" -> ANY))
     ),
     outputs = Map (
-      "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures =  List("Result"))
+      "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures =  Map("Result" -> DOUBLE))
     ),
     properties = Map (
       "Operation" -> PropertyMetadata(STRING, acceptedValues = List("Mean", "Count")),

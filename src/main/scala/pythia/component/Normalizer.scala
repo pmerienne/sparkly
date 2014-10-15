@@ -1,6 +1,7 @@
 package pythia.component
 
 import org.apache.spark.streaming.dstream.DStream
+import pythia.core.FeatureType.NUMBER
 import pythia.core._
 
 class Normalizer extends Component {
@@ -8,7 +9,7 @@ class Normalizer extends Component {
   def metadata = ComponentMetadata(
     name = "Normalizer", category = "Pre-processor",
     inputs = Map (
-      "Input" -> InputStreamMetadata(listedFeatures = List("Features"))
+      "Input" -> InputStreamMetadata(listedFeatures = Map("Features" -> NUMBER))
     ),
     outputs = Map (
       "Output" -> OutputStreamMetadata(from = Some("Input"))

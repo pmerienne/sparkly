@@ -3,6 +3,7 @@ package pythia.component.classifier
 import breeze.linalg.DenseVector
 import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.dstream.DStream
+import pythia.core.FeatureType.{DOUBLE, STRING, NUMBER, ANY}
 import pythia.core._
 
 import scala.reflect._
@@ -10,12 +11,12 @@ abstract class ClassifierComponent[L : ClassTag] extends Component {
 
   def metadata = ComponentMetadata("Classifier",
     inputs = Map (
-      "Train" -> InputStreamMetadata(namedFeatures = List("Label"), listedFeatures = List("Features")),
-      "Prediction query" -> InputStreamMetadata(listedFeatures = List("Features"))
+      "Train" -> InputStreamMetadata(namedFeatures = Map("Label" -> ANY), listedFeatures = Map("Features" -> NUMBER)),
+      "Prediction query" -> InputStreamMetadata(listedFeatures = Map("Features" -> NUMBER))
     ),
     outputs = Map (
-      "Prediction result" -> OutputStreamMetadata(from = Some("Prediction query"), namedFeatures = List("Label")),
-      "Accuracy" -> OutputStreamMetadata(namedFeatures = List("Name", "Accuracy"))
+      "Prediction result" -> OutputStreamMetadata(from = Some("Prediction query"), namedFeatures = Map("Label" -> ANY)),
+      "Accuracy" -> OutputStreamMetadata(namedFeatures = Map("Name" -> STRING, "Accuracy" -> DOUBLE))
     )
   )
 

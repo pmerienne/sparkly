@@ -23,7 +23,7 @@ class TwitterSource extends Component {
       "Access token secret" -> PropertyMetadata(STRING)
     ),
     outputs = Map(
-      "Tweets" -> OutputStreamMetadata(namedFeatures = List("User id", "Text"))
+      "Tweets" -> OutputStreamMetadata(namedFeatures = Map("User id" -> FeatureType.LONG, "Text" -> FeatureType.STRING))
     )
   )
 

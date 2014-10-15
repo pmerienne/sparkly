@@ -1,17 +1,17 @@
 <div>
     <h4>{{stream.metadata.name}}</h4>
 
-    <div class="form-group" ng-repeat="(componentName, topologyName) in stream.mappedFeatures">
-        <label>{{componentName}}</label>
+    <div class="form-group" ng-repeat="(name, topologyName) in stream.mappedFeatures">
+        <label>{{name}} ({{stream.mappedFeatureType(name)}} feature)</label>
         <select class="form-control"
-                ng-model="stream.mappedFeatures[componentName]"
-                ng-options="value as value for value in topology.retrieveAvailableFeatures(component, stream)"
+                ng-model="stream.mappedFeatures[name]"
+                ng-options="value as value for value in availableFeatures"
                 ng-required="true">
         </select>
     </div>
 
-    <div class="form-group" ng-repeat="(componentName, features) in stream.selectedFeatures">
-        <label>{{componentName}}</label>
-        <input tags values="stream.selectedFeatures[componentName]" options="availableFeatures"/>
+    <div class="form-group" ng-repeat="(name, features) in stream.selectedFeatures">
+        <label>{{name}} (List of {{stream.selectedFeaturesType(name)}} features)</label>
+        <input tags values="stream.selectedFeatures[name]" options="availableFeatures"/>
     </div>
 </div>

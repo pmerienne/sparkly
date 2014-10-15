@@ -47,15 +47,18 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
     Topology.prototype.retrieveAvailableFeatures = function(component, stream) {
         var self = this;
         var features = [];
-        var outputsConnectedTo = this.connectedTo(component.id, stream.name);
+        var connections = this.connectedTo(component.id, stream.name);
 
-        outputsConnectedTo.forEach(function(os) {
+        connections.forEach(function(connection) {
+            var otherComponent = self.component(connection.from.component);
+            var os = otherComponent.outputStream(connection.from.stream);
+
             var osFeatures = os.availableFeatures();
             features.pushAll(osFeatures);
 
             if(os.metadata.from) {
-                var is = component.inputStream(os.metadata.from)
-                features.pushAll(self.retrieveAvailableFeatures(is));
+                var is = otherComponent.inputStream(os.metadata.from)
+                features.pushAll(self.retrieveAvailableFeatures(otherComponent, is));
             }
         });
 
@@ -64,16 +67,15 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
 
     Topology.prototype.connectedTo = function(componentId, streamName) {
         var self = this;
-        var outputs = [];
+        var connectionsTo = [];
 
         this.connections.forEach(function (connection) {
             if(connection.to.component == componentId && connection.to.stream == streamName) {
-                var output = self.component(connection.from.component).outputStream(connection.from.stream);
-                outputs.push(output);
+                connectionsTo.push(connection);
             }
         });
 
-        return outputs;
+        return connectionsTo;
     };
 
     Topology.prototype.removeConnectionsOf = function(componentId) {
