@@ -33,11 +33,20 @@ app.controller('EditTopologyCtrl', function($scope, $location, $route, $routePar
         $scope.cluster = cluster;
     });
 
+    $scope.saveAndLaunch = function() {
+		$scope.topology.save().then(function(data) {
+			NotificationService.notify($scope.topology.name + " saved");
+			$scope.launch("local");
+		}, function(error) {
+                NotificationService.notify("Unable to deploy pipeline " + $scope.topology.name + " because it could not be saved.", "danger");
+		});
+    };
+
     $scope.launch = function(clusterId) {
         Cluster.findById("local").then(function(cluster) {
             NotificationService.notify("Deploying topology on " + cluster.name);
             cluster.deploy($scope.topology.id).then(function(success) {
-                NotificationService.notify("Topology " + $scope.topology.name + " deployed on " + cluster.name);
+                NotificationService.notify($scope.topology.name + " deployed on " + cluster.name);
             }, function(error) {
                 NotificationService.notify("Unable to deploy topology " + $scope.topology.name + " on " + cluster.name, "danger");
             });
