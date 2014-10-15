@@ -1,4 +1,4 @@
-app.factory('ClusterStatus', function(Topology) {
+app.factory('ClusterStatus', function(Pipeline) {
 
     function ClusterStatus(state, time, pipeline) {
         this.state = state;
@@ -7,7 +7,7 @@ app.factory('ClusterStatus', function(Topology) {
     }
 
     ClusterStatus.build = function (data) {
-        var pipeline = data.pipeline ? Topology.build(data.pipeline) : null;
+        var pipeline = data.pipeline ? Pipeline.build(data.pipeline) : null;
         return new ClusterStatus(data.state, data.time, pipeline);
     };
 
@@ -32,11 +32,11 @@ app.factory('Cluster', function(ClusterStatus, $http) {
         });
     };
 
-    Cluster.prototype.deploy = function(topologyId) {
-        return $http.post('api/clusters/' + this.id  + "/deploy?pipelineId=" + topologyId);
+    Cluster.prototype.deploy = function(pipelineId) {
+        return $http.post('api/clusters/' + this.id  + "/deploy?pipelineId=" + pipelineId);
     };
 
-    Cluster.prototype.stop = function(topologyId) {
+    Cluster.prototype.stop = function(pipelineId) {
         return $http.post('api/clusters/' + this.id  + "/stop");
     };
 

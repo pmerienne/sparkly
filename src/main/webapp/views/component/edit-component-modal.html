@@ -20,7 +20,7 @@
 				<tab-heading id="input-mapping-tab-heading"><i class="fa fa-link fa-lg"></i> Inputs </tab-heading>
 				
 				<form role="form" ng-repeat="input in component.inputs" ng-show="input.metadata.type != 'NONE'">
-                    <input-stream-editor stream="input" component="component" topology="topology" />
+                    <input-stream-editor stream="input" component="component" pipeline="pipeline" />
 				</form>
 			</tab>
 
@@ -28,7 +28,7 @@
 				<tab-heading id="output-mapping-tab-heading"><i class="fa fa-link fa-lg"></i> Outputs </tab-heading>
 
 				<form role="form" ng-repeat="output in component.outputs" ng-show="output.metadata.type != 'NONE'">
-                    <output-stream-editor stream="output" component="component" topology="topology" />
+                    <output-stream-editor stream="output" component="component" pipeline="pipeline" />
 				</form>
 			</tab>
 		</tabset>

@@ -4,22 +4,22 @@ app.directive('pipelineDataWorkflow', function($timeout, $modal, Component, Comp
     return {
         restrict: "E",
 		replace : true,
-		templateUrl : 'views/topology/pipeline-data-workflow.html',
+		templateUrl : 'views/pipeline/pipeline-data-workflow.html',
         scope: true,
         link: function (scope, element, attrs) {
-            scope.$watch("topology", function(newValue, oldValue) {
-                scope.displayTopology(newValue);
+            scope.$watch("pipeline", function(newValue, oldValue) {
+                scope.displayPipeline(newValue);
                 if(newValue != null && newValue.id != null) {
                     scope.validate();
                 }
             });
 
-            scope.displayTopology = function(topology) {
+            scope.displayPipeline = function(pipeline) {
                 scope.diagram = JsPlumbService.createDiagram("jsplumb-container");
 
-                if(topology != null && topology.id != null) {
+                if(pipeline != null && pipeline.id != null) {
                     setTimeout(function() {
-                        scope.diagram.bindTopologyConnections(scope.topology);
+                        scope.diagram.bindPipelineConnections(scope.pipeline);
                         scope.redraw();
                     }, REDRAW_TIMEOUT);
                 }
@@ -32,8 +32,8 @@ app.directive('pipelineDataWorkflow', function($timeout, $modal, Component, Comp
                     resolve : {
                         component : function() {
                             return component;
-                        }, topology: function() {
-                            return scope.topology;
+                        }, pipeline: function() {
+                            return scope.pipeline;
                         }
                     }
                 });
@@ -52,15 +52,15 @@ app.directive('pipelineDataWorkflow', function($timeout, $modal, Component, Comp
         
             scope.removeComponent = function(component) {
                 scope.diagram.clearComponent(component);
-                scope.topology.components.remove(component);
-                scope.topology.removeConnectionsOf(component.id);
+                scope.pipeline.components.remove(component);
+                scope.pipeline.removeConnectionsOf(component.id);
             };
 
             scope.addNewComponent = function(metadata, x, y) {
                 var component = Component.newComponent(metadata);
                 if(x) component.x = x;
                 if(y) component.y = y;
-                scope.topology.components.push(component);
+                scope.pipeline.components.push(component);
                 scope.redraw(true);
                 scope.validate();
             };

@@ -13,9 +13,9 @@
             <span class="dropdown-arrow dropdown-arrow-inverse"></span>
             <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
                 <li ng-class="{'disabled' : !cluster.isRunning()}">
-                    <a ng-click="cluster.stop()">Stop {{topology.name}}</a>
-                <li ng-repeat="topology in topologies" ng-class="{'disabled' : !cluster.isReadyToDeploy()}">
-                    <a ng-click="deploy(topology)">Deploy {{topology.name}}</a>
+                    <a ng-click="cluster.stop()">Stop {{pipeline.name}}</a>
+                <li ng-repeat="pipeline in pipelines" ng-class="{'disabled' : !cluster.isReadyToDeploy()}">
+                    <a ng-click="deploy(pipeline)">Deploy {{pipeline.name}}</a>
                 </li>
             </ul>
         </span>

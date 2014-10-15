@@ -1,5 +1,5 @@
 app.controller('ManageClusterCtrl', function($scope, $route, $location, $routeParams, $timeout,
-    NotificationService, Cluster, Topology) {
+    NotificationService, Cluster, Pipeline) {
 
 	$scope.cluster = {};
 
@@ -11,16 +11,16 @@ app.controller('ManageClusterCtrl', function($scope, $route, $location, $routePa
         $location.path("/");
     });
 
-	$scope.topologies = [];
-    Topology.findAll().then(function(topologies) {
-        $scope.topologies = topologies;
+	$scope.pipelines = [];
+    Pipeline.findAll().then(function(pipelines) {
+        $scope.pipelines = pipelines;
     });
 
-    $scope.deploy = function(topology) {
-        $scope.cluster.deploy(topology.id).then(function(success) {
-            NotificationService.notify("Topology " + topology.name + " deployed on " + $scope.cluster.name);
+    $scope.deploy = function(pipeline) {
+        $scope.cluster.deploy(pipeline.id).then(function(success) {
+            NotificationService.notify("Pipeline " + pipeline.name + " deployed on " + $scope.cluster.name);
          }, function(error) {
-            NotificationService.notify("Unable to deploy topology " + topology.name + " on " + $scope.cluster.name, "danger");
+            NotificationService.notify("Unable to deploy pipeline " + pipeline.name + " on " + $scope.cluster.name, "danger");
          });
     };
 

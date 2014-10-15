@@ -1,6 +1,6 @@
-app.factory('Topology', function($http, Component, Connection, ValidationReport) {
+app.factory('Pipeline', function($http, Component, Connection, ValidationReport) {
 
-    function Topology(id, name, description, components, connections) {
+    function Pipeline(id, name, description, components, connections) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -8,8 +8,8 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
         this.connections = connections;
     };
 
-    Topology.build = function (data) {
-        return new Topology(
+    Pipeline.build = function (data) {
+        return new Pipeline(
             data.id,
             data.name,
             data.description,
@@ -18,33 +18,33 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
         );
     };
 
-    Topology.findAll = function() {
-        return $http.get('api/topologies/').then(function(topologies) {
-            return $.map(topologies.data, Topology.build);
+    Pipeline.findAll = function() {
+        return $http.get('api/pipelines/').then(function(pipelines) {
+            return $.map(pipelines.data, Pipeline.build);
         });
     };
 
-    Topology.findById = function(id) {
-        return $http.get('api/topologies/' + id).then(function(topology) {
-            return Topology.build(topology.data);
+    Pipeline.findById = function(id) {
+        return $http.get('api/pipelines/' + id).then(function(pipeline) {
+            return Pipeline.build(pipeline.data);
         });
     };
 
-    Topology.delete = function(id) {
-        return $http.delete('api/topologies/' + id);
+    Pipeline.delete = function(id) {
+        return $http.delete('api/pipelines/' + id);
     };
 
-    Topology.prototype.save = function() {
-        return $http.put('api/topologies/' , this);
+    Pipeline.prototype.save = function() {
+        return $http.put('api/pipelines/' , this);
     };
 
-    Topology.validate = function(topology) {
-        return $http.post('api/pipeline-validation', topology).then(function(report) {
+    Pipeline.validate = function(pipeline) {
+        return $http.post('api/pipeline-validation', pipeline).then(function(report) {
             return ValidationReport.build(report.data);
         });
     };
 
-    Topology.prototype.retrieveAvailableFeatures = function(component, stream) {
+    Pipeline.prototype.retrieveAvailableFeatures = function(component, stream) {
         var self = this;
         var features = [];
         var connections = this.connectedTo(component.id, stream.name);
@@ -65,7 +65,7 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
         return features;
     };
 
-    Topology.prototype.connectedTo = function(componentId, streamName) {
+    Pipeline.prototype.connectedTo = function(componentId, streamName) {
         var self = this;
         var connectionsTo = [];
 
@@ -78,17 +78,17 @@ app.factory('Topology', function($http, Component, Connection, ValidationReport)
         return connectionsTo;
     };
 
-    Topology.prototype.removeConnectionsOf = function(componentId) {
+    Pipeline.prototype.removeConnectionsOf = function(componentId) {
         this.connections = $.grep(this.connections, function (connection) {
             return connection.to.component != componentId && connection.from.component != componentId;
         });
     };
 
-    Topology.prototype.component = function(componentId) {
+    Pipeline.prototype.component = function(componentId) {
         return $.grep(this.components, function (component) { return component.id == componentId})[0];
     };
 
-    return Topology;
+    return Pipeline;
 });
 
 app.factory('ValidationReport', function(ValidationMessage) {

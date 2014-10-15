@@ -2,7 +2,7 @@
     <header>
         <div class="pull-left">
             <span class="clickable" ng-click="currentView = 'Data workflow'">
-                {{topology.name}}
+                {{pipeline.name}}
                 <span ng-show="!validationReport.isEmpty()" class="badge" style="color: #fff;background-color: #E74C3C;"
                         tooltip-placement="bottom" tooltip="{{validationReport.warningCount}} warnings, {{validationReport.errorCount}} errors">
                     !
@@ -46,13 +46,13 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-10">
-                    <input type="text" ng-model="topology.name" class="form-control" ng-required="true"/>
+                    <input type="text" ng-model="pipeline.name" class="form-control" ng-required="true"/>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-10">
-                    <textarea ng-model="topology.description" class="form-control" rows="5" ng-required="false"/>
+                    <textarea ng-model="pipeline.description" class="form-control" rows="5" ng-required="false"/>
                 </div>
             </div>
         </form>

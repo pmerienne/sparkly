@@ -9,7 +9,7 @@ import pythia.web.resource.{PipelineValidationResource, LocalClusterResource, Co
 
 class ScalatraBootstrap extends LifeCycle with Bindings {
   override def init(context: ServletContext) {
-    context.mount(new PipelineResource, "/api/topologies")
+    context.mount(new PipelineResource, "/api/pipelines")
     context.mount(new ComponentResource, "/api/components")
     context.mount(new LocalClusterResource(), "/api/clusters/local")
     context.mount(new PipelineValidationResource(), "/api/pipeline-validation")

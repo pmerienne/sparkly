@@ -1,7 +1,7 @@
 <div>
     <h4>{{stream.metadata.name}}</h4>
 
-    <div class="form-group" ng-repeat="(name, topologyName) in stream.mappedFeatures">
+    <div class="form-group" ng-repeat="(name, pipelineName) in stream.mappedFeatures">
         <label>{{name}} ({{stream.mappedFeatureType(name)}} feature)</label>
         <select class="form-control"
                 ng-model="stream.mappedFeatures[name]"

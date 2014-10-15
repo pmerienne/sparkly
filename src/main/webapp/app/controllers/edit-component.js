@@ -1,7 +1,7 @@
-app.controller('EditComponentCtrl', function($scope, $modalInstance, component, topology) {
+app.controller('EditComponentCtrl', function($scope, $modalInstance, component, pipeline) {
 
 	$scope.component = component;
-	$scope.topology = topology;
+	$scope.pipeline = pipeline;
 
 	$scope.saveComponent = function() {
 		$modalInstance.close($scope.component);

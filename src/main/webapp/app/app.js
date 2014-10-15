@@ -7,16 +7,16 @@ var app = angular.module('app', [ 'ngRoute', 'ngResource', 'ui.include', 'ui.boo
 			'Content-Type' : 'application/json'
 		};
 
-		$routeProvider.when('/topologies', {
-			templateUrl: 'views/topology/list.html',
-			controller: 'ListTopologiesCtrl'
-		}).when('/topologies/:topologyId', {
-			templateUrl: 'views/topology/edit-topology.html',
-			controller: 'EditTopologyCtrl'
+		$routeProvider.when('/pipelines', {
+			templateUrl: 'views/pipeline/list.html',
+			controller: 'ListPipelinesCtrl'
+		}).when('/pipelines/:pipelineId', {
+			templateUrl: 'views/pipeline/edit-pipeline.html',
+			controller: 'EditPipelineCtrl'
 		}).when('/clusters/:clusterId', {
 			templateUrl: 'views/cluster/cluster.html',
 			controller: 'ManageClusterCtrl'
 		}).otherwise({
-			redirectTo : '/topologies'
+			redirectTo : '/pipelines'
 		});
 });

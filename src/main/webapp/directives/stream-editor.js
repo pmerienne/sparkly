@@ -4,12 +4,12 @@ app.directive('inputStreamEditor', function($compile) {
 		replace : true,
 		templateUrl : 'views/component/input-stream-editor.html',
 		scope : {
-		    topology : "=topology",
+		    pipeline : "=pipeline",
 			component : "=component",
 			stream : "=stream",
 		},
 		link : function(scope, element, attrs) {
-		    scope.availableFeatures = scope.topology.retrieveAvailableFeatures(scope.component, scope.stream);
+		    scope.availableFeatures = scope.pipeline.retrieveAvailableFeatures(scope.component, scope.stream);
 		}
 	};
 });
@@ -20,7 +20,7 @@ app.directive('outputStreamEditor', function($compile) {
 		replace : true,
 		templateUrl : 'views/component/output-stream-editor.html',
 		scope : {
-		    topology : "=topology",
+		    pipeline : "=pipeline",
 			component : "=component",
 			stream : "=stream"
 		}

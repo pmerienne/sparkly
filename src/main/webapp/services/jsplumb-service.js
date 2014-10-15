@@ -22,10 +22,10 @@ app.factory('JsPlumbService', function(Connection) {
 		
 	};
 	
-	JsPlumbDiagram.prototype.bindTopologyConnections = function(topology) {
+	JsPlumbDiagram.prototype.bindPipelineConnections = function(pipeline) {
 		var self = this;
 
-		topology.connections.forEach(function(connection) {
+		pipeline.connections.forEach(function(connection) {
 			self.connect(connection);
 		});
 		
@@ -40,7 +40,7 @@ app.factory('JsPlumbService', function(Connection) {
             };
 			var connection = new Connection(from, to);
 
-			topology.connections.push(connection);
+			pipeline.connections.push(connection);
 		});
 		
 		this.jsPlumbInstance.bind("click", function(connection) {
@@ -57,7 +57,7 @@ app.factory('JsPlumbService', function(Connection) {
                 stream: self.getInputStreamName(info.targetEndpoint._jsPlumb.uuid, info.targetId)
             };
 			var connection = new Connection(from, to);
-			topology.connections.remove(connection);
+			pipeline.connections.remove(connection);
 		});
 	};
 	
