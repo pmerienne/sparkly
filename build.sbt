@@ -7,24 +7,34 @@ scalaVersion := "2.10.4"
 
 parallelExecution := false
 
-// 9.2.1.v20140609
 val jettyVersion = "8.1.14.v20131031"
 
 jetty()
+
+resolvers += Resolver.sonatypeRepo("public")
 
 libraryDependencies ++= Seq(
   // Spark
   "org.apache.spark" %% "spark-core" % "1.1.0",
   "org.apache.spark" %% "spark-streaming" % "1.1.0",
   "org.apache.spark" %% "spark-streaming-twitter" % "1.1.0",
+  "org.apache.spark" %% "spark-mllib" % "1.1.0",
   // Breeze for linear algebra
   "org.scalanlp" %% "breeze" % "0.8.1",
   "org.scalanlp" %% "breeze-natives" % "0.8.1",
+  // Algebird
+  "com.twitter" %% "algebird-core" % "0.8.1",
+  "org.apache.commons" % "commons-math3" % "3.2",
   // Scalatra
   "org.scalatra" %% "scalatra" % "2.3.0",
+  "org.scalatra" %% "scalatra-atmosphere" % "2.3.0",
+  "org.eclipse.jetty" %  "jetty-plus" % jettyVersion % "compile;provided",
   "org.eclipse.jetty" % "jetty-webapp" % jettyVersion % "container;compile",
+  "org.eclipse.jetty" % "jetty-websocket" % jettyVersion % "compile;provided",
   "org.scalatra" %% "scalatra-json" % "2.3.0",
   "org.json4s"   %% "json4s-jackson" % "3.2.9",
+  // Web-Socket client
+  "org.jfarcand" % "wcs" % "1.3",
   // DB
   "org.mapdb" % "mapdb" % "1.0.6",
   // Utils
@@ -38,6 +48,8 @@ dependencyOverrides += "org.eclipse.jetty" % "jetty-webapp" % jettyVersion
 
 dependencyOverrides += "org.eclipse.jetty" % "jetty-server" % jettyVersion
 
+dependencyOverrides += "org.eclipse.jetty" % "jetty-websocket" % jettyVersion
+
 dependencyOverrides += "org.eclipse.jetty" % "jetty-io" % jettyVersion
 
 dependencyOverrides += "org.eclipse.jetty" % "jetty-jndi" % jettyVersion
@@ -49,7 +61,6 @@ dependencyOverrides += "org.eclipse.jetty" % "jetty-plus" % jettyVersion
 dependencyOverrides += "org.eclipse.jetty" % "jetty-security" % jettyVersion
 
 dependencyOverrides += "org.eclipse.jetty" % "jetty-util" % jettyVersion
-// 9.2.1.v20140609
 
 // Packaging
 

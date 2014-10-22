@@ -20,6 +20,11 @@ case class Feature[U : ClassTag](value: Option[U]) {
   def isDefined: Boolean = value.isDefined
   def isEmpty: Boolean = value.isEmpty
 
+  def or[V: ClassTag](other: V): V = value match {
+    case Some(_) => as[V]
+    case None => other
+  }
+
   def as[V: ClassTag]: V = {
     try {
       convertTo[V]()

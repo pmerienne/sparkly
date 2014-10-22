@@ -31,3 +31,9 @@ object ConnectionConfiguration {
     new ConnectionConfiguration(ConnectionPoint(fromComponent, fromStream), ConnectionPoint(toComponent, toStream))
   }
 }
+
+case class VisualizationConfiguration (
+  id: String = Random.nextString(10),
+  name: String,
+  clazz: String
+)

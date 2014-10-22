@@ -10,10 +10,12 @@ import pythia.service.ClusterState._
 import pythia.testing.SpamData
 import pythia.component.debug.DebugComponent
 
-class LocalClusterServiceSpec  extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach with BeforeAndAfterAll {
+class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach with BeforeAndAfterAll {
 
   implicit val pipelineRepository = mock[PipelineRepository]
   implicit val pipelineValidationService = mock[PipelineValidationService]
+  implicit val pipelineBuilder = new PipelineBuilder()
+  implicit val visualizationBuilder = mock[VisualizationBuilder]
   val localClusterService: LocalClusterService = new LocalClusterService()
 
   override def afterEach(): Unit = {
