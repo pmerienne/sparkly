@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "org.scalatra" %% "scalatra-json" % "2.3.0",
   "org.json4s"   %% "json4s-jackson" % "3.2.9",
   // Web-Socket client
-  "org.jfarcand" % "wcs" % "1.3",
+  "org.atmosphere" % "wasync" % "1.4.0",
   // DB
   "org.mapdb" % "mapdb" % "1.0.6",
   // Utils

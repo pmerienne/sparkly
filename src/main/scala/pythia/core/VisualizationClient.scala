@@ -1,11 +1,11 @@
 package pythia.core
 
-import org.jfarcand.wcs._
+import org.atmosphere.wasync.impl.{DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder}
+import org.atmosphere.wasync.{Client, ClientFactory, Request}
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
 import scala.concurrent.Future
-import java.net.{URLEncoder, URL}
 
 class VisualizationClient(val hostname: String, val port: Int, val master:String , val id: String) {
 
@@ -25,9 +25,20 @@ class VisualizationClient(val hostname: String, val port: Int, val master:String
     }
   }
 
+
   private def sendJson( json: String): Unit = {
-    WebSocket().open(url).send(json)
+    val client: Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder] = ClientFactory.getDefault.newClient.asInstanceOf[Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder]]
+
+    val req = client.newRequestBuilder
+      .method(Request.METHOD.GET)
+      .uri(url)
+      .transport(Request.TRANSPORT.WEBSOCKET)
+
+    val opts = client.newOptionsBuilder().reconnect(false).build()
+    val socket = client.create(opts).open(req.build())
+    socket.fire(json)
+    socket.close()
   }
 
-  private def clean(str: String) = URLEncoder.encode(str, "UTF-8")
+  private def clean(str: String) = str.replaceAll("[^a-zA-Z0-9/]" , "");
 }

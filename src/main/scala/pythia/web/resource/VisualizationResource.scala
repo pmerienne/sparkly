@@ -1,6 +1,7 @@
 package pythia.web.resource
 
 import org.scalatra.atmosphere._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class VisualizationResource extends BaseResource with AtmosphereSupport {
@@ -10,6 +11,11 @@ class VisualizationResource extends BaseResource with AtmosphereSupport {
     val id = params("id")
     new VisualizationAtmosphereClient(master + ":" + id)
   }
+
+  error {
+    case t: Throwable => t.printStackTrace()
+  }
+
 
   class VisualizationAtmosphereClient(val id: String) extends AtmosphereClient {
 

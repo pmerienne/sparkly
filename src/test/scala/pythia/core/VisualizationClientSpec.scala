@@ -1,14 +1,15 @@
-package pythia.visualization
+package pythia.core
 
-import org.scalatra.test.scalatest._
-import org.scalatest._
+import org.atmosphere.wasync.impl.{DefaultRequestBuilder, DefaultOptionsBuilder, DefaultOptions}
+import org.atmosphere.wasync._
+import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
+import org.scalatra.test.scalatest.ScalatraFlatSpec
 import pythia.web.resource.VisualizationResource
-import pythia.core.{VisualizationEvent, VisualizationClient}
-import scala.util.Random
-import org.jfarcand.wcs.{TextListener, WebSocket}
+
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventually {
 
@@ -28,10 +29,18 @@ class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventu
       .get
 
     val visualisationClient = new VisualizationClient(visualisationHost, visualisationPort, master, id)
+
     val messages = ListBuffer[String]()
-    val ws = WebSocket().open(visualisationClient.url).listener(new TextListener{
-      override def onMessage(msg: String) = messages += msg
+    val client: Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder] = ClientFactory.getDefault.newClient.asInstanceOf[Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder]]
+    val opts = client.newOptionsBuilder().reconnect(false).build()
+    val req = client.newRequestBuilder
+      .method(Request.METHOD.GET)
+      .uri(visualisationClient.url)
+      .transport(Request.TRANSPORT.WEBSOCKET)
+    val socket = client.create(opts).on(Event.MESSAGE, new Function[String] {
+      def on(msg: String) = messages += msg
     })
+    socket.open(req.build())
 
     //Then
     val event = VisualizationEvent(0L, Map("test" -> 1.0))
@@ -43,6 +52,7 @@ class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventu
       )
     }
 
-    ws.close
+    socket.close
   }
+
 }

@@ -10,7 +10,6 @@ import pythia.component.classifier.Perceptron
 import pythia.component.Normalizer
 import pythia.component.source.CsvSource
 import pythia.testing._
-import pythia.visualization.FeatureVisualization
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
