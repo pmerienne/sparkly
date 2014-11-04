@@ -3,19 +3,20 @@ package pythia.core
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
+import pythia.visualization.LatencyVisualization
 
 import scala.collection.mutable
 import scala.collection.mutable.{Map => MutableMap}
 
-case class Pipeline(configuration: PipelineConfiguration) {
-  val connections = configuration.connections
+class PipelineBuilder {
 
-  implicit val componentOrdering = ComponentOrdering(configuration)
+  def build(ssc: StreamingContext, pipeline: PipelineConfiguration): Map[(String, String), DStream[Instance]] = {
+    val connections = pipeline.connections
+    implicit val componentOrdering = ComponentOrdering(pipeline)
 
-  def build(ssc: StreamingContext): Map[(String, String), DStream[Instance]] = {
     val outputStreams = MutableMap[(String, String), DStream[Instance]]();
 
-    configuration.components.sorted
+    pipeline.components.sorted
       .foreach{componentConfiguration =>
         val componentId = componentConfiguration.id
 
@@ -33,7 +34,7 @@ case class Pipeline(configuration: PipelineConfiguration) {
     outputStreams.toMap
   }
 
-  def emptyStream(ssc: StreamingContext): DStream[Instance] = {
+  private def emptyStream(ssc: StreamingContext): DStream[Instance] = {
     val queue = new mutable.SynchronizedQueue[RDD[Instance]]()
     ssc.queueStream(queue)
   }

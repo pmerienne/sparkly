@@ -15,6 +15,8 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
+  val pipelineBuilder = new PipelineBuilder()
+
   "Pipeline" should "build and connect components together" in {
     val pipelineConfig = PipelineConfiguration (
       name = "test",
@@ -62,20 +64,21 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
       )
     )
 
-    val pipeline = Pipeline(pipelineConfig)
-
     // System init
     val ssc = new StreamingContext("local", "Test", Seconds(1))
     ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
 
-    val availableStreams = pipeline.build(ssc)
+    val availableStreams = pipelineBuilder.build(ssc, pipelineConfig)
     val accuracies = InspectedStream(availableStreams(("perceptron" ,"Accuracy")))
 
-    ssc.start()
-    eventually {
-      accuracies.instances.last.rawFeatures("Accuracy").asInstanceOf[Double] should be > 0.80
+    try {
+      ssc.start()
+      eventually {
+        accuracies.instances.last.rawFeatures("Accuracy").asInstanceOf[Double] should be > 0.80
+      }
+    } finally {
+      ssc.stop()
     }
-    ssc.stop()
 
   }
 }

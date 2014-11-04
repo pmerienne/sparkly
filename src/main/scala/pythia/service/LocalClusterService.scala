@@ -5,10 +5,12 @@ import java.util.Date
 import org.apache.spark.SparkContext
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import pythia.config.PythiaConfig._
-import pythia.core.{Pipeline, PipelineConfiguration}
+import pythia.core.{VisualizationBuilder, PipelineBuilder, PipelineConfiguration}
 import pythia.dao.PipelineRepository
 
 class LocalClusterService(
+  implicit val pipelineBuilder: PipelineBuilder,
+  implicit val visualizationBuilder: VisualizationBuilder,
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
@@ -56,9 +58,10 @@ class LocalClusterService(
     status = ClusterStatus(ClusterState.Deploying, Some(new Date()), Some(pipeline))
 
     try {
-      val ssc = initStreamingContext()
-      Pipeline(pipeline).build(ssc)
-      ssc.start()
+      val context = initStreamingContext()
+      val outputStreams = pipelineBuilder.build(context, pipeline)
+      visualizationBuilder.buildVisualizations(context, pipeline, outputStreams)
+      context.start()
 
       status = ClusterStatus(ClusterState.Running, Some(new Date()), Some(pipeline))
     } catch {

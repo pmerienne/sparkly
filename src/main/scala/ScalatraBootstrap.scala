@@ -5,14 +5,15 @@ import org.scalatra.LifeCycle
 import org.scalatra.servlet.ScalatraListener
 import pythia.config._
 import PythiaConfig._
-import pythia.web.resource.{PipelineValidationResource, LocalClusterResource, ComponentResource, PipelineResource}
+import pythia.web.resource._
 
 class ScalatraBootstrap extends LifeCycle with Bindings {
   override def init(context: ServletContext) {
-    context.mount(new PipelineResource, "/api/pipelines")
-    context.mount(new ComponentResource, "/api/components")
-    context.mount(new LocalClusterResource(), "/api/clusters/local")
-    context.mount(new PipelineValidationResource(), "/api/pipeline-validation")
+    context.mount(new PipelineResource, "/api/pipelines/*")
+    context.mount(new ComponentResource, "/api/components/*")
+    context.mount(new LocalClusterResource(), "/api/clusters/local/*")
+    context.mount(new PipelineValidationResource(), "/api/pipeline-validation/*")
+    context.mount(new VisualizationResource(), "/api/visualization/*")
   }
 }
 
