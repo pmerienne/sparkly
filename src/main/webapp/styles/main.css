@@ -335,3 +335,31 @@ select.form-control {
   transition: 0.25s;
   */
 }
+
+/* Improve Rickshaw */
+.chart-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.chart {
+    display: inline-block;
+    position: absolute;
+    width: 100%;
+}
+
+.chart-legend {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0 0 10px;
+}
+
+.chart-title {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 400;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+}
