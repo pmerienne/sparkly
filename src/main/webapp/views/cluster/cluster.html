@@ -23,7 +23,8 @@
 
     <div class="container-fluid">
         <div class="row" ng-if="cluster.isRunning()">
-            <pipeline-latency-viz cluster="clusterId" />
+            <pipeline-latency-viz cluster="clusterId"></pipeline-latency-viz>
+            <pipeline-memory-viz cluster="clusterId"></pipeline-memory-viz>
         </div>
     </div>
 

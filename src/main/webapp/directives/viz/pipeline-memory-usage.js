@@ -1,18 +1,20 @@
-app.directive('pipelineLatencyViz', function(VisualizationDataSource) {
+app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
 	return {
 		restrict : "E",
 		replace : true,
-		templateUrl : 'views/visualization/pipeline-latency.html',
+		templateUrl : 'views/visualization/pipeline-memory.html',
 		scope : {
 			clusterId : "=cluster"
 		},
 		link : function(scope, element, attrs) {
-            scope.dataSource = new VisualizationDataSource(scope.clusterId, "pipeline-latency");
+            scope.dataSource = new VisualizationDataSource(scope.clusterId, "pipeline-memory");
+
             scope.dataSource.listen(function(event){
                 var time = event.timestampMs / 1000;
                 var data = {
-                    'Scheduling delay (ms)': event.data.schedulingDelay,
-                    'Processing delay (ms)': event.data.processingDelay
+                    'Memory used (MB)': event.data["memory.used"] / 1024 / 1024,
+                    'Memory committed (MB)': event.data["memory.committed"] / 1024 / 1024,
+                    'Max Memory (MB)': event.data["memory.max"]  / 1024 / 1024
                 };
                 scope.graph.series.addData(data, time);
                 scope.graph.render();
@@ -22,23 +24,22 @@ app.directive('pipelineLatencyViz', function(VisualizationDataSource) {
                 scope.dataSource.close();
             });
 
-	        var palette = new Rickshaw.Color.Palette();
-
             scope.graph = new Rickshaw.Graph({
                 element: element.context.querySelector('.chart'),
-                renderer: 'area',
+                renderer: 'line',
                 stroke: true,
                 height: 300,
 	            preserve: true,
-                series: new Rickshaw.Series.FixedDuration([{ name: 'Scheduling delay (ms)', color: palette.color() }, {name: 'Processing delay (ms)', color: palette.color()}], undefined, {
-                    timeInterval: 1000, // TODO : Hard coded batch duration
+	            interpolation: 'linear',
+                series: new Rickshaw.Series.FixedDuration([{ name: 'Memory used (MB)', color: '#73c03a'}, { name: 'Memory committed (MB)', color: '#65b9ac'}, {name: 'Max Memory (MB)', color: '#cb513a'}], undefined, {
+                    timeInterval: 10000,
                     maxDataPoints: 60
                 })
             });
 
             var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                 graph: scope.graph,
-                yFormatter: function(y) { return Math.floor(y) + " ms" },
+                yFormatter: function(y) { return Math.floor(y) + " MB" },
                 xFormatter: function(x) {return new Date(x * 1000).toString();}
             });
 

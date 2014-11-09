@@ -3,7 +3,6 @@ package pythia.core
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
-import pythia.visualization.LatencyVisualization
 
 import scala.collection.mutable
 import scala.collection.mutable.{Map => MutableMap}

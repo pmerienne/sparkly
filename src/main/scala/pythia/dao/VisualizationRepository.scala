@@ -6,17 +6,17 @@ import pythia.core._
 import org.reflections.Reflections
 import scala.collection.JavaConversions._
 
-class ComponentRepository(val componentBasePackage: String) {
+class VisualizationRepository(val visualizationBasePackage: String) {
 
-  private val reflections = new Reflections(componentBasePackage)
+  private val reflections = new Reflections(visualizationBasePackage)
 
   private val metadatas = reflections
-    .getSubTypesOf(classOf[Component])
+    .getSubTypesOf(classOf[Visualization])
     .filter(clazz => !clazz.isInterface && !Modifier.isAbstract(clazz.getModifiers()))
     .map(clazz => (clazz.getName() , clazz.newInstance.metadata))
     .toMap
 
-  def components(): Map[String, ComponentMetadata] = metadatas
-  def component(name: String) = metadatas.get(name)
+  def visualizations(): Map[String, VisualizationMetadata] = metadatas
+  def visualization(name: String) = metadatas.get(name)
   def findByClassName(name: String) = metadatas(name)
 }

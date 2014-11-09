@@ -16,12 +16,13 @@
                 <span class="dropdown-arrow dropdown-arrow-inverse"></span>
                 <ul class="dropdown-menu dropdown-menu-inverse">
                     <li><a ng-click="currentView = 'Data workflow'">Data workflow</a></li>
+                    <li><a ng-click="currentView = 'Visualizations'">Visualizations</a></li>
+                    <li><a ng-click="currentView = 'Informations'">Informations</a></li>
                     <li>
                         <a ng-click="currentView = 'Messages'" ng-show="!validationReport.isEmpty()">
                             Messages <span class="label label-warning">{{validationReport.size()}}</span>
                         </a>
                     </li>
-                    <li><a ng-click="currentView = 'Informations'">Informations</a></li>
                 </ul>
             </span>
         </div>
@@ -39,6 +40,24 @@
         <div class="bs-callout bs-callout-{{message.level.toLowerCase()}}" ng-repeat="message in validationReport.messages">
             <p>{{message.text}}</p>
         </div>
+    </div>
+
+    <div ng-show="currentView == 'Visualizations'" class="container-fluid">
+        <pipeline-visualization-edition ng-repeat="visualization in pipeline.visualizations" pipeline="pipeline" visualization="visualization"></pipeline-visualization-edition>
+
+        <span class="btn-group">
+            <button type="button" class="btn btn-primary">Add new visualization</button>
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+                <span class="sr-only"></span>
+            </button>
+            <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+            <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
+                <li ng-repeat="visualizationMetadata in visualizationMetadatas">
+                    <a ng-click="addNewVisualization(visualizationMetadata);">{{visualizationMetadata.name}}</a>
+                </li>
+            </ul>
+        </span>
     </div>
 
     <div ng-show="currentView == 'Informations'" class="container-fluid">

@@ -7,6 +7,7 @@ import java.io.File
 object PythiaConfig {
 
   val WEB_CONFIG = ConfigFactory.load().getConfig("web")
+  val HOSTNAME = WEB_CONFIG.getString("hostname")
   val WEB_PORT = WEB_CONFIG.getInt("port")
   val WEB_SOURCES = WEB_CONFIG.getString("sources")
 
@@ -20,4 +21,5 @@ object PythiaConfig {
   val SPARK_CONFIG = ConfigFactory.load().getConfig("spark")
   val CHECKPOINTS_DIRECTORY = SPARK_CONFIG.getString("checkpoint-directory")
   new File(CHECKPOINTS_DIRECTORY).mkdirs()
+  val METRICS_CONFIGURATION_FILE = SPARK_CONFIG.getString("metrics-conf")
 }

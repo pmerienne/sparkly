@@ -7,16 +7,18 @@ import org.json4s.jackson.JsonMethods._
 
 import scala.concurrent.Future
 
-class VisualizationClient(val hostname: String, val port: Int, val clusterId:String , val id: String) {
+class VisualizationDataCollector(val hostname: String, val port: Int, val clusterId:String , val id: String) extends Serializable {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  implicit val formats = DefaultFormats
 
-  val url = s"ws://${hostname}:${port}/api/visualization/${clusterId}/${id}"
+  val url = s"ws://${hostname}:${port}/api/visualizations/data/${clusterId}/${id}"
 
-  def send(timestamp: Long, data: Map[String, Double]): Unit = send(VisualizationEvent(timestamp, data))
+  def push(timestamp: Long, data: Map[String, Double]): Unit = send(VisualizationEvent(timestamp, data), true)
+  def push(timestamp: Long, data: Map[String, Double], async: Boolean): Unit = send(VisualizationEvent(timestamp, data), async)
 
-  def send(event: VisualizationEvent, async: Boolean = true): Unit = {
+  private def send(event: VisualizationEvent, async: Boolean): Unit = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    implicit val formats = DefaultFormats
+
     val json = compact(Extraction.decompose(event))
 
     async match {
@@ -25,15 +27,14 @@ class VisualizationClient(val hostname: String, val port: Int, val clusterId:Str
     }
   }
 
-
   private def sendJson(json: String): Unit = {
-    val socket = VisualizationClient.getOrCreateSocket(url)
+    val socket = VisualizationDataCollector.getOrCreateSocket(url)
     socket.fire(json)
   }
 
 }
 
-object VisualizationClient {
+object VisualizationDataCollector {
   import scala.collection.mutable.Map
 
   private val client: Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder] = ClientFactory.getDefault.newClient.asInstanceOf[Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder]]
@@ -53,3 +54,5 @@ object VisualizationClient {
     }
   }
 }
+
+case class VisualizationEvent(timestampMs: Long, data: Map[String, Double])

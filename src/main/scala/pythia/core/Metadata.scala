@@ -11,6 +11,13 @@ case class ComponentMetadata (
   outputs: Map[String, OutputStreamMetadata] = Map()
 )
 
+case class VisualizationMetadata (
+  name: String,
+  properties: Map[String, PropertyMetadata] = Map(),
+  streams: List[String] = List(),
+  features: List[String] = List()
+)
+
 case class PropertyMetadata (
   propertyType: PropertyType,
   defaultValue: Option[_] = None,
