@@ -43,8 +43,7 @@ class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventu
     socket.open(req.build())
 
     //Then
-    val event = VisualizationEvent(0L, Map("test" -> 1.0))
-    visualisationClient.send(event, false)
+    visualisationClient.send(0L, Map("test" -> 1.0), false)
 
     eventually {
       messages contains only (

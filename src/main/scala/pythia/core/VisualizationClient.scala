@@ -14,9 +14,10 @@ class VisualizationClient(val hostname: String, val port: Int, val clusterId:Str
 
   val url = s"ws://${hostname}:${port}/api/visualization/${clusterId}/${id}"
 
-  def send(timestamp: Long, data: Map[String, Double]): Unit = send(VisualizationEvent(timestamp, data))
+  def send(timestamp: Long, data: Map[String, Double]): Unit = send(VisualizationEvent(timestamp, data), true)
+  def send(timestamp: Long, data: Map[String, Double], async: Boolean): Unit = send(VisualizationEvent(timestamp, data), async)
 
-  def send(event: VisualizationEvent, async: Boolean = true): Unit = {
+  private def send(event: VisualizationEvent, async: Boolean): Unit = {
     val json = compact(Extraction.decompose(event))
 
     async match {

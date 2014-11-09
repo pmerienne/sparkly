@@ -2,11 +2,12 @@ package pythia.service
 
 import java.util.Date
 
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import pythia.config.PythiaConfig._
 import pythia.core.{VisualizationBuilder, PipelineBuilder, PipelineConfiguration}
 import pythia.dao.PipelineRepository
+import pythia.config.PythiaConfig
 
 class LocalClusterService(
   implicit val pipelineBuilder: PipelineBuilder,
@@ -14,7 +15,10 @@ class LocalClusterService(
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val sparkContext = new SparkContext("local[4]", "pythia")
+  val sparckConfig = new SparkConf()
+    .set("spark.metrics.conf", PythiaConfig.METRICS_CONFIGURATION_FILE)
+
+  val sparkContext = new SparkContext("local[4]", "pythia", sparckConfig)
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)
