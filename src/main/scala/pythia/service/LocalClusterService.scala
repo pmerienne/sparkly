@@ -60,7 +60,7 @@ class LocalClusterService(
     try {
       val context = initStreamingContext()
       val outputStreams = pipelineBuilder.build(context, pipeline)
-      visualizationBuilder.buildVisualizations(context, pipeline, outputStreams)
+      visualizationBuilder.buildVisualizations("local", context, pipeline, outputStreams)
       context.start()
 
       status = ClusterStatus(ClusterState.Running, Some(new Date()), Some(pipeline))

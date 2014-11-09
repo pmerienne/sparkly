@@ -22,6 +22,9 @@
     </header>
 
     <div class="container-fluid">
+        <div class="row" ng-if="cluster.isRunning()">
+            <pipeline-latency-viz cluster="clusterId" />
+        </div>
     </div>
 
 </div>

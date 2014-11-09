@@ -2,8 +2,9 @@ app.controller('ManageClusterCtrl', function($scope, $route, $location, $routePa
     NotificationService, Cluster, Pipeline) {
 
 	$scope.cluster = {};
+	$scope.clusterId = $routeParams.clusterId;
 
-    Cluster.findById($routeParams.clusterId).then(function(cluster) {
+    Cluster.findById($scope.clusterId).then(function(cluster) {
         $scope.cluster = cluster;
         $scope.updateStatus();
     }, function(error) {
