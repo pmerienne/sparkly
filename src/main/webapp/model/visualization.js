@@ -22,6 +22,10 @@ app.factory('VisualizationMetadata', function($http, PropertyMetadata) {
         );
     };
 
+    VisualizationMetadata.prototype.htmlTagName = function() {
+        return this.id.replace(/\./g, "-");
+    };
+
     VisualizationMetadata.findAll = function() {
         return $http.get('api/visualizations/').then(function(visualizationsData) {
             return $.map(visualizationsData.data, VisualizationMetadata.build);

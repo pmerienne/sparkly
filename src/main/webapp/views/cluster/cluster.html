@@ -22,9 +22,15 @@
     </header>
 
     <div class="container-fluid">
-        <div class="row" ng-if="cluster.isRunning()">
+        <div class="row">
             <pipeline-latency-viz cluster="clusterId"></pipeline-latency-viz>
             <pipeline-memory-viz cluster="clusterId"></pipeline-memory-viz>
+        </div>
+
+        <div class="row">
+            <div ng-repeat="visualization in cluster.status.pipeline.visualizations">
+                <visualization configuration="visualization" clusterid="clusterId"></visualization>
+            </div>
         </div>
     </div>
 
