@@ -1,0 +1,29 @@
+<div>
+    <h5>
+        {{visualization.name}} <small>({{visualization.metadata.name}})</small>
+        <button type="button" class="close" ng-click="pipeline.visualizations.remove(visualization);"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    </h5>
+
+    <form class="form-inline" role="form">
+        <input class="form-control input-lg" ng-model="visualization.name" placeholder="Visualization's name" />
+    </form>
+
+    <form class="form-inline" role="form" ng-if="visualization.properties.length > 0">
+        <div ng-repeat="property in visualization.properties" style="display: inline-block;padding: 10px;">
+            <property-input model="property" />
+        </div>
+    </form>
+
+    <form class="form-inline" role="form" ng-if="visualization.streams.length > 0">
+        <div ng-repeat="stream in visualization.streams" style="display: inline-block;padding: 10px;">
+            <span>{{stream.name}} : </span>
+            <div class="form-group">
+                <select class="form-control" ng-model="stream.component" ng-options="component.id as component.name for component in pipeline.components" ng-required="true"></select>
+                <select class="form-control" ng-model="stream.stream" ng-options="stream.name as stream.name for stream in pipeline.component(stream.component).outputs" ng-required="true"></select>
+            </div>
+
+        </div>
+    </form>
+
+    <hr />
+</div>

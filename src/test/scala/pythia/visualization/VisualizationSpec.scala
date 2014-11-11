@@ -11,17 +11,17 @@ import org.mockito.{Mockito, ArgumentCaptor}
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import org.scalatest.time.{Millis, Span}
-import pythia.testing.MockStream
+import org.apache.spark.streaming.dstream.DStream
 
 class VisualizationSpec extends FlatSpec with Matchers with Eventually with BeforeAndAfterEach  with MockitoSugar {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
-  val visualizationClient = mock[VisualizationClient]
+  val visualizationBuilder = new VisualizationBuilder()
+  val dataCollector = mock[VisualizationDataCollector](withSettings().serializable())
 
   var ssc: StreamingContext = null
-  var stream: MockStream = null
-
+  var outputStreams: Map[(String, String), DStream[Instance]] = Map()
 
   override def beforeEach() {
     val conf = new SparkConf()
@@ -30,30 +30,28 @@ class VisualizationSpec extends FlatSpec with Matchers with Eventually with Befo
 
     ssc = new StreamingContext(conf, Milliseconds(50))
     ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
-
-    stream = MockStream(ssc)
-    stream.dstream.foreachRDD{rdd => val doNothing = true}// Do nothing
   }
 
   override def afterEach() {
     ssc.stop()
   }
 
-  def launchVisualization[T <: Visualization](vizClazz: Class[T]): Unit = {
-    val visualization = vizClazz.newInstance
-    visualization.init(stream.dstream, ssc, visualizationClient)
+  def launchVisualization(configuration: VisualizationConfiguration): Unit = {
+    val visualization = Class.forName(configuration.clazz).newInstance.asInstanceOf[Visualization]
+    val context = visualizationBuilder.buildContext(ssc, dataCollector, visualization.metadata, configuration, outputStreams)
+    visualization.init(context)
 
     ssc.start()
   }
 
   def allSentOutData() = {
     val captor = ArgumentCaptor.forClass(classOf[Map[String, Double]])
-    verify(visualizationClient, Mockito.atLeast(0)).send(any[Long], captor.capture())
+    verify(dataCollector, Mockito.atLeast(0)).push(any[Long], captor.capture())
     captor.getAllValues
   }
   def latestSentOutData() = {
     val captor = ArgumentCaptor.forClass(classOf[Map[String, Double]])
-    verify(visualizationClient, Mockito.atLeast(0)).send(any[Long], captor.capture())
+    verify(dataCollector, Mockito.atLeast(0)).push(any[Long], captor.capture())
     captor.getValue
   }
 }

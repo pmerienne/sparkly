@@ -1,5 +1,5 @@
-app.controller('EditPipelineCtrl', function($scope, $location, $route, $routeParams, $modal, $timeout,
-		NotificationService, JsPlumbService, Pipeline, Component, ComponentMetadata, ValidationReport, Cluster) {
+app.controller('EditPipelineCtrl', function($scope, $location, $routeParams, $modal, $timeout,
+		NotificationService, JsPlumbService, Pipeline, Component, ComponentMetadata, Visualization, VisualizationMetadata, ValidationReport, Cluster) {
 
     $scope.currentView = "Data workflow";
 
@@ -47,10 +47,20 @@ app.controller('EditPipelineCtrl', function($scope, $location, $route, $routePar
             NotificationService.notify("Deploying pipeline on " + cluster.name);
             cluster.deploy($scope.pipeline.id).then(function(success) {
                 NotificationService.notify($scope.pipeline.name + " deployed on " + cluster.name);
+                $location.path('clusters/' + clusterId).replace();
             }, function(error) {
                 NotificationService.notify("Unable to deploy pipeline " + $scope.pipeline.name + " on " + cluster.name, "danger");
             });
         });
     };
 
+    VisualizationMetadata.findAll().then(function(metadatas) {
+        $scope.visualizationMetadatas = metadatas;
+    });
+
+    $scope.addNewVisualization = function(visualizationMetadata) {
+        var viz = new Visualization.newVisualization(visualizationMetadata);
+        $scope.pipeline.visualizations.push(viz);
+        $scope.validate();
+    };
 });

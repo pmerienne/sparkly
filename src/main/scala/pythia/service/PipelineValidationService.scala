@@ -1,19 +1,27 @@
 package pythia.service
 
-import pythia.core.{ComponentConfiguration, PipelineConfiguration, Property, StreamConfiguration}
-import pythia.dao.ComponentRepository
+import pythia.core._
+import pythia.dao._
 import pythia.service.MessageLevel.MessageLevel
 
 import scala.util.Try
+import pythia.core.StreamConfiguration
+import pythia.core.ComponentConfiguration
+import pythia.core.PipelineConfiguration
+import scala.Some
 
-class PipelineValidationService(implicit val componentRepository: ComponentRepository) {
+class PipelineValidationService(
+  implicit val visualizationRepository: VisualizationRepository,
+  implicit val componentRepository: ComponentRepository) {
 
   val componentValidator = new ComponentValidator()
+  val visualizationValidator = new VisualizationValidator()
 
   def validate(pipeline: PipelineConfiguration): ValidationReport = {
     val componentsMessages = pipeline.components.flatMap(componentValidator.validate)
+    val visualizationsMessages = pipeline.visualizations.flatMap(visualizationValidator.validate)
 
-    ValidationReport(componentsMessages)
+    ValidationReport(componentsMessages ++ visualizationsMessages)
   }
 }
 
@@ -60,6 +68,54 @@ class ComponentValidator(implicit val componentRepository: ComponentRepository) 
   }
 }
 
+
+class VisualizationValidator(implicit val visualizationRepository: VisualizationRepository) {
+  def validate(visualizationConfiguration: VisualizationConfiguration): List[ValidationMessage] = {
+    val visualizationName = visualizationConfiguration.name
+
+    val visualizationMetadata = visualizationRepository.visualization(visualizationConfiguration.clazz) match {
+      case Some(metadata) => metadata
+      case None => {
+        return List(ValidationMessage(s"'${visualizationName}' visualization implementation '${visualizationConfiguration.clazz}' is unknown.", MessageLevel.Error))
+      }
+    }
+
+    val missingPropertiesReport = visualizationMetadata.properties
+      .filter{case (name, metadata) => metadata.mandatory && metadata.defaultValue.isEmpty && !visualizationConfiguration.properties.contains(name)}
+      .map{case (name, metadata) => ValidationMessage(s"'${name}' property of '${visualizationName}' visualization is mandatory.", MessageLevel.Error)}
+      .toList
+
+    val badPropertyValuesReport = visualizationMetadata.properties
+      .map{case (name, metadata) => (name, metadata, visualizationConfiguration.properties.get(name))}
+      .filter{case (name, metadata, value) =>
+        val property = Property(metadata, value)
+        Try(property.get).isFailure
+      }
+      .map{case (name, metadata, value) => ValidationMessage(s"'${name}' property of '${visualizationName}' visualization is a ${metadata.propertyType} property. Value '${value.getOrElse(null)}' is not supported.", MessageLevel.Error)}
+
+    val missingStreamReport = visualizationMetadata.streams
+      .filter(stream => !visualizationConfiguration.streams.contains(stream))
+      .map(stream => ValidationMessage(s"'${stream}' stream of '${visualizationName}' visualization is missing.", MessageLevel.Error))
+
+    val badStreamReport = visualizationMetadata.streams
+      .filter(stream => visualizationConfiguration.streams.contains(stream))
+      .map{stream => (stream, visualizationConfiguration.streams(stream))}
+      .filter{case (stream, identifier) => identifier.hasMissingFields()}
+      .map{case (stream, identifier) => ValidationMessage(s"'${stream}' stream of '${visualizationName}' visualization is missing.", MessageLevel.Error)}
+
+    val missingFeatureReport = visualizationMetadata.features
+      .filter(feature => !visualizationConfiguration.features.contains(feature))
+      .map(feature => ValidationMessage(s"'${feature}' feature of '${visualizationName}' visualization is missing.", MessageLevel.Error))
+
+    val badFeatureReport = visualizationMetadata.features
+      .filter(feature => visualizationConfiguration.features.contains(feature))
+      .map{feature => (feature, visualizationConfiguration.features(feature))}
+      .filter{case (feature, identifier) => identifier.hasMissingFields()}
+      .map{case (feature, identifier) => ValidationMessage(s"'${feature}' feature of '${visualizationName}' visualization is missing.", MessageLevel.Error)}
+
+    missingPropertiesReport ++ badPropertyValuesReport ++ missingStreamReport ++ badStreamReport ++ missingFeatureReport ++ badFeatureReport
+  }
+}
 
 case class ValidationReport(messages: List[ValidationMessage] = List()) {
   def add(message: ValidationMessage): ValidationReport = this.copy(messages = this.messages :+ message)

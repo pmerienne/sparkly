@@ -13,7 +13,7 @@ import pythia.testing._
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
-  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
+  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
   val pipelineBuilder = new PipelineBuilder()
 

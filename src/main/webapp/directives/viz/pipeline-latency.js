@@ -31,7 +31,7 @@ app.directive('pipelineLatencyViz', function(VisualizationDataSource) {
                 height: 300,
 	            preserve: true,
                 series: new Rickshaw.Series.FixedDuration([{ name: 'Scheduling delay (ms)', color: palette.color() }, {name: 'Processing delay (ms)', color: palette.color()}], undefined, {
-                    timeInterval: 1000,
+                    timeInterval: 1000, // TODO : Hard coded batch duration
                     maxDataPoints: 60
                 })
             });

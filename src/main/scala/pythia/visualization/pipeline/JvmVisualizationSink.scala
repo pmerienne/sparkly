@@ -4,11 +4,10 @@ import java.util.Properties
 import com.codahale.metrics._
 import java.util.concurrent.TimeUnit
 import java.util
-import pythia.core.VisualizationClient
+import pythia.core.VisualizationDataCollector
 import pythia.config.PythiaConfig
-import org.apache.spark.SecurityManager
 
-class JvmVisualizationSink(val property: Properties, val registry: MetricRegistry, securityMgr: SecurityManager) extends Sink {
+class JvmVisualizationSink(val property: Properties, val registry: MetricRegistry, securityMgr: org.apache.spark.SecurityManager) extends Sink {
 
   val clusterId = "local"
   val reporter = new JvmVisualizationReporter(clusterId, "pipeline-memory", registry)
@@ -37,7 +36,7 @@ class JvmVisualizationReporter (clusterId: String, visualizationId: String, regi
     rateUnit: TimeUnit,
     durationUnit: TimeUnit) {
 
-  val visualizationClient = new VisualizationClient(PythiaConfig.HOSTNAME, PythiaConfig.WEB_PORT, clusterId, visualizationId)
+  val dataCollector = new VisualizationDataCollector(PythiaConfig.HOSTNAME, PythiaConfig.WEB_PORT, clusterId, visualizationId)
 
   override def report(
     gauges: util.SortedMap[String, Gauge[_]],
@@ -62,6 +61,6 @@ class JvmVisualizationReporter (clusterId: String, visualizationId: String, regi
     }
 
     val data = Map ("memory.used" -> memoryUsed, "memory.max" -> maxMemory, "memory.committed" -> memoryCommitted)
-    visualizationClient.send(System.currentTimeMillis, data)
+    dataCollector.push(System.currentTimeMillis, data)
   }
 }

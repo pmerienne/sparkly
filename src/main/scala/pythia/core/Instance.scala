@@ -46,6 +46,9 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
     FeatureList(values.map(value => Feature(value)))
   }
 
+  def rawFeature(name: String): Feature[Any] = {
+    Feature(rawFeatures.get(name))
+  }
 }
 
 object Instance {

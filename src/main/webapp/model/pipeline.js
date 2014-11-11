@@ -1,11 +1,12 @@
-app.factory('Pipeline', function($http, Component, Connection, ValidationReport) {
+app.factory('Pipeline', function($http, Component, Visualization, Connection, ValidationReport) {
 
-    function Pipeline(id, name, description, components, connections) {
+    function Pipeline(id, name, description, components, connections, visualizations) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.components = components;
         this.connections = connections;
+        this.visualizations = visualizations;
     };
 
     Pipeline.build = function (data) {
@@ -14,7 +15,8 @@ app.factory('Pipeline', function($http, Component, Connection, ValidationReport)
             data.name,
             data.description,
             data.components.map(Component.build),
-            data.connections.map(Connection.build)
+            data.connections.map(Connection.build),
+            data.visualizations.map(Visualization.build)
         );
     };
 
@@ -35,7 +37,7 @@ app.factory('Pipeline', function($http, Component, Connection, ValidationReport)
     };
 
     Pipeline.prototype.save = function() {
-        return $http.put('api/pipelines/' , this);
+        return $http.put('api/pipelines/', this);
     };
 
     Pipeline.validate = function(pipeline) {
@@ -86,6 +88,10 @@ app.factory('Pipeline', function($http, Component, Connection, ValidationReport)
 
     Pipeline.prototype.component = function(componentId) {
         return $.grep(this.components, function (component) { return component.id == componentId})[0];
+    };
+
+    Pipeline.prototype.visualization = function(visualizationId) {
+        return $.grep(this.visualizations, function (visualization) { return visualization.id == visualizationId})[0];
     };
 
     return Pipeline;

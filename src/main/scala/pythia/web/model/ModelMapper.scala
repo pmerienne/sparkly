@@ -1,17 +1,19 @@
 package pythia.web.model
 
 import pythia.core._
-import pythia.dao.ComponentRepository
+import pythia.dao.{VisualizationRepository, ComponentRepository}
 import pythia.service.{ValidationMessage, ValidationReport, ClusterStatus}
+import scala.util.Random
 
-class ModelMapper(implicit val componentRepository: ComponentRepository) {
+class ModelMapper(implicit val componentRepository: ComponentRepository, implicit val visualizationRepository: VisualizationRepository) {
 
   def convert(pipeline: PipelineConfiguration): PipelineConfigurationModel =  PipelineConfigurationModel (
     id = pipeline.id,
     name = pipeline.name,
     description = pipeline.description,
     components = pipeline.components.map(convert),
-    connections = pipeline.connections.map(convert)
+    connections = pipeline.connections.map(convert),
+    visualizations = pipeline.visualizations.map(convert)
   )
 
   def convert(component: ComponentConfiguration): ComponentConfigurationModel = ComponentConfigurationModel (
@@ -25,6 +27,14 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     outputs =  component.outputs.map(d => convert(d._1, d._2)).toList
   )
 
+  def convert(visualization: VisualizationConfiguration): VisualizationConfigurationModel = VisualizationConfigurationModel (
+    id = visualization.id,  name = visualization.name,
+    metadata = convert(visualization.clazz, visualizationRepository.findByClassName(visualization.clazz)),
+    properties = visualization.properties.map(p => convert(p._1, p._2)).toList,
+    streams = visualization.streams.map(p => convert(p._1, p._2)).toList,
+    features = visualization.features.map(p => convert(p._1, p._2)).toList
+  )
+
   def convert(id: String, metadata: ComponentMetadata): ComponentMetadataModel = ComponentMetadataModel (
     id = id,
     name = metadata.name,
@@ -33,6 +43,14 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     properties = metadata.properties.map(d => convert(d._1, d._2)).toList,
     inputs = metadata.inputs.map(d => convert(d._1, d._2)).toList,
     outputs = metadata.outputs.map(d => convert(d._1, d._2)).toList
+  )
+
+  def convert(id: String, metadata: VisualizationMetadata): VisualizationMetadataModel = VisualizationMetadataModel (
+    id = id,
+    name = metadata.name,
+    properties = metadata.properties.map(d => convert(d._1, d._2)).toList,
+    streams = metadata.streams,
+    features = metadata.features
   )
 
   def convert(name: String, metadata: PropertyMetadata): PropertyMetadataModel = PropertyMetadataModel (
@@ -67,6 +85,19 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     selectedFeatures = configuration.selectedFeatures
   )
 
+  def convert(name: String, identifier: StreamIdentifier): StreamIdentifierModel = StreamIdentifierModel (
+    name = name,
+    component = identifier.component,
+    stream = identifier.stream
+  )
+
+  def convert(name: String, identifier: FeatureIdentifier): FeatureIdentifierModel = FeatureIdentifierModel (
+    name = name,
+    component = identifier.component,
+    stream = identifier.stream,
+    feature = identifier.feature
+  )
+
   def convert(connection: ConnectionConfiguration): ConnectionModel = ConnectionModel (
     from = ConnectionPointModel(connection.from.component, connection.from.stream),
     to = ConnectionPointModel(connection.to.component, connection.to.stream)
@@ -77,7 +108,8 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     name = pipeline.name,
     description = pipeline.description,
     components = pipeline.components.map(convert),
-    connections = pipeline.connections.map(convert)
+    connections = pipeline.connections.map(convert),
+    visualizations = pipeline.visualizations.map(convert)
   )
 
   def convert(component: ComponentConfigurationModel): ComponentConfiguration = ComponentConfiguration (
@@ -91,11 +123,31 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     outputs = component.outputs.map(convert).toMap
   )
 
+  def convert(visualization: VisualizationConfigurationModel): VisualizationConfiguration = VisualizationConfiguration (
+    id = visualization.id,
+    name = visualization.name,
+    clazz = visualization.metadata.id,
+    properties = visualization.properties.map(convert).toMap,
+    streams = visualization.streams.map(convert).toMap,
+    features = visualization.features.map(convert).toMap
+  )
+
   def convert(property: PropertyConfigurationModel) = (property.name, property.value)
 
   def convert(input: StreamConfigurationModel) = (input.name, StreamConfiguration (
     mappedFeatures = input.mappedFeatures,
     selectedFeatures = input.selectedFeatures
+  ))
+
+  def convert(identifier: StreamIdentifierModel) = (identifier.name, StreamIdentifier (
+    component = identifier.component,
+    stream = identifier.stream
+  ))
+
+  def convert(identifier: FeatureIdentifierModel) = (identifier.name, FeatureIdentifier (
+    component = identifier.component,
+    stream = identifier.stream,
+    feature = identifier.feature
   ))
 
   def convert(connection: ConnectionModel): ConnectionConfiguration = ConnectionConfiguration (

@@ -7,7 +7,8 @@ case class PipelineConfigurationModel (
   name: String,
   description: String,
   components: List[ComponentConfigurationModel] = List(),
-  connections: List[ConnectionModel] = List()
+  connections: List[ConnectionModel] = List(),
+  visualizations: List[VisualizationConfigurationModel] = List()
 )
 
 case class ConnectionModel(from: ConnectionPointModel, to: ConnectionPointModel) 
@@ -57,3 +58,20 @@ case class ClusterStatusModel(state: String, time: Option[Date], pipeline: Optio
 
 case class ValidationReportModel(messages: List[ValidationMessageModel] = List())
 case class ValidationMessageModel(text: String, level: String)
+
+case class VisualizationConfigurationModel (
+  id: String,  name: String, metadata: VisualizationMetadataModel,
+  properties: List[PropertyConfigurationModel] = List(),
+  streams: List[StreamIdentifierModel] = List(),
+  features: List[FeatureIdentifierModel] = List()
+)
+
+case class VisualizationMetadataModel (
+  id: String, name: String,
+  properties: List[PropertyMetadataModel] = List(),
+  streams: List[String] = List(),
+  features: List[String] = List()
+)
+
+case class StreamIdentifierModel(name: String, component: String, stream: String)
+case class FeatureIdentifierModel(name: String, component: String, stream: String, feature: String)

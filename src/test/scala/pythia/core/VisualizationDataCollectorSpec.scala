@@ -11,7 +11,7 @@ import pythia.web.resource.VisualizationResource
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventually {
+class VisualizationDataCollectorSpec extends ScalatraFlatSpec with Matchers with Eventually {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
@@ -28,14 +28,14 @@ class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventu
       .collectFirst{case (host, port) => (host.get, port)}
       .get
 
-    val visualisationClient = new VisualizationClient(visualisationHost, visualisationPort, master, id)
+    val dataCollector = new VisualizationDataCollector(visualisationHost, visualisationPort, master, id)
 
     val messages = ListBuffer[String]()
     val client: Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder] = ClientFactory.getDefault.newClient.asInstanceOf[Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder]]
     val opts = client.newOptionsBuilder().reconnect(false).build()
     val req = client.newRequestBuilder
       .method(Request.METHOD.GET)
-      .uri(visualisationClient.url)
+      .uri(dataCollector.url)
       .transport(Request.TRANSPORT.WEBSOCKET)
     val socket = client.create(opts).on(Event.MESSAGE, new Function[String] {
       def on(msg: String) = messages += msg
@@ -43,7 +43,7 @@ class VisualizationClientSpec extends ScalatraFlatSpec with Matchers with Eventu
     socket.open(req.build())
 
     //Then
-    visualisationClient.send(0L, Map("test" -> 1.0), false)
+    dataCollector.push(0L, Map("test" -> 1.0), false)
 
     eventually {
       messages contains only (

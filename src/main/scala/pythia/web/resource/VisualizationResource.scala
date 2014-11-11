@@ -3,19 +3,32 @@ package pythia.web.resource
 import org.scalatra.atmosphere._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import pythia.dao.{VisualizationRepository, ComponentRepository}
+import pythia.web.model.ModelMapper
 
-class VisualizationResource extends BaseResource with AtmosphereSupport {
+class VisualizationResource(
+  implicit val visualizationRepository: VisualizationRepository,
+  implicit val modelMapper: ModelMapper) extends BaseResource with AtmosphereSupport {
 
-  atmosphere("/:master/:id") {
+  get("/") {
+    visualizationRepository
+      .visualizations()
+      .map{case (id, metadata) => (id, modelMapper.convert(id, metadata))}
+  }
+
+  get("/:id") {
+    val id = params("id")
+    visualizationRepository.visualization(id) match {
+      case Some(metadata) => modelMapper.convert(id, metadata)
+      case None => halt(404)
+    }
+  }
+
+  atmosphere("/data/:master/:id") {
     val master = params("master")
     val id = params("id")
     new VisualizationAtmosphereClient(master + ":" + id)
   }
-
-  error {
-    case t: Throwable => t.printStackTrace()
-  }
-
 
   class VisualizationAtmosphereClient(val id: String) extends AtmosphereClient {
 
