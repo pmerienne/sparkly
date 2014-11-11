@@ -45,9 +45,9 @@ app.controller('EditPipelineCtrl', function($scope, $location, $routeParams, $mo
     $scope.launch = function(clusterId) {
         Cluster.findById("local").then(function(cluster) {
             NotificationService.notify("Deploying pipeline on " + cluster.name);
+            $location.path('clusters/' + clusterId).replace();
             cluster.deploy($scope.pipeline.id).then(function(success) {
                 NotificationService.notify($scope.pipeline.name + " deployed on " + cluster.name);
-                $location.path('clusters/' + clusterId).replace();
             }, function(error) {
                 NotificationService.notify("Unable to deploy pipeline " + $scope.pipeline.name + " on " + cluster.name, "danger");
             });

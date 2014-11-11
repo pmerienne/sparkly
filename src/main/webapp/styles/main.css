@@ -341,12 +341,14 @@ select.form-control {
     position: relative;
     display: inline-block;
     width: 100%;
+    height: 330px;
 }
 
 .chart {
     display: inline-block;
     position: absolute;
     width: 100%;
+    height: 300px;
 }
 
 .chart-legend {
@@ -356,11 +358,8 @@ select.form-control {
 }
 
 .chart-title {
-    display: inline-block;
     font-size: 18px;
     font-weight: 400;
     width: 100%;
     text-align: center;
-    position: absolute;
-    z-index: 10;
 }
