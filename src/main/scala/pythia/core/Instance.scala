@@ -4,7 +4,7 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
 
   def inputFeature(name: String): Feature[Any] = {
     val realName = inputMapper.get.featureName(name)
-    Feature(rawFeatures.get(realName))
+    Feature(rawFeatures.get(realName).flatMap(Option(_)))
   }
 
   def inputFeature(name: String, value: Any): Instance = {
@@ -15,7 +15,7 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
   def inputFeatures[T](name: String): FeatureList = {
     val realNames = inputMapper.get.featuresNames(name)
     val values = realNames.map(realName => rawFeatures.get(realName))
-    FeatureList(values.map(value => Feature(value)))
+    FeatureList(values.map(value => Feature(value.flatMap(Option(_)))))
   }
 
   def inputFeatures(name: String, values: List[_]): Instance = {
@@ -26,7 +26,7 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
 
   def outputFeature(name: String): Feature[Any] = {
     val realName = outputMapper.get.featureName(name)
-    Feature(rawFeatures.get(realName))
+    Feature(rawFeatures.get(realName).flatMap(Option(_)))
   }
 
   def outputFeature(name: String, value: Any): Instance = {
@@ -47,7 +47,7 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
   }
 
   def rawFeature(name: String): Feature[Any] = {
-    Feature(rawFeatures.get(name))
+    Feature(rawFeatures.get(name).flatMap(Option(_)))
   }
 }
 

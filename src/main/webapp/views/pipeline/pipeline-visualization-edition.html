@@ -25,5 +25,17 @@
         </div>
     </form>
 
+    <form class="form-inline" role="form" ng-if="visualization.features.length > 0">
+        <div ng-repeat="feature in visualization.features" style="display: inline-block;padding: 10px;">
+            <span>{{feature.name}} : </span>
+            <div class="form-group">
+                <select class="form-control" ng-model="feature.component" ng-options="component.id as component.name for component in pipeline.components" ng-required="true"></select>
+                <select class="form-control" ng-model="feature.stream" ng-options="stream.name as stream.name for stream in pipeline.component(feature.component).outputs" ng-required="true"></select>
+                <select class="form-control" ng-model="feature.feature" ng-options="feature for feature in pipeline.component(feature.component).outputStream(feature.stream).availableFeatures()" ng-required="true"></select>
+            </div>
+
+        </div>
+    </form>
+
     <hr />
 </div>
