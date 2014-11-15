@@ -17,8 +17,8 @@ case class FeatureList(values:List[Feature[_]]) {
 
 case class Feature[U : ClassTag](value: Option[U]) {
 
-  def isDefined: Boolean = value.isDefined
-  def isEmpty: Boolean = value.isEmpty
+  def isDefined: Boolean = value.isDefined && value.get != null
+  def isEmpty: Boolean = value.isEmpty || value.get == null
 
   def or[V: ClassTag](other: V): V = value match {
     case Some(_) => as[V]
