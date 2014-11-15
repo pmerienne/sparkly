@@ -8,10 +8,10 @@ import pythia.core.VisualizationMetadata
 import pythia.core.PropertyMetadata
 import pythia.core.VisualizationContext
 
-class RateVisualization extends Visualization {
+class ThroughputVisualization extends Visualization {
 
   def metadata = VisualizationMetadata (
-    name = "Rate",
+    name = "Throughput",
     properties = Map("Window length (in ms)" -> PropertyMetadata(LONG)),
     streams = List("Stream")
   )
@@ -24,8 +24,8 @@ class RateVisualization extends Visualization {
     stream
       .window(Milliseconds(windowDuration))
       .foreachRDD((rdd, time) => {
-        val rate = 1000 * rdd.count.toDouble / windowDuration.toDouble
-        dataCollector.push(time.milliseconds, Map("rate" -> rate))
+        val throughput = 1000 * rdd.count.toDouble / windowDuration.toDouble
+        dataCollector.push(time.milliseconds, Map("throughput" -> throughput))
       })
   }
 }

@@ -1,8 +1,8 @@
-app.directive('pythiaVisualizationRatevisualization', function(VisualizationDataSource) {
+app.directive('pythiaVisualizationThroughputvisualization', function(VisualizationDataSource) {
 	return {
 		restrict : "E",
 		replace : true,
-		templateUrl : 'views/visualization/stream-rate.html',
+		templateUrl : 'views/visualization/stream-throughput.html',
 		scope : {
 			clusterid : "=",
 			configuration: "="
@@ -13,7 +13,7 @@ app.directive('pythiaVisualizationRatevisualization', function(VisualizationData
             scope.dataSource = new VisualizationDataSource(scope.clusterid, scope.configuration.id);
             scope.dataSource.listen(function(event){
                 var time = event.timestampMs / 1000;
-                var data = {'Rate': event.data.rate};
+                var data = {'Throughput': event.data.throughput};
                 scope.graph.series.addData(data, time);
                 scope.graph.render();
             });
@@ -29,7 +29,7 @@ app.directive('pythiaVisualizationRatevisualization', function(VisualizationData
                 height: 300,
 	            preserve: true,
 	            interpolation: 'linear',
-                series: new Rickshaw.Series.FixedDuration([{ name: 'Rate', color: '#65b9ac' }], undefined, {
+                series: new Rickshaw.Series.FixedDuration([{ name: 'Throughput', color: '#65b9ac' }], undefined, {
                     timeInterval: 1000, // TODO : Hard coded batch duration
                     maxDataPoints: 60
                 })
