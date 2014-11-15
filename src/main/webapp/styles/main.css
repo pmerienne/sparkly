@@ -357,6 +357,12 @@ select.form-control {
     margin: 0 0 0 10px;
 }
 
+.chart-value {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0px 0 0 30px;
+}
+
 .chart-title {
     font-size: 18px;
     font-weight: 400;

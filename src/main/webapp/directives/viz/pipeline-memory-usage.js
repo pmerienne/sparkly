@@ -12,9 +12,9 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
             scope.dataSource.listen(function(event){
                 var time = event.timestampMs / 1000;
                 var data = {
-                    'Memory used (MB)': event.data["memory.used"] / 1024 / 1024,
-                    'Memory committed (MB)': event.data["memory.committed"] / 1024 / 1024,
-                    'Max Memory (MB)': event.data["memory.max"]  / 1024 / 1024
+                    'Memory used': event.data["memory.used"],
+                    'Memory committed': event.data["memory.committed"],
+                    'Max Memory': event.data["memory.max"]
                 };
                 scope.graph.series.addData(data, time);
                 scope.graph.render();
@@ -31,15 +31,27 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
                 height: 300,
 	            preserve: true,
 	            interpolation: 'linear',
-                series: new Rickshaw.Series.FixedDuration([{ name: 'Memory used (MB)', color: '#73c03a'}, { name: 'Memory committed (MB)', color: '#65b9ac'}, {name: 'Max Memory (MB)', color: '#cb513a'}], undefined, {
+                series: new Rickshaw.Series.FixedDuration([{ name: 'Memory used', color: '#73c03a'}, { name: 'Memory committed', color: '#65b9ac'}, {name: 'Max Memory', color: '#cb513a'}], undefined, {
                     timeInterval: 10000,
                     maxDataPoints: 60
                 })
             });
 
+            function humanSize(bytes) {
+                var thresh = 1000;
+                if(bytes < thresh) return bytes.toFixed(1) + ' B';
+                var units = ['KB', 'MB', 'GB','TB','PB','EB','ZB','YB'];
+                var u = -1;
+                do {
+                    bytes /= thresh;
+                    ++u;
+                } while(bytes >= thresh);
+                return bytes.toFixed(1)+' '+units[u];
+            };
+
             var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                 graph: scope.graph,
-                yFormatter: function(y) { return Math.floor(y) + " MB" },
+                yFormatter: function(y) { return humanSize(y)},
                 xFormatter: function(x) {return new Date(x * 1000).toString();}
             });
 
@@ -62,7 +74,7 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
 
             var yAxis = new Rickshaw.Graph.Axis.Y({
                 graph: scope.graph,
-                tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                tickFormat: function(y){return humanSize(y);},
                 ticksTreatment: 'glow'
             });
             yAxis.render();

@@ -14,9 +14,12 @@ app.directive('pythiaVisualizationThroughputvisualization', function(Visualizati
             scope.dataSource.listen(function(event){
                 var time = event.timestampMs / 1000;
                 var data = {'Throughput': event.data.throughput};
+                scope.lastThroughput = Math.round(event.data.throughput);
                 scope.graph.series.addData(data, time);
                 scope.graph.render();
             });
+
+            scope.lastThroughput = 0;
 
             scope.$on('$destroy', function() {
                 scope.dataSource.close();
@@ -51,6 +54,7 @@ app.directive('pythiaVisualizationThroughputvisualization', function(Visualizati
 
             var yAxis = new Rickshaw.Graph.Axis.Y({
                 graph: scope.graph,
+                ticks: 2,
                 tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
                 ticksTreatment: 'glow'
             });
