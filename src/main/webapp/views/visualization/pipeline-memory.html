@@ -2,6 +2,8 @@
     <div class="chart-container">
         <div class="chart-title">Memory Usage</div>
         <div class="chart"></div>
-        <div class="chart-legend"></div>
+        <div class="chart-value" ng-show="currentUsage != null">
+            {{currentUsage}} <small>{{currentUsagePercent}}%</small>
+        </div>
     </div>
 </div>
