@@ -37,8 +37,8 @@ class CategoricalVisualizationSpec extends VisualizationSpec {
     outputStreams += ("component", "stream") -> stream.dstream
 
     val configuration = VisualizationConfiguration (
-      name = "Instance rate", clazz = classOf[CategoricalVisualization].getName,
-      properties = Map("Window length (in ms)" -> "1000", "Max category" -> "2"),
+      name = "Category distribution", clazz = classOf[CategoricalVisualization].getName,
+      properties = Map("Window length (in ms)" -> "1000", "Max category (0 for unlimited)" -> "2"),
       features = Map("Categorical feature (String, Boolean)" -> FeatureIdentifier("component", "stream", "country"))
     )
 

@@ -12,15 +12,15 @@ class CategoricalVisualization extends Visualization {
   implicit def orderingByName: Ordering[(String, Double)] = Ordering.by(count => count._2)
 
   def metadata = VisualizationMetadata (
-    name = "Categorical",
-    properties = Map("Window length (in ms)" -> PropertyMetadata(LONG), "Max category" -> PropertyMetadata(INTEGER, Some(-1))),
+    name = "Categorical distribution",
+    properties = Map("Window length (in ms)" -> PropertyMetadata(LONG), "Max category (0 for unlimited)" -> PropertyMetadata(INTEGER, Some(0))),
     features = List("Categorical feature (String, Boolean)")
   )
 
   override def init(context: VisualizationContext): Unit = {
     val dstream = context.features("Categorical feature (String, Boolean)")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
-    val max = context.properties("Max category").as[Int]
+    val max = context.properties("Max category (0 for unlimited)").as[Int]
     val dataCollector = context.dataCollector
 
     dstream

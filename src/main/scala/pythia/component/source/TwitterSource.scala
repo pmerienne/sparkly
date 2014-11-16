@@ -23,7 +23,12 @@ class TwitterSource extends Component {
       "Access token secret" -> PropertyMetadata(STRING)
     ),
     outputs = Map(
-      "Tweets" -> OutputStreamMetadata(namedFeatures = Map("User id" -> FeatureType.LONG, "Text" -> FeatureType.STRING, "Lang" -> FeatureType.STRING))
+      "Tweets" -> OutputStreamMetadata(namedFeatures = Map (
+        "User id" -> FeatureType.LONG,
+        "Text" -> FeatureType.STRING,
+        "Lang" -> FeatureType.STRING,
+        "Size" -> FeatureType.INTEGER
+      ))
     )
   )
 
@@ -39,7 +44,12 @@ class TwitterSource extends Component {
 
     val tweets = TwitterUtils
       .createStream(context.ssc, Some(auth))
-      .map(status => Instance("User id" -> status.getUser.getId, "Text" -> status.getText, "Lang" -> status.getUser.getLang))
+      .map(status => Instance(
+        "User id" -> status.getUser.getId,
+        "Text" -> status.getText,
+        "Lang" -> status.getUser.getLang,
+        "Size" -> status.getText.size
+      ))
 
     Map("Tweets" -> tweets)
   }

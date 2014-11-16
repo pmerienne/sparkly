@@ -7,8 +7,19 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
 			clusterId : "=cluster"
 		},
 		link : function(scope, element, attrs) {
-            scope.dataSource = new VisualizationDataSource(scope.clusterId, "pipeline-memory");
+            function humanSize(bytes) {
+                var thresh = 1000;
+                if(bytes < thresh) return bytes.toFixed(1) + ' B';
+                var units = ['KB', 'MB', 'GB','TB','PB','EB','ZB','YB'];
+                var u = -1;
+                do {
+                    bytes /= thresh;
+                    ++u;
+                } while(bytes >= thresh);
+                return bytes.toFixed(1)+' '+units[u];
+            };
 
+            scope.dataSource = new VisualizationDataSource(scope.clusterId, "pipeline-memory");
             scope.dataSource.listen(function(event){
                 var time = event.timestampMs / 1000;
                 var data = {
@@ -18,6 +29,9 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
                 };
                 scope.graph.series.addData(data, time);
                 scope.graph.render();
+
+                scope.currentUsage = humanSize(event.data["memory.used"]) + "/" + humanSize(event.data["memory.max"]);
+                scope.currentUsagePercent = Math.round(100 * event.data["memory.used"] / event.data["memory.max"]);
             });
 
             scope.$on('$destroy', function() {
@@ -37,32 +51,11 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
                 })
             });
 
-            function humanSize(bytes) {
-                var thresh = 1000;
-                if(bytes < thresh) return bytes.toFixed(1) + ' B';
-                var units = ['KB', 'MB', 'GB','TB','PB','EB','ZB','YB'];
-                var u = -1;
-                do {
-                    bytes /= thresh;
-                    ++u;
-                } while(bytes >= thresh);
-                return bytes.toFixed(1)+' '+units[u];
-            };
-
             var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                 graph: scope.graph,
                 yFormatter: function(y) { return humanSize(y)},
                 xFormatter: function(x) {return new Date(x * 1000).toString();}
             });
-
-            var legend = new Rickshaw.Graph.Legend( {
-                graph: scope.graph,
-                element: element.context.querySelector('.chart-legend')
-            });
-            var shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
-            	graph: scope.graph,
-            	legend: legend
-            } );
 
             var xAxis = new Rickshaw.Graph.Axis.X( {
                 graph: scope.graph,
@@ -75,7 +68,8 @@ app.directive('pipelineMemoryViz', function(VisualizationDataSource) {
             var yAxis = new Rickshaw.Graph.Axis.Y({
                 graph: scope.graph,
                 tickFormat: function(y){return humanSize(y);},
-                ticksTreatment: 'glow'
+                ticksTreatment: 'glow',
+                ticks: 2,
             });
             yAxis.render();
 
