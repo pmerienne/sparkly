@@ -13,7 +13,7 @@ class JvmVisualizationSink(val property: Properties, val registry: MetricRegistr
   val reporter = new JvmVisualizationReporter(clusterId, "pipeline-memory", registry)
 
   override def start(): Unit = {
-    reporter.start(10, TimeUnit.SECONDS)
+    reporter.start(1, TimeUnit.SECONDS)
   }
 
   override def stop(): Unit = {
