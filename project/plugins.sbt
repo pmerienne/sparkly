@@ -15,3 +15,5 @@ addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "0.99.7.1")
 addSbtPlugin("com.sksamuel.scoverage" %% "sbt-coveralls" % "0.0.5")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.5")
+
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.4")

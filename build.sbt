@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "org.apache.mahout" % "mahout-math" % "0.9",
   // Scalatra
   "org.scalatra" %% "scalatra" % "2.3.0",
-  "org.scalatra" %% "scalatra-atmosphere" % "2.3.0",
+  "org.scalatra" %% "scalatra-atmosphere" % "2.3.0" exclude("com.typesafe.akka", "akka-actor_2.10"),
   "org.eclipse.jetty" %  "jetty-plus" % jettyVersion % "compile;provided",
   "org.eclipse.jetty" % "jetty-webapp" % jettyVersion % "container;compile",
   "org.eclipse.jetty" % "jetty-websocket" % jettyVersion % "compile;provided",
@@ -88,3 +88,6 @@ releaseSettings
 useGlobalVersion := false
 
 publishTo := Some(Resolver.file("file",  new File( "target/releases" )) )
+
+// Dependency tree
+net.virtualvoid.sbt.graph.Plugin.graphSettings
