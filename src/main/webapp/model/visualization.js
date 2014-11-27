@@ -80,7 +80,7 @@ app.factory('Visualization', function($http, VisualizationMetadata, Property, Pr
     return Visualization;
 });
 
-app.factory('VisualizationDataSource', function() {
+app.factory('VisualizationDataSource', function($http) {
 
     function VisualizationDataSource(master, id) {
         this.master = master;
@@ -88,7 +88,8 @@ app.factory('VisualizationDataSource', function() {
         this.sockets = [];
     }
 
-    VisualizationDataSource.prototype.listen = function(onData) {
+    VisualizationDataSource.prototype.listen = function(onData, onPastData) {
+        var self = this;
         var socket = $.atmosphere;
         this.sockets.push(socket);
         var request = {
@@ -103,8 +104,17 @@ app.factory('VisualizationDataSource', function() {
         request.onOpen = function(message) {
             request.transport = message.transport;
         };
-        socket.subscribe(request);
+
+        if(onPastData) {
+            $http.get('api/visualizations/past_data/' + this.master + '/' + this.id).then(function(pastData) {
+                onPastData(pastData.data);
+                socket.subscribe(request);
+            });
+        } else {
+            socket.subscribe(request);
+        }
     }
+
 
     VisualizationDataSource.prototype.close = function() {
         $.each(this.sockets, function(index, socket) {

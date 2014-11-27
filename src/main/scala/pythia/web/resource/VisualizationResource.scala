@@ -1,14 +1,19 @@
 package pythia.web.resource
 
-import org.scalatra.atmosphere._
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import pythia.dao.{VisualizationRepository, ComponentRepository}
+import com.google.common.collect.EvictingQueue
+import org.json4s._
+import org.scalatra.atmosphere.{JsonMessage, _}
+import pythia.dao.VisualizationRepository
 import pythia.web.model.ModelMapper
+
+import scala.collection.mutable.{Map => MutableMap}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class VisualizationResource(
   implicit val visualizationRepository: VisualizationRepository,
   implicit val modelMapper: ModelMapper) extends BaseResource with AtmosphereSupport {
+
+  val visualizationData: MutableMap[String, VisualizationData] = MutableMap()
 
   get("/") {
     visualizationRepository
@@ -24,16 +29,37 @@ class VisualizationResource(
     }
   }
 
+  get("/past_data/:master/:id") {
+    val master = params("master")
+    val id = params("id")
+    val visualizationId = master + ":" + id
+    getVisualizationData(visualizationId).all()
+  }
+
   atmosphere("/data/:master/:id") {
     val master = params("master")
     val id = params("id")
-    new VisualizationAtmosphereClient(master + ":" + id)
+    val visualizationId = master + ":" + id
+    val data = getVisualizationData(visualizationId)
+    new VisualizationAtmosphereClient(visualizationId, data)
   }
 
-  class VisualizationAtmosphereClient(val id: String) extends AtmosphereClient {
+  private def getVisualizationData(id: String) = visualizationData.get(id) match {
+    case Some(data) => data
+    case None => {
+      val data = new VisualizationData()
+      visualizationData.put(id, data)
+      data
+    }
+  }
+
+  class VisualizationAtmosphereClient(val id: String, val data: VisualizationData) extends AtmosphereClient {
 
     def receive: AtmoReceive = {
-      case JsonMessage(json) => broadcastEvent(json)
+      case JsonMessage(json) => {
+        data.add(json)
+        broadcastEvent(json)
+      }
       case _ =>
     }
 
@@ -51,4 +77,14 @@ class VisualizationResource(
       override def toString(): String = "CustomClientFilter"
     }
   }
+}
+
+class VisualizationData {
+  import scala.collection.JavaConversions._
+
+  private val MAX_DATA = 100
+  private val queue = EvictingQueue.create[JValue](MAX_DATA)
+
+  def add(json: JValue) = queue.offer(json)
+  def all() = queue.toList
 }
