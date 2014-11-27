@@ -52,13 +52,13 @@ app.directive('pythiaVisualizationFeaturestatisticsvisualization', function(Visu
                     preserve: true,
                     interpolation: 'linear',
                     series: new Rickshaw.Series.FixedDuration([
-                        {name: 'Max', color: '#65B9AC'},
-                        {name: '99%', color: '#58A196'},
-                        {name: '90%', color: '#4B8A81'},
-                        {name: '75%', color: '#3F736B'},
-                        {name: '50%', color: '#325C56'},
-                        {name: '25%', color: '#254540'},
-                        {name: 'Min', color: '#192E2B'}
+                        {name: 'Max', color: '#5DADE2'},
+                        {name: '99%', color: '#569CCC'},
+                        {name: '90%', color: '#4F8CB6'},
+                        {name: '75%', color: '#497BA0'},
+                        {name: '50%', color: '#426A8A'},
+                        {name: '25%', color: '#3B5A74'},
+                        {name: 'Min', color: '#34495E'}
                     ], undefined, {
                         timeInterval: 1000, // TODO : Hard coded batch duration
                         maxDataPoints: 60,

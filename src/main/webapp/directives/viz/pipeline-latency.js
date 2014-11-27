@@ -9,15 +9,13 @@ app.directive('pipelineLatencyViz', function(VisualizationDataSource) {
 		link : function(scope, element, attrs) {
 
             scope.initGraph = function(timeBase) {
-                var palette = new Rickshaw.Color.Palette();
-
                 scope.graph = new Rickshaw.Graph({
                     element: element.context.querySelector('.chart'),
                     renderer: 'area',
                     stroke: true,
                     height: 300,
                     preserve: true,
-                    series: new Rickshaw.Series.FixedDuration([{ name: 'Scheduling delay (ms)', color: palette.color() }, {name: 'Processing delay (ms)', color: palette.color()}], undefined, {
+                    series: new Rickshaw.Series.FixedDuration([{ name: 'Scheduling delay (ms)', color: '#34495E' }, {name: 'Processing delay (ms)', color: '#5DADE2'}], undefined, {
                         timeInterval: 1000, // TODO : Hard coded batch duration
                         maxDataPoints: 60,
                         timeBase: timeBase
