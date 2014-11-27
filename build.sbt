@@ -71,6 +71,8 @@ packMain := Map("boot" -> "Boot")
 
 packResourceDir += (baseDirectory.value / "src/main/webapp" -> "web-content")
 
+packResourceDir += (baseDirectory.value / "src/main/resources" -> "conf")
+
 packExtraClasspath := Map("boot" -> Seq("${PROG_HOME}/conf"))
 
 packJvmOpts := Map("boot" -> Seq("-Dpythia.home=${PROG_HOME}"))

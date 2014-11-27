@@ -2,12 +2,11 @@ package pythia.service
 
 import java.util.Date
 
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
 import pythia.config.PythiaConfig._
-import pythia.core.{VisualizationBuilder, PipelineBuilder, PipelineConfiguration}
+import pythia.core.{PipelineBuilder, PipelineConfiguration, VisualizationBuilder}
 import pythia.dao.PipelineRepository
-import pythia.config.PythiaConfig
 
 class LocalClusterService(
   implicit val pipelineBuilder: PipelineBuilder,
@@ -16,7 +15,6 @@ class LocalClusterService(
   implicit val pipelineRepository: PipelineRepository) {
 
   val sparckConfig = new SparkConf()
-    .set("spark.metrics.conf", PythiaConfig.METRICS_CONFIGURATION_FILE)
 
   val sparkContext = new SparkContext("local[4]", "pythia", sparckConfig)
   var streamingContext: Option[StreamingContext] = None
