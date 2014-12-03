@@ -16,7 +16,7 @@ class LocalClusterService(
 
   val sparckConfig = new SparkConf()
 
-  val sparkContext = new SparkContext("local[4]", "pythia", sparckConfig)
+  val sparkContext = new SparkContext("local[16]", "pythia", sparckConfig)
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)
