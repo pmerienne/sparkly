@@ -22,10 +22,11 @@ libraryDependencies ++= Seq(
   // Breeze for linear algebra
   "org.scalanlp" %% "breeze" % "0.8.1",
   "org.scalanlp" %% "breeze-natives" % "0.8.1",
-  // Math lib
+  // Math/Analytics/DM lib
   "com.twitter" %% "algebird-core" % "0.8.1",
   "org.apache.commons" % "commons-math3" % "3.2",
   "org.apache.mahout" % "mahout-math" % "0.9",
+  "nz.ac.waikato.cms.moa" % "moa" % "2014.04",
   // Scalatra
   "org.scalatra" %% "scalatra" % "2.3.0",
   "org.scalatra" %% "scalatra-atmosphere" % "2.3.0" exclude("com.typesafe.akka", "akka-actor_2.10"),

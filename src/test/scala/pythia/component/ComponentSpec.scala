@@ -20,7 +20,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
 
   override def beforeEach() {
     val conf = new SparkConf()
-      .setMaster("local")
+      .setMaster("local[8]")
       .setAppName("test-" + this.getClass.getSimpleName)
 
     ssc = new StreamingContext(conf, Milliseconds(200))
