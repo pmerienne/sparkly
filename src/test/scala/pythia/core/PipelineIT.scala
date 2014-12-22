@@ -8,8 +8,8 @@ import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FlatSpec, Matchers}
 import pythia.component.classifier.Perceptron
 import pythia.component.Normalizer
-import pythia.component.source.CsvSource
 import pythia.testing._
+import pythia.component.source.CsvFileDirectorySource
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
@@ -24,9 +24,11 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
         ComponentConfiguration (
           id = "csv_source",
           name = "Train data",
-          clazz = classOf[CsvSource].getName,
+          clazz = classOf[CsvFileDirectorySource].getName,
           properties = Map (
-            "File" -> "src/test/resources/spam.data"
+            "Directory" -> "src/test/resources",
+            "Process only new files" -> "false",
+            "Filename pattern" -> "spam.data"
           ),
           outputs = Map (
             "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (labelName::featureNames)))

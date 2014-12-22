@@ -2,7 +2,7 @@ app.factory('PropertyMetadata', function() {
 
     function PropertyMetadata(name, defaultValue, propertyType, mandatory, acceptedValues) {
         this.name = name;
-        this.defaultValue = defaultValue;
+        this.defaultValue = defaultValue ? defaultValue.toString() : null;
         this.propertyType = propertyType;
         this.mandatory = mandatory;
         this.acceptedValues = acceptedValues;

@@ -3,7 +3,7 @@ package pythia.service
 import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.mock.MockitoSugar
-import pythia.component.source.CsvSource
+import pythia.component.source.CsvFileDirectorySource
 import pythia.core._
 import pythia.dao._
 import pythia.service.ClusterState._
@@ -80,9 +80,11 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
       ComponentConfiguration (
         id = "csv_source",
         name = "Train data",
-        clazz = classOf[CsvSource].getName,
+        clazz = classOf[CsvFileDirectorySource].getName,
         properties = Map(
-          "File" -> "src/test/resources/spam.data"
+          "Directory" -> "src/test/resources",
+          "Process only new files" -> "false",
+          "Filename pattern" -> "spam.data"
         ),
         outputs = Map(
           "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (labelName :: featureNames)))
