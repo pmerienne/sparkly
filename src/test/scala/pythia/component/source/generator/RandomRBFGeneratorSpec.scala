@@ -1,7 +1,6 @@
 package pythia.component.source.generator
 
 import pythia.component.ComponentSpec
-import pythia.component.source.generator.RandomRBFGenerator
 import pythia.core.{ComponentConfiguration, StreamConfiguration}
 import pythia.testing.InspectedStream
 

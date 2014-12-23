@@ -1,7 +1,8 @@
-package pythia.component
+package pythia.component.preprocess
 
 import pythia.core._
 import pythia.testing.InspectedStream
+import pythia.component.ComponentSpec
 
 class NormalizerSpec extends ComponentSpec {
 
