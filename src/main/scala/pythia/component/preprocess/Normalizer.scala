@@ -1,4 +1,4 @@
-package pythia.component
+package pythia.component.preprocess
 
 import org.apache.spark.streaming.dstream.DStream
 import pythia.core.FeatureType.NUMBER

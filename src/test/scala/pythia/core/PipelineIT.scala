@@ -7,9 +7,9 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FlatSpec, Matchers}
 import pythia.component.classifier.Perceptron
-import pythia.component.Normalizer
 import pythia.testing._
 import pythia.component.source.CsvFileDirectorySource
+import pythia.component.preprocess.Normalizer
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
