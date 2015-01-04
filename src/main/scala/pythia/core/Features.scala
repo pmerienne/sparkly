@@ -8,9 +8,10 @@ import org.joda.time.format.ISODateTimeFormat
 
 import scala.reflect._
 
-case class FeatureList(values:List[Feature[_]]) {
+case class FeatureList(values: List[Feature[_]] = List()) {
   def asList = values
   def as[T : ClassTag] = values.map(_.as[T])
+  def asRaw = values.map(_.value.getOrElse(null))
   def asArrayOf[T : ClassTag]  = as[T].toArray
   def asDenseVector = DenseVector(asArrayOf[Double])
 }
