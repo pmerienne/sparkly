@@ -33,10 +33,3 @@ class BasicFilter extends Component {
     case "!=" => (f: Feature[Any]) => f.as[String] != properties("Operand").as[String]
   }
 }
-
-object Test {
-
-  def main(args: Array[String]) {
-    println("true" > "false")
-  }
-}
