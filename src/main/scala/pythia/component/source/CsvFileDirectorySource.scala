@@ -18,7 +18,8 @@ import scala.Some
 class CsvFileDirectorySource extends Component {
 
   override def metadata = ComponentMetadata(
-    name = "Csv files source", description = "Monitor a directory and parse csv files created in it (files written in nested directories not supported). Note that file system should be compatible with the HDFS API (that is, HDFS, S3, NFS, etc.).", category = "Source - File",
+    name = "Csv files source", description = "Monitor a directory and parse csv files created in it (files written in nested directories not supported). Note that file system should be compatible with the HDFS API (that is, HDFS, S3, NFS, etc.).",
+    category = "Data Sources",
     outputs = Map(
       "Instances" -> OutputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.STRING))
     ),

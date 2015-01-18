@@ -15,7 +15,7 @@ import twitter4j.conf._
 class TwitterSource extends Component {
 
   def metadata = ComponentMetadata (
-    name = "Tweet source", description = "Use twitter as a stream source", category = "Twitter",
+    name = "Tweet source", description = "Use twitter as a stream source", category = "Data Sources",
     properties = Map(
       "Consumer key" -> PropertyMetadata(STRING),
       "Consumer secret" -> PropertyMetadata(STRING),

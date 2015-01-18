@@ -17,7 +17,8 @@ import org.apache.commons.io.FilenameUtils
 class TextFileDirectorySource extends Component {
 
   override def metadata = ComponentMetadata(
-    name = "Text files source", description = "Monitor a directory and process text files created in it (files written in nested directories not supported). Note that file system should be compatible with the HDFS API (that is, HDFS, S3, NFS, etc.).", category = "Source - File",
+    name = "Text files source", description = "Monitor a directory and process text files created in it (files written in nested directories not supported). Note that file system should be compatible with the HDFS API (that is, HDFS, S3, NFS, etc.).",
+    category = "Data Sources",
     outputs = Map(
       "Instances" -> OutputStreamMetadata(namedFeatures = Map("Line" -> FeatureType.STRING))
     ),

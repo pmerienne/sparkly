@@ -1,6 +1,6 @@
 package pythia.component
 
-import java.nio.file.Files
+import java.nio.file.{Path, Files}
 
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
@@ -10,6 +10,8 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import pythia.core._
 import pythia.testing._
+import java.io.File
+import org.apache.commons.io.FileUtils
 
 trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with Eventually {
 
@@ -17,18 +19,23 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
 
   var sc: SparkContext = null
   var ssc: StreamingContext = null
+  var checkpointDirectory: Path = null
 
   override def beforeEach() {
     val conf = new SparkConf()
       .setMaster("local[8]")
       .setAppName("test-" + this.getClass.getSimpleName)
 
+
+    checkpointDirectory = Files.createTempDirectory("pythia-test")
     ssc = new StreamingContext(conf, Milliseconds(200))
-    ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
+    ssc.checkpoint(checkpointDirectory.toString)
   }
 
   override def afterEach() {
     ssc.stop()
+    ssc.awaitTermination(2000)
+    FileUtils.deleteDirectory(checkpointDirectory.toFile)
   }
 
   def deployComponent(componentConfiguration: ComponentConfiguration, inputs: Map[String, DStream[Instance]]): Map[String, InspectedStream] = {
