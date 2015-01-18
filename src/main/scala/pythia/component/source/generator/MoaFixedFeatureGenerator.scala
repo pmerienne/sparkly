@@ -17,7 +17,7 @@ abstract class MoaFixedFeatureGenerator extends Component {
 
   override def metadata = ComponentMetadata(
     name = "MOA generator",
-    category = "Source generator",
+    category = "Data Sources",
     outputs = Map("Instances" -> OutputStreamMetadata(namedFeatures = features.toMap)),
     properties = Map("Throughput (instance/second)" -> PropertyMetadata(INTEGER, defaultValue = Some(100)))
   )

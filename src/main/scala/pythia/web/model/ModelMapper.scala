@@ -58,7 +58,8 @@ class ModelMapper(implicit val componentRepository: ComponentRepository, implici
     propertyType = metadata.propertyType.toString,
     defaultValue = metadata.defaultValue,
     acceptedValues = metadata.acceptedValues,
-    mandatory= metadata.mandatory
+    mandatory= metadata.mandatory,
+    description = metadata.description
   )
 
   def convert(name: String, metadata: InputStreamMetadata): InputStreamMetadataModel = InputStreamMetadataModel (

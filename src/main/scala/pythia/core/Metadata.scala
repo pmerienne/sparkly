@@ -22,8 +22,9 @@ case class PropertyMetadata (
   propertyType: PropertyType,
   defaultValue: Option[_] = None,
   acceptedValues: List[String] = List(),
-  mandatory: Boolean = true) {
-}
+  mandatory: Boolean = true,
+  description: String = ""
+)
 
 object PropertyType extends Enumeration {
   type PropertyType = Value

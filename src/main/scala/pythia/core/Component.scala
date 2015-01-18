@@ -41,6 +41,7 @@ case class Context (
   properties: Map[String, Property],
   ssc: StreamingContext) {
 
+
   def property(name: String) = properties(name)
 
   def dstream(input: String): DStream[Instance] = {
@@ -63,6 +64,8 @@ case class Context (
   def outputSize(output: String, features: String): Int = outputMappers(output).size(features)
   def outputFeatureMapped(output: String, feature: String): Boolean = outputMappers(output).isFeatureMapped(feature)
   def outputFeaturesMapped(output: String, features: String): Boolean = outputMappers(output).areFeaturesMapped(features)
+
+  def outputFeatureName(output: String, feature: String): String = outputMappers(output).featureName(feature)
 }
 
 case class Mapper(namedFeatures: Map[String, String] = Map(), listedFeatures: Map[String, List[String]] = Map()) {

@@ -18,6 +18,8 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "1.1.0",
   "org.apache.spark" %% "spark-streaming" % "1.1.0",
   "org.apache.spark" %% "spark-streaming-twitter" % "1.1.0",
+  "org.apache.spark" %% "spark-streaming-kafka" % "1.1.0",
+  "org.apache.kafka" %% "kafka" % "0.8.0",
   "org.apache.spark" %% "spark-mllib" % "1.1.0",
   // Breeze for linear algebra
   "org.scalanlp" %% "breeze" % "0.8.1",
@@ -42,8 +44,10 @@ libraryDependencies ++= Seq(
   // Utils
   "org.reflections" % "reflections" % "0.9.9-RC1",
   // Test
-  "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test",
-  "org.scalatra" %% "scalatra-scalatest" % "2.3.0" % "test"
+  "org.apache.curator" % "curator-test" % "2.3.0" % Test,
+  "org.apache.kafka" %% "kafka" % "0.8.0" % Test classifier "test",
+  "org.scalatest" % "scalatest_2.10" % "2.2.0" % Test,
+  "org.scalatra" %% "scalatra-scalatest" % "2.3.0" % Test
 )
 
 dependencyOverrides += "org.eclipse.jetty" % "jetty-webapp" % jettyVersion

@@ -44,7 +44,8 @@ case class PropertyMetadataModel (
   propertyType: String,
   defaultValue: Option[_] = None,
   acceptedValues: List[String] = List(),
-  mandatory: Boolean = true
+  mandatory: Boolean = true,
+  description: String = ""
 )
 
 case class InputStreamMetadataModel(name: String, namedFeatures: Map[String, String] = Map(),listedFeatures: Map[String, String] = Map())
