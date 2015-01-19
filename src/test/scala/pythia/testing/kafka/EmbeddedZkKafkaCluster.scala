@@ -48,6 +48,8 @@ object EmbeddedZkKafkaCluster {
     val props = new Properties();
     props.put("metadata.broker.list", kafkaBroker)
     props.put("serializer.class", "kafka.serializer.StringEncoder");
+    props.put("message.send.max.retries", "5")
+    props.put("retry.backoff.ms", "500")
     new ProducerConfig(props);
   }
 
