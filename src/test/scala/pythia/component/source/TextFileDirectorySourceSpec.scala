@@ -24,8 +24,7 @@ class TextFileDirectorySourceSpec extends ComponentSpec {
       clazz = classOf[TextFileDirectorySource].getName,
       name = "Text source",
       properties = Map (
-        "Directory" -> workingDirectory.getAbsolutePath,
-        "Process only new files" -> "false"
+        "Directory" -> workingDirectory.getAbsolutePath
       ),
       outputs = Map (
         "Instances" -> StreamConfiguration(mappedFeatures = Map("Line" -> "Sentence"))
@@ -51,7 +50,6 @@ class TextFileDirectorySourceSpec extends ComponentSpec {
       name = "Text source",
       properties = Map (
         "Directory" -> workingDirectory.getAbsolutePath,
-        "Process only new files" -> "false",
         "Filename pattern" -> "*.txt"
       ),
       outputs = Map (
@@ -60,34 +58,6 @@ class TextFileDirectorySourceSpec extends ComponentSpec {
     )
 
     val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
-
-    eventually {
-      outputs("Instances").features should contain only (
-        Map("Sentence" -> "the cow jumped over the moon"),
-        Map("Sentence" -> "the man went to the store and bought some candy")
-        )
-    }
-  }
-
-  "Text file directory" should "be able to process only new files" in {
-    write("data-old.txt", List("four score and seven years ago", "how many apples can you eat"))
-
-    val configuration = ComponentConfiguration (
-      clazz = classOf[TextFileDirectorySource].getName,
-      name = "Text source",
-      properties = Map (
-        "Directory" -> workingDirectory.getAbsolutePath,
-        "Process only new files" -> "true"
-      ),
-      outputs = Map (
-        "Instances" -> StreamConfiguration(mappedFeatures = Map("Line" -> "Sentence"))
-      )
-    )
-
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
-
-    Thread.sleep(1000)
-    write("data-new.txt", List("the cow jumped over the moon", "the man went to the store and bought some candy"))
 
     eventually {
       outputs("Instances").features should contain only (

@@ -7,23 +7,24 @@ import pythia.component.source.CsvFileDirectorySource
 import pythia.core._
 import pythia.dao._
 import pythia.service.ClusterState._
+import pythia.config.PythiaConfig._
 import pythia.testing.SpamData
 import pythia.component.debug.DebugComponent
+import scala.reflect.io.Directory
 
-class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach with BeforeAndAfterAll {
+class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach {
 
   implicit val pipelineRepository = mock[PipelineRepository]
   implicit val pipelineValidationService = mock[PipelineValidationService]
-  implicit val pipelineBuilder = new PipelineBuilder()
-  implicit val visualizationBuilder = mock[VisualizationBuilder]
   val localClusterService: LocalClusterService = new LocalClusterService()
+
+  override def beforeEach(): Unit = {
+    Directory(BASE_CHECKPOINTS_DIRECTORY).deleteRecursively()
+  }
 
   override def afterEach(): Unit = {
     localClusterService.stop(false)
-  }
-
-  override def afterAll(): Unit = {
-    localClusterService.sparkContext.stop()
+    Directory(BASE_CHECKPOINTS_DIRECTORY).deleteRecursively()
   }
 
   "Local cluster" should "deploy pipeline" in {

@@ -1,7 +1,5 @@
 package pythia.core
 
-import java.nio.file.Files
-
 import org.apache.spark.streaming._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
@@ -10,12 +8,21 @@ import pythia.component.classifier.Perceptron
 import pythia.testing._
 import pythia.component.source.CsvFileDirectorySource
 import pythia.component.preprocess.Normalizer
+import org.apache.spark.SparkConf
+import scala.reflect.io.Directory
+import org.apache.commons.io.FileUtils
+import java.io.File
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
   val pipelineBuilder = new PipelineBuilder()
+  val conf = new SparkConf()
+    .setAppName("sparkly")
+    .setMaster("local[8]")
+    .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
+  val workingDirectory = Directory.makeTemp()
 
   "Pipeline" should "build and connect components together" in {
     val pipelineConfig = PipelineConfiguration (
@@ -26,7 +33,7 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
           name = "Train data",
           clazz = classOf[CsvFileDirectorySource].getName,
           properties = Map (
-            "Directory" -> "src/test/resources",
+            "Directory" -> workingDirectory.toString,
             "Process only new files" -> "false",
             "Filename pattern" -> "spam.data"
           ),
@@ -67,14 +74,16 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
     )
 
     // System init
-    val ssc = new StreamingContext("local", "Test", Seconds(1))
-    ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
+    val checkpointDirectory = Directory.makeTemp("sparkly")
+    val ssc = new StreamingContext(conf, Seconds(1))
+    ssc.checkpoint(checkpointDirectory.toString)
 
     val availableStreams = pipelineBuilder.build(ssc, pipelineConfig)
     val accuracies = InspectedStream(availableStreams(("perceptron" ,"Accuracy")))
 
     try {
       ssc.start()
+      FileUtils.copyFileToDirectory(new File("src/test/resources/spam.data"), new File(workingDirectory.toString), false)
       eventually {
         accuracies.instances.last.rawFeatures("Accuracy").asInstanceOf[Double] should be > 0.80
       }
