@@ -12,7 +12,7 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
     copy(rawFeatures = rawFeatures + (realName -> value))
   }
 
-  def inputFeatures[T](name: String): FeatureList = {
+  def inputFeatures(name: String): FeatureList = {
     val realNames = inputMapper.get.featuresNames(name)
     val values = realNames.map(realName => rawFeatures.get(realName))
     FeatureList(values.map(value => Feature(value.flatMap(Option(_)))))
