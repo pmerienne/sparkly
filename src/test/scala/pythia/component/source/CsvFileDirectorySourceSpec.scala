@@ -24,8 +24,7 @@ class CsvFileDirectorySourceSpec extends ComponentSpec {
       clazz = classOf[CsvFileDirectorySource].getName,
       name = "Csv source",
       properties = Map (
-        "Directory" -> workingDirectory.getAbsolutePath,
-        "Process only new files" -> "false"
+        "Directory" -> workingDirectory.getAbsolutePath
       ),
       outputs = Map (
         "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("Name", "Birth date", "Gender")))
@@ -51,7 +50,6 @@ class CsvFileDirectorySourceSpec extends ComponentSpec {
       name = "Csv source",
       properties = Map (
         "Directory" -> workingDirectory.getAbsolutePath,
-        "Process only new files" -> "false",
         "Filename pattern" -> "*.csv"
       ),
       outputs = Map (
@@ -60,34 +58,6 @@ class CsvFileDirectorySourceSpec extends ComponentSpec {
     )
 
     val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
-
-    eventually {
-      outputs("Instances").features should contain only (
-        Map("Name" -> "Julie", "Birth date" -> "1981", "Gender" -> "Female"),
-        Map("Name" -> "Pierre", "Birth date" -> "1987", "Gender" -> "Male")
-        )
-    }
-  }
-
-  "Csv files source" should "be able to process only new files" in {
-    write("data-old.csv", List("Fabien;1986;Male", "Julie;1987;Female"))
-
-    val configuration = ComponentConfiguration (
-      clazz = classOf[CsvFileDirectorySource].getName,
-      name = "Csv source",
-      properties = Map (
-        "Directory" -> workingDirectory.getAbsolutePath,
-        "Process only new files" -> "true"
-      ),
-      outputs = Map (
-        "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("Name", "Birth date", "Gender")))
-      )
-    )
-
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
-
-    Thread.sleep(1000)
-    write("data-new.csv", List("Julie;1981;Female", "Pierre;1987;Male"))
 
     eventually {
       outputs("Instances").features should contain only (

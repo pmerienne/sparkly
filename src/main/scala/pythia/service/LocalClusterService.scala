@@ -2,21 +2,16 @@ package pythia.service
 
 import java.util.Date
 
-import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.streaming._
 import pythia.config.PythiaConfig._
-import pythia.core.{PipelineBuilder, PipelineConfiguration, VisualizationBuilder}
+import pythia.core._
 import pythia.dao.PipelineRepository
 
 class LocalClusterService(
-  implicit val pipelineBuilder: PipelineBuilder,
-  implicit val visualizationBuilder: VisualizationBuilder,
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val sparckConfig = new SparkConf()
-
-  val sparkContext = new SparkContext("local[16]", "pythia", sparckConfig)
+  val streamingContextFactory = new StreamingContextFactory(BASE_CHECKPOINTS_DIRECTORY, "local[16]", "local", Seconds(1), HOSTNAME, WEB_PORT)
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)
@@ -42,10 +37,9 @@ class LocalClusterService(
   def stop(stopGracefully: Boolean) {
     status = ClusterStatus(ClusterState.Stopping, None, None)
 
-    if(streamingContext.isDefined) {
-      val ssc = streamingContext.get
+    streamingContext.foreach{ ssc =>
       try {
-        ssc.stop(stopSparkContext = false, stopGracefully = stopGracefully)
+        ssc.stop(stopSparkContext = true, stopGracefully = stopGracefully)
         ssc.awaitTermination(5000)
         streamingContext = None
       } catch {
@@ -60,10 +54,8 @@ class LocalClusterService(
     status = ClusterStatus(ClusterState.Deploying, Some(new Date()), Some(pipeline))
 
     try {
-      val context = initStreamingContext()
-      val outputStreams = pipelineBuilder.build(context, pipeline)
-      visualizationBuilder.buildVisualizations("local", context, pipeline, outputStreams)
-      context.start()
+      streamingContext = Some(streamingContextFactory.createStreamingContext(pipeline))
+      streamingContext.get.start()
 
       status = ClusterStatus(ClusterState.Running, Some(new Date()), Some(pipeline))
     } catch {
@@ -73,14 +65,6 @@ class LocalClusterService(
         throw new IllegalArgumentException(s"Unable to start pipeline ${pipeline.id}", e)
       }
     }
-  }
-
-  private def initStreamingContext(): StreamingContext = {
-    val ssc = new StreamingContext(sparkContext, Seconds(1))
-    ssc.checkpoint(CHECKPOINTS_DIRECTORY)
-
-    streamingContext = Some(ssc)
-    ssc
   }
 
 }

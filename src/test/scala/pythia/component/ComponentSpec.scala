@@ -1,8 +1,7 @@
 package pythia.component
 
-import java.nio.file.{Files, Path}
+import java.nio.file.{Path, Files}
 
-import org.apache.commons.io.FileUtils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
@@ -12,8 +11,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import pythia.core._
 import pythia.testing._
-
-import scala.collection.mutable
+import org.apache.commons.io.FileUtils
 
 trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with Eventually {
 
@@ -24,10 +22,11 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
   var checkpointDirectory: Path = null
 
   override def beforeEach() {
-    val conf = new SparkConf()
+    super.beforeEach()
+    val conf =  new SparkConf()
+      .setAppName("sparkly")
       .setMaster("local[8]")
-      .setAppName("test-" + this.getClass.getSimpleName)
-
+      .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
 
     checkpointDirectory = Files.createTempDirectory("pythia-test")
     ssc = new StreamingContext(conf, Milliseconds(200))
@@ -35,6 +34,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
   }
 
   override def afterEach() {
+    super.afterEach()
     ssc.stop()
     ssc.awaitTermination(2000)
     FileUtils.deleteDirectory(checkpointDirectory.toFile)
@@ -53,7 +53,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
   def mockedStream() = MockStream(ssc)
 
   private def emptyStream(ssc: StreamingContext): DStream[Instance] = {
-    val queue = new mutable.SynchronizedQueue[RDD[Instance]]()
+    val queue = new scala.collection.mutable.SynchronizedQueue[RDD[Instance]]()
     ssc.queueStream(queue)
   }
 }

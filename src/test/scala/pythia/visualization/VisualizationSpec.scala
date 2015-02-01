@@ -17,7 +17,7 @@ class VisualizationSpec extends FlatSpec with Matchers with Eventually with Befo
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
-  val visualizationBuilder = new VisualizationBuilder()
+  val visualizationBuilder = new VisualizationBuilder("localhost", 8080)
   val dataCollector = mock[VisualizationDataCollector](withSettings().serializable())
 
   var ssc: StreamingContext = null

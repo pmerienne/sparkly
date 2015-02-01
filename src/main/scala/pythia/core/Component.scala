@@ -29,7 +29,7 @@ abstract class Component extends Serializable {
       (prop._1, Property(prop._2, value))
     }.toMap[String, Property]
 
-    initStreams(Context(inputs, inputMappers, outputMappers, properties, ssc))
+    initStreams(Context(inputs, inputMappers, outputMappers, properties, ssc, configuration.id))
   }
 
 }
@@ -39,7 +39,8 @@ case class Context (
   inputMappers: Map[String, Mapper],
   outputMappers: Map[String, Mapper],
   properties: Map[String, Property],
-  ssc: StreamingContext) {
+  ssc: StreamingContext,
+  componentId: String) {
 
 
   def property(name: String) = properties(name)
@@ -70,6 +71,8 @@ case class Context (
 
   def outputFeatureName(output: String, feature: String): String = outputMappers(output).featureName(feature)
   def outputFeatureNames(output: String, feature: String): List[String] = outputMappers(output).featuresNames(feature)
+
+  def hadoopConfiguration() = ssc.sparkContext.hadoopConfiguration
 }
 
 case class Mapper(namedFeatures: Map[String, String] = Map(), listedFeatures: Map[String, List[String]] = Map()) {

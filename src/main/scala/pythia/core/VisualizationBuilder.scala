@@ -2,13 +2,9 @@ package pythia.core
 
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.StreamingContext
-import pythia.config.PythiaConfig
 import pythia.visualization.pipeline.LatencyVisualization
 
-class VisualizationBuilder {
-
-  val visualizationHost = PythiaConfig.HOSTNAME
-  val visualizationPort = PythiaConfig.WEB_PORT
+class VisualizationBuilder(val visualizationHost: String, val visualizationPort: Int) {
 
   def buildVisualizations(clusterId: String, ssc: StreamingContext, configuration: PipelineConfiguration, outputStreams: Map[(String, String), DStream[Instance]]): Unit = {
     initBaseVisualizations(clusterId, ssc)
@@ -16,7 +12,7 @@ class VisualizationBuilder {
     configuration.visualizations.foreach{configuration =>
       val visualization = Class.forName(configuration.clazz).newInstance.asInstanceOf[Visualization]
 
-      val dataCollector = new VisualizationDataCollector(PythiaConfig.HOSTNAME,  PythiaConfig.WEB_PORT, clusterId, configuration.id)
+      val dataCollector = new VisualizationDataCollector(visualizationHost, visualizationPort, clusterId, configuration.id)
       val context = buildContext(ssc, dataCollector, visualization.metadata, configuration, outputStreams)
 
       visualization.init(context)

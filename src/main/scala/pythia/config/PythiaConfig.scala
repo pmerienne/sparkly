@@ -12,8 +12,10 @@ object PythiaConfig {
   val WEB_SOURCES = WEB_CONFIG.getString("sources")
 
   val DATA_CONFIG = ConfigFactory.load().getConfig("data")
-  val DB_DIRECTORY = DATA_CONFIG.getString("db-directory")
-  new File(DB_DIRECTORY).mkdirs()
-  val CHECKPOINTS_DIRECTORY = DATA_CONFIG.getString("checkpoint-directory")
-  new File(CHECKPOINTS_DIRECTORY).mkdirs()
+  val BASE_LOCAL_DIRECTORY = DATA_CONFIG.getString("base-local-directory")
+  val BASE_DISTRIBUTED_DIRECTORY = DATA_CONFIG.getString("base-distributed-directory")
+
+  val DB_DIRECTORY = new File(BASE_LOCAL_DIRECTORY, "db").getAbsolutePath
+  val BASE_CHECKPOINTS_DIRECTORY = new File(BASE_DISTRIBUTED_DIRECTORY, "checkpoints").getAbsolutePath
+  val BASE_STATES_DIRECTORY = new File(BASE_DISTRIBUTED_DIRECTORY, "states").getAbsolutePath
 }

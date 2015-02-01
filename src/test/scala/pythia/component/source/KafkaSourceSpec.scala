@@ -42,6 +42,7 @@ class KafkaSourceSpec extends ComponentSpec {
 
     // When
     val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    Thread.sleep(1000)
     messages.foreach(message => embeddedZkKafkaCluster.sendMessage("test-topic", "key", message))
 
     // Then

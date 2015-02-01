@@ -24,14 +24,12 @@ class TextFileDirectorySource extends Component {
     ),
     properties = Map(
       "Directory" -> PropertyMetadata(STRING),
-      "Filename pattern" -> PropertyMetadata(STRING, defaultValue = Some("*")),
-      "Process only new files" -> PropertyMetadata(BOOLEAN, defaultValue = Some(true))
+      "Filename pattern" -> PropertyMetadata(STRING, defaultValue = Some("*"))
     )
   )
 
   override def initStreams(context: Context): Map[String, DStream[Instance]] = {
     val directory = context.property("Directory").as[String]
-    val newFilesOnly = context.property("Process only new files").as[Boolean]
     val filter = context.property("Filename pattern").selectedValue match {
       case None => (path: Path) => true
       case Some("") => (path: Path) => true
@@ -41,7 +39,7 @@ class TextFileDirectorySource extends Component {
     val featureName = context.outputMappers("Instances").featureName("Line")
 
     val lineStream = context.ssc
-      .fileStream[LongWritable, Text, TextInputFormat](directory, filter, newFilesOnly)
+      .fileStream[LongWritable, Text, TextInputFormat](directory, filter, false)
       .map(_._2.toString)
       .map(line => Instance(featureName -> line))
 

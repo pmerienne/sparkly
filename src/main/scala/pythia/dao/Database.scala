@@ -26,5 +26,6 @@ abstract class Database[K, V](name :String) {
 }
 
 object Database {
+  new File(DB_DIRECTORY).mkdirs()
   val db = DBMaker.newFileDB(new File(DB_DIRECTORY, "data")).make()
 }
