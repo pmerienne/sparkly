@@ -61,11 +61,15 @@ case class Context (
   def inputFeatureMapped(input: String, feature: String): Boolean = inputMappers(input).isFeatureMapped(feature)
   def inputFeaturesMapped(input: String, features: String): Boolean = inputMappers(input).areFeaturesMapped(features)
 
+  def inputFeatureName(inputStream: String, feature: String): String = inputMappers(inputStream).featureName(feature)
+  def inputFeatureNames(inputStream: String, feature: String): List[String] = inputMappers(inputStream).featuresNames(feature)
+
   def outputSize(output: String, features: String): Int = outputMappers(output).size(features)
   def outputFeatureMapped(output: String, feature: String): Boolean = outputMappers(output).isFeatureMapped(feature)
   def outputFeaturesMapped(output: String, features: String): Boolean = outputMappers(output).areFeaturesMapped(features)
 
   def outputFeatureName(output: String, feature: String): String = outputMappers(output).featureName(feature)
+  def outputFeatureNames(output: String, feature: String): List[String] = outputMappers(output).featuresNames(feature)
 }
 
 case class Mapper(namedFeatures: Map[String, String] = Map(), listedFeatures: Map[String, List[String]] = Map()) {
