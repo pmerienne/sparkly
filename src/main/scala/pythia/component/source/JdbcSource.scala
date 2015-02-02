@@ -105,15 +105,17 @@ class SqlReceiver(
         }
       }
     } catch {
-      case t: Throwable => restart(s"Error while connecting to ${url}", t)
+      case t: Throwable => stop(s"Error while connecting to ${url}", t)
     }
   }
 
   private def fetchData(connection: Connection): List[Map[String, String]] = managed(connection.createStatement) acquireAndGet { statement =>
     val data = ListBuffer[Map[String, String]]()
-    val conditions = s"$incrementField > $lowerBound AND $incrementField % $partitions = $partition"
+    val conditions = s"$incrementField > $lowerBound AND MOD($incrementField, $partitions) = $partition"
 
-    val result = statement.executeQuery(sql.replace("$CONDITIONS", conditions))
+    val query = sql.replace("$CONDITIONS", conditions)
+    val result = statement.executeQuery(query)
+
     while(result.next) {
       val row = JdbcUtil.getData(result)
       data += row
