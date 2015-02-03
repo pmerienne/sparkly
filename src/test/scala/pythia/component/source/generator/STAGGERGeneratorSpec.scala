@@ -1,8 +1,7 @@
 package pythia.component.source.generator
 
 import pythia.component.ComponentSpec
-import pythia.core.{StreamConfiguration, ComponentConfiguration}
-import pythia.testing.InspectedStream
+import pythia.core.{ComponentConfiguration, StreamConfiguration}
 
 class STAGGERGeneratorSpec extends ComponentSpec {
 
@@ -20,10 +19,10 @@ class STAGGERGeneratorSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").instances.foreach { instance =>
+      component.outputs("Instances").instances.foreach { instance =>
         instance.outputFeature("size").as[String] should (be("small") or be("medium") or be("large"))
         instance.outputFeature("color").as[String] should (be("green") or be("blue") or be("red"))
         instance.outputFeature("shape").as[String] should (be("circle") or be("triangle") or be("square"))
@@ -31,7 +30,7 @@ class STAGGERGeneratorSpec extends ComponentSpec {
       }
 
       // Check it generates random instances
-      outputs("Instances").instances.toSet.size should be > 1
+      component.outputs("Instances").instances.toSet.size should be > 1
     }
   }
 

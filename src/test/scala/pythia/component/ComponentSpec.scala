@@ -1,60 +1,63 @@
 package pythia.component
 
-import java.nio.file.{Path, Files}
-
-import org.apache.spark.rdd.RDD
-import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
-import org.apache.spark.{SparkConf, SparkContext}
 import org.scalatest._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import pythia.core._
 import pythia.testing._
-import org.apache.commons.io.FileUtils
+
+import scala.reflect.io.Directory
+import scala.util.Try
 
 trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with Eventually {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
-  var sc: SparkContext = null
-  var ssc: StreamingContext = null
-  var checkpointDirectory: Path = null
+  var checkpointDirectory = Directory.makeTemp("sparkly-component-test")
+  val streamingContextFactory = new StreamingContextFactory(checkpointDirectory.toString, "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
+
+  var ssc: Option[StreamingContext] = None
 
   override def beforeEach() {
     super.beforeEach()
-    val conf =  new SparkConf()
-      .setAppName("sparkly")
-      .setMaster("local[8]")
-      .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
-
-    checkpointDirectory = Files.createTempDirectory("pythia-test")
-    ssc = new StreamingContext(conf, Milliseconds(200))
-    ssc.checkpoint(checkpointDirectory.toString)
+    checkpointDirectory.deleteRecursively()
   }
 
   override def afterEach() {
     super.afterEach()
-    ssc.stop()
-    ssc.awaitTermination(2000)
-    FileUtils.deleteDirectory(checkpointDirectory.toFile)
+    ssc.foreach{ssc =>
+      ssc.stop()
+      ssc.awaitTermination(2000)
+    }
+    checkpointDirectory.deleteRecursively()
   }
 
-  def deployComponent(componentConfiguration: ComponentConfiguration, inputs: Map[String, DStream[Instance]]): Map[String, InspectedStream] = {
-    val component = Class.forName(componentConfiguration.clazz).newInstance.asInstanceOf[Component]
-    val allInputs = component.metadata.inputs.keys.map(inputName => (inputName, inputs.getOrElse(inputName, emptyStream(ssc)))).toMap
-    val outputs = component.init(ssc, componentConfiguration, allInputs)
-    val inspectedOutputs = outputs.map{case (name, dstream) => (name, InspectedStream(dstream))}
+  def deployComponent(componentConfiguration: ComponentConfiguration): RunningComponent = {
+    val inputComponents = inputMockStream(componentConfiguration)
+    val connections = inputComponents.map(inputComponent => ConnectionConfiguration(inputComponent._2.id, MockStream.OUTPUT_NAME, componentConfiguration.id, inputComponent._1)).toList
+    val components = componentConfiguration :: inputComponents.values.toList
 
-    ssc.start()
-    inspectedOutputs
+    val pipeline = PipelineConfiguration(name = this.getClass.getSimpleName, components = components, connections = connections)
+    val (streamingContext, buildResult) = streamingContextFactory.createStreamingContext(pipeline)
+
+    val mockedInputs = inputComponents.map{case(name, config) => // TODO ugly!
+      val mockInput = buildResult.components.values.find(component => Try(component.asInstanceOf[MockStream].componentId == config.id).getOrElse(false))
+      (name, mockInput.get.asInstanceOf[MockStream])
+    }
+
+    val inspectedOutputs = buildResult.outputs.map{case (names, dstream) => (names._2, InspectedStream(dstream))}
+
+    ssc = Some(streamingContext)
+    ssc.get.start()
+
+    RunningComponent(mockedInputs, inspectedOutputs)
   }
 
-  def mockedStream() = MockStream(ssc)
-
-  private def emptyStream(ssc: StreamingContext): DStream[Instance] = {
-    val queue = new scala.collection.mutable.SynchronizedQueue[RDD[Instance]]()
-    ssc.queueStream(queue)
+  private def inputMockStream(component: ComponentConfiguration) = {
+    ComponentMetadata.of(component).inputs.keys.map(name => (name, ComponentConfiguration(name = name, clazz = classOf[MockStream].getName))).toMap
   }
+
 }
 
+case class RunningComponent(inputs: Map[String, MockStream], outputs: Map[String, InspectedStream])

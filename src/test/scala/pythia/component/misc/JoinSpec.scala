@@ -1,17 +1,12 @@
 package pythia.component.misc
 
-import pythia.core._
 import pythia.component.ComponentSpec
-import pythia.core.StreamConfiguration
-import pythia.core.ComponentConfiguration
-import pythia.testing.InspectedStream
+import pythia.core._
 
 class JoinSpec extends ComponentSpec {
 
   "Join" should "do inner join" in {
     // Given
-    val inputStream1 = mockedStream()
-    val inputStream2 = mockedStream()
     val configuration = ComponentConfiguration (
       clazz = classOf[Join].getName,
       name = "Join",
@@ -26,14 +21,14 @@ class JoinSpec extends ComponentSpec {
     )
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map("Stream 1" -> inputStream1.dstream, "Stream 2" -> inputStream2.dstream))
+    val component = deployComponent(configuration)
 
-    inputStream1.push (
+    component.inputs("Stream 1").push (
       Instance("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "language" -> "en"),
       Instance("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "language" -> "fr"),
       Instance("name" -> "Julie", "age" -> 27, "city" -> "Nantes", "country" -> "France", "language" -> "bz")
     )
-    inputStream2.push (
+    component.inputs("Stream 2").push (
       Instance("username" -> "Pierre", "age" -> 27, "validated" -> true),
       Instance("username" -> "Julie", "age" -> 32, "validated" -> false),
       Instance("username" -> "Perceval", "age" -> 15, "validated" -> false)
@@ -41,7 +36,7 @@ class JoinSpec extends ComponentSpec {
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "validated" -> true),
         Map("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "validated" -> false)
       )
@@ -50,8 +45,6 @@ class JoinSpec extends ComponentSpec {
 
   "Join" should "do right join" in {
     // Given
-    val inputStream1 = mockedStream()
-    val inputStream2 = mockedStream()
     val configuration = ComponentConfiguration (
       clazz = classOf[Join].getName,
       name = "Join",
@@ -66,14 +59,14 @@ class JoinSpec extends ComponentSpec {
     )
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map("Stream 1" -> inputStream1.dstream, "Stream 2" -> inputStream2.dstream))
+    val component = deployComponent(configuration)
 
-    inputStream1.push (
+    component.inputs("Stream 1").push (
       Instance("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "language" -> "en"),
       Instance("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "language" -> "fr"),
       Instance("name" -> "Julie", "age" -> 27, "city" -> "Nantes", "country" -> "France", "language" -> "bz")
     )
-    inputStream2.push (
+    component.inputs("Stream 2").push (
       Instance("username" -> "Pierre", "age" -> 27, "validated" -> true),
       Instance("username" -> "Julie", "age" -> 32, "validated" -> false),
       Instance("username" -> "Perceval", "age" -> 15, "validated" -> false)
@@ -81,7 +74,7 @@ class JoinSpec extends ComponentSpec {
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "validated" -> true),
         Map("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "validated" -> false),
         Map("name" -> "Perceval", "age" -> 15, "city" -> null, "country" -> null, "validated" -> false)
@@ -91,8 +84,6 @@ class JoinSpec extends ComponentSpec {
 
   "Join" should "do left join" in {
     // Given
-    val inputStream1 = mockedStream()
-    val inputStream2 = mockedStream()
     val configuration = ComponentConfiguration (
       clazz = classOf[Join].getName,
       name = "Join",
@@ -107,14 +98,14 @@ class JoinSpec extends ComponentSpec {
     )
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map("Stream 1" -> inputStream1.dstream, "Stream 2" -> inputStream2.dstream))
+    val component = deployComponent(configuration)
 
-    inputStream1.push (
+    component.inputs("Stream 1").push (
       Instance("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "language" -> "en"),
       Instance("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "language" -> "fr"),
       Instance("name" -> "Julie", "age" -> 27, "city" -> "Nantes", "country" -> "France", "language" -> "bz")
     )
-    inputStream2.push (
+    component.inputs("Stream 2").push (
       Instance("username" -> "Pierre", "age" -> 27, "validated" -> true),
       Instance("username" -> "Julie", "age" -> 32, "validated" -> false),
       Instance("username" -> "Perceval", "age" -> 15, "validated" -> false)
@@ -122,11 +113,11 @@ class JoinSpec extends ComponentSpec {
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "validated" -> true),
         Map("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "validated" -> false),
         Map("name" -> "Julie", "age" -> 27, "city" -> "Nantes", "country" -> "France", "validated" -> null)
-        )
+      )
     }
   }
 }

@@ -1,9 +1,8 @@
 package pythia.component.classifier
 
 import org.scalatest.BeforeAndAfterEach
-import pythia.component.ComponentSpec
+import pythia.component.{ComponentSpec, RunningComponent}
 import pythia.core._
-import pythia.testing._
 
 import scala.util.Random
 
@@ -16,15 +15,10 @@ trait ClassifierSpec extends ComponentSpec with BeforeAndAfterEach {
 
   val (trainDataset, testDataset) = split(dataset)
 
-  var trainStream: MockStream = _
-  var predictionQueryStream: MockStream = _
-
-  var outputs: Map[String, InspectedStream] = _
+  var runningComponent: RunningComponent = _
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    trainStream = mockedStream()
-    predictionQueryStream = mockedStream()
   }
 
   def initClassifier(classierClass: Class[_ <: Component]) = {
@@ -40,15 +34,15 @@ trait ClassifierSpec extends ComponentSpec with BeforeAndAfterEach {
         "Accuracy" -> StreamConfiguration(mappedFeatures = Map("Name" -> "Name", "Accuracy" -> "Accuracy"))
       )
     )
-    val inputs = Map("Train" -> trainStream.dstream, "Prediction query" -> predictionQueryStream.dstream)
-    outputs = deployComponent(configuration, inputs)
+
+    runningComponent = deployComponent(configuration)
   }
 
   def train(classierClass: Class[_ <: Component]) = {
     initClassifier(classOf[Perceptron])
-    trainStream.push(trainDataset)
+    runningComponent.inputs("Train").push(trainDataset)
 
-    val accuracies = outputs("Accuracy").instances
+    val accuracies = runningComponent.outputs("Accuracy").instances
     eventually {
       accuracies should have size trainDataset.size
     }
@@ -58,8 +52,8 @@ trait ClassifierSpec extends ComponentSpec with BeforeAndAfterEach {
   }
 
   def test(): Double = {
-    predictionQueryStream.push(testDataset)
-    val results = outputs("Prediction result").instances
+    runningComponent.inputs("Prediction query").push(testDataset)
+    val results = runningComponent.outputs("Prediction result").instances
 
     eventually {
       results should have size testDataset.size

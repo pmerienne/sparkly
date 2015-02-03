@@ -1,12 +1,10 @@
 package pythia.component.source
 
 import java.io.{File, FileWriter}
+import java.nio.file.Files
 
 import pythia.component.ComponentSpec
 import pythia.core._
-import pythia.testing.InspectedStream
-import org.apache.commons.io.FileUtils
-import java.nio.file.Files
 
 class TextFileDirectorySourceSpec extends ComponentSpec {
 
@@ -31,10 +29,10 @@ class TextFileDirectorySourceSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").features should contain only (
+      component.outputs("Instances").features should contain only (
         Map("Sentence" -> "the cow jumped over the moon"),
         Map("Sentence" -> "the man went to the store and bought some candy")
       )
@@ -57,13 +55,13 @@ class TextFileDirectorySourceSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").features should contain only (
+      component.outputs("Instances").features should contain only (
         Map("Sentence" -> "the cow jumped over the moon"),
         Map("Sentence" -> "the man went to the store and bought some candy")
-        )
+      )
     }
   }
 

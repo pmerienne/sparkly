@@ -1,12 +1,10 @@
 package pythia.component.source
 
 import java.io.{File, FileWriter}
+import java.nio.file.Files
 
 import pythia.component.ComponentSpec
 import pythia.core._
-import pythia.testing.InspectedStream
-import org.apache.commons.io.FileUtils
-import java.nio.file.Files
 
 class CsvFileDirectorySourceSpec extends ComponentSpec {
 
@@ -31,10 +29,10 @@ class CsvFileDirectorySourceSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").features should contain only (
+      component.outputs("Instances").features should contain only (
         Map("Name" -> "Julie", "Birth date" -> "1981", "Gender" -> "Female"),
         Map("Name" -> "Pierre", "Birth date" -> "1987", "Gender" -> "Male")
       )
@@ -57,13 +55,13 @@ class CsvFileDirectorySourceSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").features should contain only (
+      component.outputs("Instances").features should contain only (
         Map("Name" -> "Julie", "Birth date" -> "1981", "Gender" -> "Female"),
         Map("Name" -> "Pierre", "Birth date" -> "1987", "Gender" -> "Male")
-        )
+      )
     }
   }
 

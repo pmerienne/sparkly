@@ -1,16 +1,11 @@
 package pythia.visualization
 
 import pythia.core._
-import pythia.testing.MockStream
 
 class FeatureStatisticsVisualizationSpec extends VisualizationSpec {
 
   "FeatureStatisticsVisualization" should "send distinct feature's statistics" in {
     // Given
-    val data = List(-10, 15, null, -5, 20, 25, -10, 15, 10, null).map(value => Instance("value" -> value)).toList
-    val stream = MockStream(ssc)
-    outputStreams += ("component", "stream") -> stream.dstream
-
     val configuration = VisualizationConfiguration (
       name = "Feature statistics", clazz = classOf[FeatureStatisticsVisualization].getName,
       properties = Map("Window length (in ms)" -> "1000"),
@@ -18,8 +13,10 @@ class FeatureStatisticsVisualizationSpec extends VisualizationSpec {
     )
 
     // When
-    launchVisualization(configuration)
-    stream.push(data)
+    val build = deployVisualization(configuration)
+
+    val data = List(-10, 15, null, -5, 20, 25, -10, 15, 10, null).map(value => Instance("value" -> value)).toList
+    build.mockStream("component", "stream", "value").push(data)
 
     // Then
     eventually {
