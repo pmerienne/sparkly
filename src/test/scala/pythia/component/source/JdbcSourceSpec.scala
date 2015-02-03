@@ -1,9 +1,8 @@
 package pythia.component.source
 
 import pythia.component.ComponentSpec
-import pythia.testing.{H2Embedded, InspectedStream}
-import pythia.core.StreamConfiguration
-import pythia.core.ComponentConfiguration
+import pythia.core.{ComponentConfiguration, StreamConfiguration}
+import pythia.testing.H2Embedded
 
 class JdbcSourceSpec extends ComponentSpec with H2Embedded {
 
@@ -35,22 +34,22 @@ class JdbcSourceSpec extends ComponentSpec with H2Embedded {
 
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("id" -> "2", "name" -> "Julie", "age" -> "33"),
         Map("id" -> "3", "name" -> "Pierre", "age" -> "27")
       )
     }
 
-    outputs("Output").instances.clear()
+    component.outputs("Output").instances.clear()
     statement.execute("INSERT INTO USER (ID, NAME, AGE) VALUES (0, 'Fabien', 29)")
     statement.execute("INSERT INTO USER (ID, NAME, AGE) VALUES (4, 'Julie', 27)")
 
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("id" -> "4", "name" -> "Julie", "age" -> "27")
       )
     }

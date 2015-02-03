@@ -2,7 +2,6 @@ package pythia.component.source.generator
 
 import pythia.component.ComponentSpec
 import pythia.core.{ComponentConfiguration, StreamConfiguration}
-import pythia.testing.InspectedStream
 
 class AgrawalGeneratorSpec extends ComponentSpec {
 
@@ -27,10 +26,10 @@ class AgrawalGeneratorSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").instances.foreach { instance =>
+      component.outputs("Instances").instances.foreach { instance =>
         instance.outputFeature("salary").as[Double] should be > 0.0
         instance.outputFeature("commission").as[Double] should be >= 0.0
         instance.outputFeature("age").as[Int] should be > 0
@@ -44,7 +43,7 @@ class AgrawalGeneratorSpec extends ComponentSpec {
       }
 
       // Check it generates random instances
-      outputs("Instances").instances.toSet.size should be > 1
+      component.outputs("Instances").instances.toSet.size should be > 1
     }
   }
 

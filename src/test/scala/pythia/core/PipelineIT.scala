@@ -1,27 +1,25 @@
 package pythia.core
 
+import java.io.File
+
+import org.apache.commons.io.FileUtils
 import org.apache.spark.streaming._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FlatSpec, Matchers}
 import pythia.component.classifier.Perceptron
-import pythia.testing._
-import pythia.component.source.CsvFileDirectorySource
 import pythia.component.preprocess.Normalizer
-import org.apache.spark.SparkConf
+import pythia.component.source.CsvFileDirectorySource
+import pythia.testing._
+
 import scala.reflect.io.Directory
-import org.apache.commons.io.FileUtils
-import java.io.File
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
-  val pipelineBuilder = new PipelineBuilder()
-  val conf = new SparkConf()
-    .setAppName("sparkly")
-    .setMaster("local[8]")
-    .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
+  val checkpointDirectory = Directory.makeTemp()
+  val streamingContextFactory = new StreamingContextFactory(checkpointDirectory.toString, "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
   val workingDirectory = Directory.makeTemp()
 
   "Pipeline" should "build and connect components together" in {
@@ -74,12 +72,8 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
     )
 
     // System init
-    val checkpointDirectory = Directory.makeTemp("sparkly")
-    val ssc = new StreamingContext(conf, Seconds(1))
-    ssc.checkpoint(checkpointDirectory.toString)
-
-    val availableStreams = pipelineBuilder.build(ssc, pipelineConfig)
-    val accuracies = InspectedStream(availableStreams(("perceptron" ,"Accuracy")))
+    val (ssc, build) = streamingContextFactory.createStreamingContext(pipelineConfig)
+    val accuracies = InspectedStream(build.outputs(("perceptron" ,"Accuracy")))
 
     try {
       ssc.start()

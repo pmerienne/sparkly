@@ -1,14 +1,12 @@
 package pythia.component.misc
 
 import pythia.component.ComponentSpec
-import pythia.core.{Instance, StreamConfiguration, ComponentConfiguration}
-import pythia.testing.InspectedStream
+import pythia.core._
 
 class StreamingSqlSpec extends ComponentSpec {
 
   "Streaming SQL" should "execute sql query on single stream" in {
     // Given
-    val inputStream = mockedStream()
     val configuration = ComponentConfiguration (
       clazz = classOf[StreamingSql].getName,
       name = "StreamingSql",
@@ -22,9 +20,9 @@ class StreamingSqlSpec extends ComponentSpec {
     )
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map("Stream1" -> inputStream.dstream))
+    val component = deployComponent(configuration)
 
-    inputStream.push (
+    component.inputs("Stream1").push (
       Instance("name" -> "Pierre", "age" -> 27, "city" -> "Paris", "country" -> "France", "language" -> "en"),
       Instance("name" -> "Julie", "age" -> 32, "city" -> "Paris", "country" -> "France", "language" -> "fr"),
       Instance("name" -> "Fabien", "age" -> 29, "city" -> "Nantes", "country" -> "France", "language" -> "bz")
@@ -32,7 +30,7 @@ class StreamingSqlSpec extends ComponentSpec {
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("extracted_name" -> "Pierre", "extracted_country" -> "France"),
         Map("extracted_name" -> "Julie", "extracted_country" -> "France"),
         Map("extracted_name" -> "Fabien", "extracted_country" -> "France")
@@ -42,8 +40,6 @@ class StreamingSqlSpec extends ComponentSpec {
 
   "Streaming SQL" should "execute sql query on multiple streams" in {
     // Given
-    val stream1 = mockedStream()
-    val stream2 = mockedStream()
     val configuration = ComponentConfiguration (
       clazz = classOf[StreamingSql].getName,
       name = "StreamingSql",
@@ -63,20 +59,20 @@ class StreamingSqlSpec extends ComponentSpec {
     )
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map("Stream1" -> stream1.dstream, "Stream2" -> stream2.dstream))
+    val component = deployComponent(configuration)
 
-    stream1.push (
+    component.inputs("Stream1").push (
       Instance("temperature" -> 9, "location" -> "Paris", "sensor_id" -> "paris_0"),
       Instance("temperature" -> 8, "location" -> "Paris", "sensor_id" -> "paris_1"),
       Instance("temperature" -> 18, "location" -> "Madrid", "sensor_id" -> "madrid_0")
     )
-    stream2.push (
+    component.inputs("Stream2").push (
       Instance("humidity" -> 92, "location" -> "Paris", "sensor_id" -> "paris_hydro_0")
     )
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("temperature" -> "9", "humidity" -> "92", "location" -> "Paris"),
         Map("temperature" -> "18", "humidity" -> null, "location" -> "Madrid")
       )

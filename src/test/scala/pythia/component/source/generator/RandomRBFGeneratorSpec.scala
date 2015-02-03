@@ -2,7 +2,6 @@ package pythia.component.source.generator
 
 import pythia.component.ComponentSpec
 import pythia.core.{ComponentConfiguration, StreamConfiguration}
-import pythia.testing.InspectedStream
 
 class RandomRBFGeneratorSpec extends ComponentSpec {
 
@@ -15,16 +14,16 @@ class RandomRBFGeneratorSpec extends ComponentSpec {
       )
     )
 
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
 
     eventually {
-      outputs("Instances").instances.foreach{ instance =>
+      component.outputs("Instances").instances.foreach{ instance =>
         instance.outputFeatures("Features").asList.exists(_.isEmpty) should be(false)
         instance.outputFeature("Class").as[String] should startWith("class")
       }
 
       // Check it generates random instances
-      outputs("Instances").instances.toSet.size should be > 1
+      component.outputs("Instances").instances.toSet.size should be > 1
     }
   }
 

@@ -9,11 +9,12 @@ import scala.collection.mutable.{Map => MutableMap}
 
 class PipelineBuilder {
 
-  def build(ssc: StreamingContext, pipeline: PipelineConfiguration): Map[(String, String), DStream[Instance]] = {
+  def build(ssc: StreamingContext, pipeline: PipelineConfiguration): BuildResult = {
     val connections = pipeline.connections
     implicit val componentOrdering = ComponentOrdering(pipeline)
 
     val outputStreams = MutableMap[(String, String), DStream[Instance]]();
+    val components = MutableMap[String, Component]();
 
     pipeline.components.sorted
       .foreach{componentConfiguration =>
@@ -28,9 +29,10 @@ class PipelineBuilder {
 
         val outputs = component.init(ssc, componentConfiguration, inputs)
         outputStreams ++= outputs.map(t => (componentConfiguration.id, t._1) -> t._2)
+      components += componentId -> component
       }
 
-    outputStreams.toMap
+    BuildResult(components.toMap, outputStreams.toMap)
   }
 
   private def emptyStream(ssc: StreamingContext): DStream[Instance] = {
@@ -60,3 +62,5 @@ case class ComponentOrdering(configuration: PipelineConfiguration) extends Order
     }
   }
 }
+
+case class BuildResult(components: Map[String, Component], outputs: Map[(String, String), DStream[Instance]])

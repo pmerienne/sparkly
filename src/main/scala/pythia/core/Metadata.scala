@@ -46,3 +46,9 @@ object FeatureType extends Enumeration {
   type FeatureType = Value
   val STRING, DOUBLE, INTEGER, LONG, NUMBER, BOOLEAN , DATE, ANY = Value
 }
+
+object ComponentMetadata {
+  def of(component: ComponentConfiguration): ComponentMetadata = {
+    Class.forName(component.clazz).newInstance.asInstanceOf[Component].metadata
+  }
+}

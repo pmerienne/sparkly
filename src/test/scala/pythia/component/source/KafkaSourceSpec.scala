@@ -1,10 +1,8 @@
 package pythia.component.source
 
 import pythia.component.ComponentSpec
+import pythia.core.{ComponentConfiguration, StreamConfiguration}
 import pythia.testing.kafka.EmbeddedZkKafkaCluster
-import pythia.testing.InspectedStream
-import pythia.core.StreamConfiguration
-import pythia.core.ComponentConfiguration
 
 class KafkaSourceSpec extends ComponentSpec {
 
@@ -41,13 +39,13 @@ class KafkaSourceSpec extends ComponentSpec {
     )
 
     // When
-    val outputs: Map[String, InspectedStream] = deployComponent(configuration, Map())
+    val component = deployComponent(configuration)
     Thread.sleep(1000)
     messages.foreach(message => embeddedZkKafkaCluster.sendMessage("test-topic", "key", message))
 
     // Then
     eventually {
-      outputs("Output").features should contain only (
+      component.outputs("Output").features should contain only (
         Map("Message" -> "Hello"),
         Map("Message" -> "How are you?"),
         Map("Message" -> "Does it work?")

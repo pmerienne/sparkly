@@ -54,7 +54,7 @@ class LocalClusterService(
     status = ClusterStatus(ClusterState.Deploying, Some(new Date()), Some(pipeline))
 
     try {
-      streamingContext = Some(streamingContextFactory.createStreamingContext(pipeline))
+      streamingContext = Some(streamingContextFactory.createStreamingContext(pipeline)._1)
       streamingContext.get.start()
 
       status = ClusterStatus(ClusterState.Running, Some(new Date()), Some(pipeline))
