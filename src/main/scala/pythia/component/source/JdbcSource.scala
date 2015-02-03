@@ -1,22 +1,18 @@
 package pythia.component.source
 
-import pythia.core._
-import pythia.core.PropertyType._
-import org.apache.spark.streaming.dstream.DStream
-import java.sql.{ResultSet, Driver, DriverManager, Connection}
-import org.apache.spark.streaming.receiver.Receiver
-import org.apache.spark.storage.StorageLevel
-import org.apache.spark._
-import com.google.common.util.concurrent.RateLimiter
+import java.sql.{Connection, Driver, DriverManager, ResultSet}
 
+import com.google.common.util.concurrent.RateLimiter
+import org.apache.spark._
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.receiver.Receiver
+import pythia.component.utils.{HdfsState, SerializableHadoopConfiguration}
+import pythia.core.PropertyType._
+import pythia.core.{ComponentMetadata, Context, OutputStreamMetadata, PropertyMetadata, _}
 import resource._
+
 import scala.collection.mutable.ListBuffer
-import pythia.component.utils.{SerializableHadoopConfiguration, HdfsState}
-import pythia.core.OutputStreamMetadata
-import scala.Some
-import pythia.core.Context
-import pythia.core.ComponentMetadata
-import pythia.core.PropertyMetadata
 
 class JdbcSource extends Component {
 
@@ -59,7 +55,7 @@ class JdbcSource extends Component {
       context.ssc.receiverStream(new SqlReceiver(context.componentId, url, driver, user, password, sql, incrementField, startValue, rateLimit, partition, partitions, hadoopConf))
     }
 
-    Map("Output" ->  context.ssc.union(rawStreams).map(rawData => new Instance(Map(), outputMapper = outputMapper).outputFeatures("Fields", rawData.values.toList))
+    Map("Output" ->  context.ssc.union(rawStreams).map(rawData => new Instance(outputMapper = outputMapper).outputFeatures("Fields", rawData.values.toList))
     )
   }
 

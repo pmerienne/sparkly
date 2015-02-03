@@ -1,6 +1,6 @@
 package pythia.core
 
-case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = None, outputMapper: Option[Mapper] = None) {
+case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Mapper] = None, outputMapper: Option[Mapper] = None) {
 
   def inputFeature(name: String): Feature[Any] = {
     val realName = inputMapper.get.featureName(name)
@@ -49,9 +49,11 @@ case class Instance(rawFeatures: Map[String, _], inputMapper: Option[Mapper] = N
   def rawFeature(name: String): Feature[Any] = {
     Feature(rawFeatures.get(name).flatMap(Option(_)))
   }
+
+  def outputMapper(mapper: Mapper) = this.copy(outputMapper = Some(mapper))
+  def inputMapper(mapper: Mapper) = this.copy(inputMapper = Some(mapper))
 }
 
 object Instance {
   def apply(features: (String, _)*): Instance = new Instance(features.toMap)
-  def apply(outputMapper: Mapper, features: (String, _)*): Instance = new Instance(features.toMap, outputMapper = Some(outputMapper))
 }
