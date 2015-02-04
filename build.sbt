@@ -47,6 +47,7 @@ libraryDependencies ++= Seq(
   // Utils
   "com.jsuereth" %% "scala-arm" % "1.3",
   "org.reflections" % "reflections" % "0.9.9-RC1",
+  "io.gatling" %% "jsonpath" % "0.6.2",
   // Test
   "org.apache.curator" % "curator-test" % "2.3.0" % Test,
   "org.apache.kafka" %% "kafka" % "0.8.0" % Test classifier "test",
