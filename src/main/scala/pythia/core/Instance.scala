@@ -50,8 +50,6 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
     Feature(rawFeatures.get(name).flatMap(Option(_)))
   }
 
-  def outputMapper(mapper: Mapper) = this.copy(outputMapper = Some(mapper))
-  def inputMapper(mapper: Mapper) = this.copy(inputMapper = Some(mapper))
 }
 
 object Instance {
