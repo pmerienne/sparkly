@@ -7,6 +7,7 @@ import org.apache.spark.streaming.Milliseconds
 import pythia.core.VisualizationMetadata
 import pythia.core.PropertyMetadata
 import pythia.core.VisualizationContext
+import scala.util.Try
 
 class ThroughputVisualization extends Visualization {
 
@@ -20,11 +21,14 @@ class ThroughputVisualization extends Visualization {
     val stream = context.streams("Stream")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
     val dataCollector = context.dataCollector
+    val partitions = context.ssc.sparkContext.defaultParallelism
 
     stream
-      .window(Milliseconds(windowDuration))
+      .repartition(partitions)
+      .countByWindow(Milliseconds(windowDuration), stream.slideDuration)
       .foreachRDD((rdd, time) => {
-        val throughput = 1000 * rdd.count.toDouble / windowDuration.toDouble
+        val count = Try(rdd.take(1)(0)).toOption.getOrElse(0L)
+        val throughput = 1000 * count / windowDuration.toDouble
         dataCollector.push(time.milliseconds, Map("throughput" -> throughput))
       })
   }

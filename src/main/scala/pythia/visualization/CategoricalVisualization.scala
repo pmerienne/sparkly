@@ -19,14 +19,13 @@ class CategoricalVisualization extends Visualization {
 
   override def init(context: VisualizationContext): Unit = {
     val dstream = context.features("Categorical feature (String, Boolean)")
-    val windowDuration = context.properties("Window length (in ms)").as[Long]
+    val windowDuration = Milliseconds(context.properties("Window length (in ms)").as[Long])
     val max = context.properties("Max category (0 for unlimited)").as[Int]
     val dataCollector = context.dataCollector
 
     dstream
-      .window(Milliseconds(windowDuration))
       .map{f => (f.or("$MISSING_FEATURE$"), 1.0)}
-      .reduceByKey(_ + _)
+      .reduceByKeyAndWindow(_ + _, windowDuration)
       .foreachRDD((rdd, time) => {
         val total = if(rdd.count() > 0) rdd.map(_._2).reduce(_ + _) else 0.0
         val counts = if(max > 0) {

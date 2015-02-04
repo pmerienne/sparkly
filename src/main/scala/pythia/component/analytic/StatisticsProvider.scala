@@ -20,7 +20,7 @@ class StatisticsProvider extends Component {
     ),
     properties = Map (
       "Operation" -> PropertyMetadata(STRING, acceptedValues = List("Mean", "Count")),
-      "Window length (in ms)" -> PropertyMetadata(LONG)
+      "Window length (in ms)" -> PropertyMetadata(LONG, mandatory = false)
     )
   )
 

@@ -2,6 +2,7 @@ package org.apache.spark.metrics.sink
 
 import java.util.Properties
 import com.codahale.metrics._
+import scala.collection.JavaConversions._
 import java.util.concurrent.TimeUnit
 import java.util
 import pythia.core.VisualizationDataCollector
@@ -45,17 +46,19 @@ class JvmVisualizationReporter (clusterId: String, visualizationId: String, regi
     meters: util.SortedMap[String, Meter],
     timers: util.SortedMap[String, Timer]): Unit = {
 
-    val memoryUsed = Option(gauges.get("jvm.total.used")) match {
+    // TODO : We may have multiple gauges! 1 per worker ??!?
+
+    val memoryUsed = gauges.find(_._1 endsWith "jvm.total.used").map(_._2) match {
       case Some(gauge) => gauge.getValue.toString.toDouble
       case None => 0.0
     }
 
-    val memoryCommitted = Option(gauges.get("jvm.total.committed")) match {
+    val memoryCommitted = gauges.find(_._1 endsWith "jvm.total.committed").map(_._2) match {
       case Some(gauge) => gauge.getValue.toString.toDouble
       case None => 0.0
     }
 
-    val maxMemory = Option(gauges.get("jvm.total.max")) match {
+    val maxMemory = gauges.find(_._1 endsWith "jvm.total.max").map(_._2) match {
       case Some(gauge) => gauge.getValue.toString.toDouble
       case None => 0.0
     }

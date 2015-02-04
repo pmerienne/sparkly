@@ -5,7 +5,8 @@ import pythia.core.PropertyType._
 import pythia.core.VisualizationMetadata
 import pythia.core.PropertyMetadata
 import org.apache.spark.streaming.Milliseconds
-import org.apache.mahout.math.stats.OnlineSummarizer
+import scala.util.Try
+import pythia.utils.FeatureStatistics
 
 class FeatureStatisticsVisualization extends Visualization {
 
@@ -19,37 +20,28 @@ class FeatureStatisticsVisualization extends Visualization {
     val dstream = context.features("Number feature")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
     val dataCollector = context.dataCollector
+    val partitions = context.ssc.sparkContext.defaultParallelism
 
     dstream
-      .window(Milliseconds(windowDuration))
+      .repartition(partitions)
+      .mapPartitions(features => Iterator(FeatureStatistics(features)))
+      .reduceByWindow((stat1, stat2) => stat1.merge(stat2), Milliseconds(windowDuration), dstream.slideDuration)
       .foreachRDD((rdd, time) => {
-        val features = rdd.cache()
-        val totalCount = features.count.toDouble
-        val definedFeatures = features.filter(_.isDefined).map(_.as[Double]).cache()
-
-        val definedCount = definedFeatures.count
-        val missing = totalCount - definedCount.toDouble
-
-        if(definedCount > 0) {
-          val advancedStats = new OnlineSummarizer() with Serializable
-          definedFeatures.collect().foreach(advancedStats.add)
-
-          val data = Map(
-            "count" -> totalCount,
-            "missing" -> missing,
-            "mean" -> advancedStats.getMean,
-            "std" -> advancedStats.getSD,
-            "min" -> advancedStats.getMin,
-            "max" -> advancedStats.getMax,
-            "quantile 0.25" -> advancedStats.quantile(0.25),
-            "quantile 0.50" -> advancedStats.quantile(0.50),
-            "quantile 0.75" -> advancedStats.quantile(0.75),
-            "quantile 0.90" -> advancedStats.quantile(0.90),
-            "quantile 0.99" -> advancedStats.quantile(0.99)
-          )
-
-          dataCollector.push(time.milliseconds, data)
-        }
+        val stats = Try(rdd.take(1)(0)).getOrElse(FeatureStatistics.zero())
+        val data = Map(
+          "count" -> stats.count.toDouble,
+          "missing" -> stats.missing.toDouble,
+          "mean" -> stats.mean,
+          "std" -> stats.stdev,
+          "min" -> stats.min,
+          "max" -> stats.max,
+          "quantile 0.25" -> stats.quantile(0.25),
+          "quantile 0.50" -> stats.quantile(0.50),
+          "quantile 0.75" -> stats.quantile(0.75),
+          "quantile 0.90" -> stats.quantile(0.90),
+          "quantile 0.99" -> stats.quantile(0.99)
+        )
+        dataCollector.push(time.milliseconds, data)
       })
   }
 }
