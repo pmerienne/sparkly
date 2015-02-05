@@ -11,7 +11,6 @@ import pythia.component.utils.{HdfsState, SerializableHadoopConfiguration}
 import pythia.core.PropertyType._
 import pythia.core.{ComponentMetadata, Context, OutputStreamMetadata, PropertyMetadata, _}
 import resource._
-
 import scala.collection.mutable.ListBuffer
 
 class JdbcSource extends Component {
@@ -34,7 +33,7 @@ class JdbcSource extends Component {
       "Increment field" -> PropertyMetadata(STRING, description = "Fields use as increment value (i.e date)"),
       "Start value" -> PropertyMetadata(LONG, defaultValue = Some(0L)),
       "Rate limit (query/second)" -> PropertyMetadata(INTEGER, defaultValue = Some(10)),
-      "Partitions" -> PropertyMetadata(INTEGER, defaultValue = Some(1))
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(1), description = "Level of parallelism to use")
     )
   )
 
@@ -47,7 +46,7 @@ class JdbcSource extends Component {
     val incrementField = context.property("Increment field").as[String]
     val startValue = context.property("Start value").as[Long]
     val rateLimit = context.property("Rate limit (query/second)").as[Int]
-    val partitions = context.property("Partitions").as[Int]
+    val partitions = context.property("Parallelism").as[Int]
     val outputMapper = Some(context.outputMappers("Output"))
     val hadoopConf = SerializableHadoopConfiguration.from(context)
 

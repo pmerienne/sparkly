@@ -20,31 +20,33 @@ class StatisticsProvider extends Component {
     ),
     properties = Map (
       "Operation" -> PropertyMetadata(STRING, acceptedValues = List("Mean", "Count")),
-      "Window length (in ms)" -> PropertyMetadata(LONG, mandatory = false)
+      "Window length (in ms)" -> PropertyMetadata(LONG, mandatory = false),
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
     )
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
     val windowLengthMs = context.properties( "Window length (in ms)")
+    val parallelism = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
 
     val aggregableStatistic = AggregableStatistic.withName(context.properties("Operation").as[String])
     val isGrouped = context.inputFeatureMapped("Input", "Group by")
     val out = if(windowLengthMs.isDefined) {
-      computeStatistics(aggregableStatistic, isGrouped, context.dstream("Input", "Output"), Milliseconds(windowLengthMs.as[Long]))
+      computeStatistics(aggregableStatistic, isGrouped, context.dstream("Input", "Output"), parallelism, Milliseconds(windowLengthMs.as[Long]))
     } else {
-      computeStatistics(aggregableStatistic, isGrouped, context.dstream("Input", "Output"))
+      computeStatistics(aggregableStatistic, isGrouped, context.dstream("Input", "Output"), parallelism)
     }
     Map("Output" -> out)
   }
 
   def computeStatistics[T <: Any : ClassTag](
     aggregableStatistic: AggregableStatistic[T], isGrouped: Boolean,
-    dstream: DStream[Instance]): DStream[Instance] = {
+    dstream: DStream[Instance], parallelism: Int): DStream[Instance] = {
 
     val groupedInstances = dstream.map{instance =>
       val key = if(isGrouped) instance.inputFeature("Group by").as[String] else  "$GLOBAL$"
       (key, instance)
-    }
+    }.cache()
 
     val states = groupedInstances
       .map{case (key, instance) => (key, instance.inputFeature("Compute on").as[Double])}
@@ -52,10 +54,10 @@ class StatisticsProvider extends Component {
         val state = previousState.getOrElse(aggregableStatistic.zero())
         val newState = aggregableStatistic.update(state, newValues)
         Some(newState)
-      })
+      }, parallelism)
 
     groupedInstances
-      .leftOuterJoin(states)
+      .leftOuterJoin(states, parallelism)
       .map {
         case (key, (instance, Some(state))) => instance.outputFeature("Result", aggregableStatistic.valueOf(state))
         case (key, (instance, None)) => instance.outputFeature("Result", null)
@@ -64,20 +66,21 @@ class StatisticsProvider extends Component {
 
   def computeStatistics[T <: Any : ClassTag](
     aggregableStatistic: AggregableStatistic[T], isGrouped: Boolean,
-    dstream: DStream[Instance],
+    dstream: DStream[Instance], parallelism: Int,
     windowDuration: Duration): DStream[Instance] = {
+    val slideDuration = dstream.slideDuration
 
     val groupedInstances = dstream.map{instance =>
       val key = if(isGrouped) instance.inputFeature("Group by").as[String] else  "$GLOBAL$"
       (key, instance)
-    }
+    }.cache()
 
     val states = groupedInstances
       .map{case (key, instance) => (key, aggregableStatistic.init(instance.inputFeature("Compute on").as[Double]))}
-      .reduceByKeyAndWindow((a: T, b: T) => aggregableStatistic.combine(a, b), windowDuration)
+      .reduceByKeyAndWindow((a: T, b: T) => aggregableStatistic.combine(a, b), windowDuration, slideDuration, parallelism)
 
     groupedInstances
-      .leftOuterJoin(states)
+      .leftOuterJoin(states, parallelism)
       .map {
       case (key, (instance, Some(state))) => instance.outputFeature("Result", aggregableStatistic.valueOf(state))
       case (key, (instance, None)) => instance.outputFeature("Result", null)

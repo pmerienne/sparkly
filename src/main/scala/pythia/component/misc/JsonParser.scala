@@ -8,21 +8,32 @@ import org.codehaus.jackson.map.ObjectMapper
 import pythia.core._
 
 import scala.util.Try
+import pythia.core.PropertyType._
+import pythia.core.OutputStreamMetadata
+import pythia.core.InputStreamMetadata
+import pythia.core.PropertyType
+import pythia.core.Context
+import pythia.core.PropertyMetadata
+import scala.Some
 
 class JsonParser extends Component {
 
   override def metadata: ComponentMetadata = ComponentMetadata(
     name = "JSON parser", category = "Miscellaneous",
     description = "Parse a JSON string to extract",
-    properties = Map("Queries" -> PropertyMetadata(PropertyType.STRING, description = "Semicolon separated list of json-path expressions (see http://goessner.net/articles/JsonPath/)")),
+    properties = Map(
+      "Queries" -> PropertyMetadata(PropertyType.STRING, description = "Semicolon separated list of json-path expressions (see http://goessner.net/articles/JsonPath/)"),
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
+    ),
     inputs = Map("Input" -> InputStreamMetadata(namedFeatures = Map("JSON" -> FeatureType.STRING))),
     outputs = Map("Output" -> OutputStreamMetadata(listedFeatures = Map("Values" -> FeatureType.STRING)))
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
     val queries = context.property("Queries").as[String].split(";")
+    val parallelism = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
 
-    val output = context.dstream("Input", "Output").map { instance =>
+    val output = context.dstream("Input", "Output").repartition(parallelism).map{ instance =>
       val values = JsonParser.extractValues(instance.inputFeature("JSON").as[String], queries)
       instance.outputFeatures("Values", values)
     }

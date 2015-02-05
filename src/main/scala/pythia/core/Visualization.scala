@@ -13,4 +13,7 @@ case class VisualizationContext (
   streams: Map[String, DStream[Instance]],
   features: Map[String, DStream[Feature[Any]]],
   properties: Map[String, Property]
-)
+) {
+  val sc = ssc.sparkContext
+  def property(name: String) = properties(name)
+}
