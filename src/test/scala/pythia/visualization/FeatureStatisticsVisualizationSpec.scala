@@ -4,7 +4,6 @@ import pythia.core._
 
 class FeatureStatisticsVisualizationSpec extends VisualizationSpec {
 
-  // TODO use agrawal generator could be better
   "FeatureStatisticsVisualization" should "send distinct feature's statistics" in {
     // Given
     val configuration = VisualizationConfiguration (

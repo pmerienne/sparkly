@@ -34,6 +34,12 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
     copy(rawFeatures = rawFeatures + (realName -> value))
   }
 
+  def outputFeatures(features: (String, _)*): Instance = {
+    val realNames = features.map(_._1).map(outputMapper.get.featureName(_))
+    val newFeatures = (realNames zip features.map(_._2)).toMap
+    copy(rawFeatures = rawFeatures ++ newFeatures)
+  }
+
   def outputFeatures(name: String, values:List[_]): Instance = {
     val realNames = outputMapper.get.featuresNames(name)
     val newFeatures = (realNames zip values).toMap

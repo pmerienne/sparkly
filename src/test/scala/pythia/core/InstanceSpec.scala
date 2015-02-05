@@ -28,6 +28,14 @@ class InstanceSpec extends FlatSpec with Matchers {
     instance.outputFeatures("values").asList should contain only (Feature(Some(30)), Feature(Some("Paris")), Feature(None))
   }
 
+  "Instance" should "support new output named features in batch" in {
+    val instance = Instance()
+      .copy(outputMapper = Some(Mapper(namedFeatures = Map("id" -> "username", "name" -> "first name"))))
+      .outputFeatures("id" -> "jchanut", "name" -> "Julie")
+
+    instance.rawFeatures should contain only ("username" -> "jchanut", "first name" -> "Julie")
+  }
+
   "Instance" should "support input feature overriding" in {
     val instance = Instance("name" -> "Juli", "age" -> 29, "city" -> "Pari")
       .copy(inputMapper = Some(Mapper(namedFeatures = Map("id" -> "name"), listedFeatures = Map("values" -> List("age", "city", "gender")))))

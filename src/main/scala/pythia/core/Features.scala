@@ -66,7 +66,7 @@ case class Feature[U : ClassTag](value: Option[U]) {
       case t if t == classTag[String] => value
       case t if t == classTag[Int] => value.toInt
       case t if t == classTag[Long] => value.toLong
-      case t if t == classTag[Date] => DateTime.parse(value).toDate
+      case t if t == classTag[Date] => DateTime.parse(value, ISODateTimeFormat.dateTimeParser.withZoneUTC()).toDate
       case t if t == classTag[Boolean] => value match {
         case "true" => true
         case "false" => false
