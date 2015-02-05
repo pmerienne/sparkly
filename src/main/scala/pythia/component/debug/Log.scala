@@ -5,15 +5,12 @@ import pythia.core.FeatureType.ANY
 import pythia.core._
 import pythia.core.PropertyType._
 
-class DebugComponent extends Component {
+class Log extends Component {
 
   override def metadata: ComponentMetadata = ComponentMetadata (
-    name = "Debug",
+    name = "Log",
     inputs = Map[String, InputStreamMetadata] (
       "Input" -> InputStreamMetadata(listedFeatures = Map("Features" -> ANY))
-    ),
-    properties = Map (
-      "Log component name (fake)" -> PropertyMetadata(BOOLEAN, defaultValue = Some(true))
     )
   )
 

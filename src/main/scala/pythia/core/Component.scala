@@ -5,6 +5,9 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import pythia.core.PropertyType._
 
+import pythia.utils.ScalaUtils._
+import scala.util.Try
+
 abstract class Component extends Serializable {
   def metadata: ComponentMetadata
 
@@ -42,6 +45,7 @@ case class Context (
   ssc: StreamingContext,
   componentId: String) {
 
+  val sc = ssc.sparkContext
 
   def property(name: String) = properties(name)
 
@@ -105,6 +109,11 @@ case class Property (
   }
 
   def as[V] = get.asInstanceOf[V]
+
+  def or[V](default: V, on: (V) => Boolean = (value: V) => isEmpty ) = {
+    val value = Try(get).getOrElse(null).asInstanceOf[V]
+    (on(value)) ? default | value
+  }
 }
 
 object Property {

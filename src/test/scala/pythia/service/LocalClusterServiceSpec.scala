@@ -9,7 +9,7 @@ import pythia.dao._
 import pythia.service.ClusterState._
 import pythia.config.PythiaConfig._
 import pythia.testing.SpamData
-import pythia.component.debug.DebugComponent
+import pythia.component.debug.Log
 import scala.reflect.io.Directory
 
 class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach {
@@ -94,7 +94,7 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
       ComponentConfiguration (
         id = "debug",
         name = "Debug",
-        clazz = classOf[DebugComponent].getName,
+        clazz = classOf[Log].getName,
         inputs = Map(
           "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> List(labelName)))
         )

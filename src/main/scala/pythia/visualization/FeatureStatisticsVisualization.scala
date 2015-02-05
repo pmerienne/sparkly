@@ -12,7 +12,10 @@ class FeatureStatisticsVisualization extends Visualization {
 
   def metadata = VisualizationMetadata (
     name = "Feature statistics",
-    properties = Map("Window length (in ms)" -> PropertyMetadata(LONG)),
+    properties = Map(
+      "Window length (in ms)" -> PropertyMetadata(LONG),
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
+    ),
     features = List("Number feature")
   )
 
@@ -20,7 +23,7 @@ class FeatureStatisticsVisualization extends Visualization {
     val dstream = context.features("Number feature")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
     val dataCollector = context.dataCollector
-    val partitions = context.ssc.sparkContext.defaultParallelism
+    val partitions = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
 
     dstream
       .repartition(partitions)
