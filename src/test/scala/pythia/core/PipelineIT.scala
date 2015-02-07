@@ -18,8 +18,8 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
-  val checkpointDirectory = Directory.makeTemp()
-  val streamingContextFactory = new StreamingContextFactory(checkpointDirectory.toString, "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
+  val pipelineDirectory = Directory.makeTemp()
+  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString, "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
   val workingDirectory = Directory.makeTemp()
 
   "Pipeline" should "build and connect components together" in {

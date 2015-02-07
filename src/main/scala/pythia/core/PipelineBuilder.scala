@@ -6,10 +6,11 @@ import org.apache.spark.streaming.dstream.DStream
 
 import scala.collection.mutable
 import scala.collection.mutable.{Map => MutableMap}
+import scala.reflect.io.Path
 
 class PipelineBuilder {
 
-  def build(ssc: StreamingContext, pipeline: PipelineConfiguration): BuildResult = {
+  def build(ssc: StreamingContext, pipelineDirectory: String, pipeline: PipelineConfiguration): BuildResult = {
     val connections = pipeline.connections
     implicit val componentOrdering = ComponentOrdering(pipeline)
 
@@ -27,7 +28,7 @@ class PipelineBuilder {
             (name, dstream.getOrElse(emptyStream(ssc)))
           }.toMap
 
-        val outputs = component.init(ssc, componentConfiguration, inputs)
+        val outputs = component.init(ssc, pipelineDirectory, pipeline.id, componentConfiguration, inputs)
         outputStreams ++= outputs.map(t => (componentConfiguration.id, t._1) -> t._2)
       components += componentId -> component
       }

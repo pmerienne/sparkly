@@ -12,6 +12,7 @@ import pythia.core.PropertyType._
 import pythia.core.{ComponentMetadata, Context, OutputStreamMetadata, PropertyMetadata, _}
 import resource._
 import scala.collection.mutable.ListBuffer
+import pythia.utils.SparklyDirectoryStructure
 
 class JdbcSource extends Component {
 
@@ -51,7 +52,7 @@ class JdbcSource extends Component {
     val hadoopConf = SerializableHadoopConfiguration.from(context)
 
     val rawStreams =  (0 until partitions).map{ partition =>
-      context.ssc.receiverStream(new SqlReceiver(context.componentId, url, driver, user, password, sql, incrementField, startValue, rateLimit, partition, partitions, hadoopConf))
+      context.ssc.receiverStream(new SqlReceiver(context.pipelineDirectory, context.componentId, url, driver, user, password, sql, incrementField, startValue, rateLimit, partition, partitions, hadoopConf))
     }
 
     Map("Output" ->  context.ssc.union(rawStreams).map(rawData => new Instance(outputMapper = outputMapper).outputFeatures("Fields", rawData.values.toList))
@@ -61,6 +62,7 @@ class JdbcSource extends Component {
 }
 
 class SqlReceiver(
+  pipelineDirectory: String,
   componentId: String,
   url: String,
   driver: String,
@@ -73,8 +75,8 @@ class SqlReceiver(
   partition: Int, partitions: Int,
   hadoopConfiguration: SerializableHadoopConfiguration) extends Receiver[Map[String, String]](StorageLevel.MEMORY_AND_DISK_SER) with Logging {
 
-  val stateId = s"$componentId-sql-receiver-$partition"
-  val lowerBoundState = new HdfsState[Long](stateId, hadoopConfiguration)
+  private val statePath = SparklyDirectoryStructure.getStateDirectory(pipelineDirectory, s"$componentId-sql-receiver-$partition")
+  private val lowerBoundState = new HdfsState[Long](statePath, hadoopConfiguration)
 
   private var lowerBound: Long = _
 

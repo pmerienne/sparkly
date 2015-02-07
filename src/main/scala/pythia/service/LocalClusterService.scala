@@ -6,12 +6,13 @@ import org.apache.spark.streaming._
 import pythia.config.PythiaConfig._
 import pythia.core._
 import pythia.dao.PipelineRepository
+import pythia.config.PythiaConfig
 
 class LocalClusterService(
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val streamingContextFactory = new StreamingContextFactory(BASE_CHECKPOINTS_DIRECTORY, "local[16]", "local", Seconds(1), HOSTNAME, WEB_PORT)
+  val streamingContextFactory = new StreamingContextFactory(BASE_DISTRIBUTED_DIRECTORY, "local[16]", "local", Seconds(1), HOSTNAME, WEB_PORT)
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)

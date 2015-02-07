@@ -11,6 +11,7 @@ import pythia.config.PythiaConfig._
 import pythia.testing.SpamData
 import pythia.component.debug.Log
 import scala.reflect.io.Directory
+import pythia.config.PythiaConfig
 
 class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach {
 
@@ -19,12 +20,12 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
   val localClusterService: LocalClusterService = new LocalClusterService()
 
   override def beforeEach(): Unit = {
-    Directory(BASE_CHECKPOINTS_DIRECTORY).deleteRecursively()
+    Directory(BASE_DISTRIBUTED_DIRECTORY).deleteRecursively()
   }
 
   override def afterEach(): Unit = {
     localClusterService.stop(false)
-    Directory(BASE_CHECKPOINTS_DIRECTORY).deleteRecursively()
+    Directory(BASE_DISTRIBUTED_DIRECTORY).deleteRecursively()
   }
 
   "Local cluster" should "deploy pipeline" in {

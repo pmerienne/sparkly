@@ -15,12 +15,19 @@ import org.apache.spark.streaming.dstream.DStream
 import pythia.testing.MockStream
 
 import scala.collection.mutable.{Map => MutableMap}
+import scala.reflect.io.Directory
+import pythia.utils.SparklyDirectoryStructure
 
 // TODO : this class should use StreamingContextFactory
 // We need to spawn a web socket server to do so (avoid using mock)
 class VisualizationSpec extends FlatSpec with Matchers with Eventually with BeforeAndAfterEach  with MockitoSugar {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
+
+  val pipelineId = "visualization-spec"
+  val baseDirectory = Directory.makeTemp("visualization-spec")
+  val pipelineDirectory = SparklyDirectoryStructure.getPipelineDirectory(baseDirectory.toString, pipelineId)
+  val checkpointDirectory = SparklyDirectoryStructure.getCheckpointDirectory(pipelineDirectory, pipelineId)
 
   val visualizationBuilder = new VisualizationBuilder("localhost", 8080)
   val dataCollector = mock[VisualizationDataCollector](withSettings().serializable())
@@ -33,11 +40,12 @@ class VisualizationSpec extends FlatSpec with Matchers with Eventually with Befo
       .setAppName("test-" + this.getClass.getSimpleName)
 
     ssc = new StreamingContext(conf, Milliseconds(50))
-    ssc.checkpoint(Files.createTempDirectory("pythia-test").toString)
+    ssc.checkpoint(checkpointDirectory.toString)
   }
 
   override def afterEach() {
     ssc.stop()
+    baseDirectory.deleteRecursively()
   }
 
   def deployVisualization(configuration: VisualizationConfiguration): BuiltVisualization = {
@@ -46,7 +54,7 @@ class VisualizationSpec extends FlatSpec with Matchers with Eventually with Befo
     val streams = configuration.streams.map{case (name, streamIdentifier) =>
       val config: ComponentConfiguration = ComponentConfiguration(id = streamIdentifier.component, name = "visualization stream", clazz = classOf[MockStream].getName)
       val mockStream = classOf[MockStream].newInstance()
-      val outputs = mockStream.init(ssc, config, Map())
+      val outputs = mockStream.init(ssc, pipelineDirectory, pipelineId, config, Map())
       outputStreams += (config.id, streamIdentifier.stream) -> outputs(MockStream.OUTPUT_NAME)
       (streamIdentifier, mockStream)
     }
@@ -54,7 +62,7 @@ class VisualizationSpec extends FlatSpec with Matchers with Eventually with Befo
     val features = configuration.features.map{case (name, featureIdentifier) =>
       val config: ComponentConfiguration = ComponentConfiguration(id = featureIdentifier.component, name = "visualization stream", clazz = classOf[MockStream].getName)
       val mockStream = classOf[MockStream].newInstance()
-      val outputs = mockStream.init(ssc, config, Map())
+      val outputs = mockStream.init(ssc, pipelineDirectory, pipelineId, config, Map())
       outputStreams += (config.id, featureIdentifier.stream) -> outputs(MockStream.OUTPUT_NAME)
       (featureIdentifier, mockStream)
     }
