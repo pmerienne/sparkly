@@ -20,7 +20,8 @@ class LocalClusterResource(
 
   post("/:action") {
     params("action") match {
-      case "deploy" => localClusterService.deploy(params("pipelineId"))
+      case "deploy" => localClusterService.deploy(params("pipelineId"), false)
+      case "restart" => localClusterService.deploy(params("pipelineId"), true)
       case "stop" => localClusterService.stop(params.getOrElse("stopGracefully", "false").toBoolean)
       case _ => throw new IllegalArgumentException("Unknonw action " + params("action"))
     }

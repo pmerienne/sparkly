@@ -40,8 +40,6 @@ abstract class MoaFixedFeatureGenerator extends Component {
     }
 
     def onStop() {
-      // There is nothing much to do as the thread calling receive()
-      // is designed to stop by itself isStopped() returns false
     }
 
     def toPythia(instance: weka.core.Instance) = {

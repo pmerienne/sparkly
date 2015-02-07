@@ -19,6 +19,7 @@ class StreamingContextFactory (
   def restoreStreamingContext(pipeline: PipelineConfiguration): StreamingContext = {
     val pipelineDirectory = getPipelineDirectory(baseDistributedDirectory, pipeline.id)
     val checkpointDirectory = getCheckpointDirectory(pipelineDirectory, pipeline.id).toString
+    // TODO should give hadoop conf
     StreamingContext.getOrCreate(checkpointDirectory, build(pipeline, pipelineDirectory, checkpointDirectory)._1 _, createOnError = false)
   }
 

@@ -25,6 +25,14 @@ app.controller('ManageClusterCtrl', function($scope, $route, $location, $routePa
          });
     };
 
+    $scope.restart = function(pipeline) {
+        $scope.cluster.restart(pipeline.id).then(function(success) {
+            NotificationService.notify("Pipeline " + pipeline.name + " restarted on " + $scope.cluster.name);
+         }, function(error) {
+            NotificationService.notify("Unable to restart pipeline " + pipeline.name + " on " + $scope.cluster.name, "danger");
+         });
+    };
+
     $scope.updateStatus = function() {
         $scope.cluster.updateStatus();
         $scope.updateStateCss();

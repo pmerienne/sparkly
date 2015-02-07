@@ -34,7 +34,7 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
     when(pipelineValidationService.validate(pipeline)).thenReturn(ValidationReport())
 
     // When
-    localClusterService.deploy("pipeline1", false)
+    localClusterService.deploy("pipeline1", true, false)
 
     // Then
     val state = localClusterService.status
@@ -51,7 +51,7 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
 
     // When
     intercept[IllegalArgumentException] {
-      localClusterService.deploy("pipeline1", false)
+      localClusterService.deploy("pipeline1", true, false)
     }
 
     // Then
@@ -63,10 +63,10 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
     // Given
     when(pipelineRepository.get("pipeline1")).thenReturn(Some(pipeline))
     when(pipelineValidationService.validate(pipeline)).thenReturn(ValidationReport())
-    localClusterService.deploy("pipeline1", false)
+    localClusterService.deploy("pipeline1", true, false)
 
     // When
-    localClusterService.deploy("pipeline1", false)
+    localClusterService.deploy("pipeline1", true, false)
 
     // Then
     val state = localClusterService.status
