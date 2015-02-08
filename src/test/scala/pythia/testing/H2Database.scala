@@ -15,6 +15,7 @@ class H2Database(val port: Int = 9081, val password: String = "sa") {
   }
 
   def stop() {
+    server.shutdown()
     server.stop()
   }
 
@@ -29,6 +30,7 @@ class H2DatabaseSpec extends FlatSpec with H2Embedded with Matchers {
     connection.setAutoCommit(true)
 
     val statement = connection.createStatement()
+    statement.execute("DROP TABLE IF EXISTS USER")
     statement.execute("CREATE TABLE USER(ID INT PRIMARY KEY, NAME VARCHAR, CREATION BIGINT)")
 
     // When

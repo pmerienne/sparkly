@@ -27,6 +27,7 @@ class JdbcSourceSpec extends ComponentSpec with H2Embedded {
 
     val connection = JdbcUtil.getConnection("org.h2.Driver", db.connectUrl, "sa", "sa")
     val statement = connection.createStatement()
+    statement.execute("DROP TABLE IF EXISTS USER")
     statement.execute("CREATE TABLE USER (ID INT PRIMARY KEY, NAME VARCHAR, AGE INT)")
     statement.execute("INSERT INTO USER (ID, NAME, AGE) VALUES (1, 'Brice', 33)")
     statement.execute("INSERT INTO USER (ID, NAME, AGE) VALUES (2, 'Julie', 33)")
