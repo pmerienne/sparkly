@@ -1,34 +1,32 @@
 package pythia.component.utils
 
-import pythia.config.PythiaConfig.BASE_STATES_DIRECTORY
 import org.apache.hadoop.fs._
 import scala.util.Try
 import java.io._
 import scala.Serializable
 import com.google.common.io.ByteStreams
 
-class HdfsState[T](val id: String, val hadoopConfiguration: SerializableHadoopConfiguration) extends Serializable {
+class HdfsState[T](val path: String, val hadoopConfiguration: SerializableHadoopConfiguration) extends Serializable {
+
+  private def hdfsPath() = new org.apache.hadoop.fs.Path(path.toString)
 
   def set(value: T) = {
-    val path = new Path(BASE_STATES_DIRECTORY, id)
-    val fs = HdfsHelper.getFileSystemForPath(path, hadoopConfiguration.get())
-    val os = fs.create(path)
+    val fs = HdfsHelper.getFileSystemForPath(hdfsPath, hadoopConfiguration.get())
+    val os = fs.create(hdfsPath)
     write(os, value)
   }
 
   def get(): Option[T] = Try {
-    val path = new Path(BASE_STATES_DIRECTORY, id)
-    val fs = HdfsHelper.getFileSystemForPath(path, hadoopConfiguration.get())
-    val is = fs.open(path)
+    val fs = HdfsHelper.getFileSystemForPath(hdfsPath, hadoopConfiguration.get())
+    val is = fs.open(hdfsPath)
     read(is)
   }.toOption
 
   def getOrElse(default: T): T = get.getOrElse(default)
 
   def clear() = {
-    val path = new Path(BASE_STATES_DIRECTORY, id)
-    val fs = HdfsHelper.getFileSystemForPath(path, hadoopConfiguration.get())
-    fs.delete(path, true)
+    val fs = HdfsHelper.getFileSystemForPath(hdfsPath, hadoopConfiguration.get())
+    fs.delete(hdfsPath, true)
   }
 
   private def write(os: FSDataOutputStream, value: T) = {

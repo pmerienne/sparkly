@@ -6,23 +6,24 @@ import org.apache.spark.streaming._
 import pythia.config.PythiaConfig._
 import pythia.core._
 import pythia.dao.PipelineRepository
+import pythia.config.PythiaConfig
 
 class LocalClusterService(
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val streamingContextFactory = new StreamingContextFactory(BASE_CHECKPOINTS_DIRECTORY, "local[16]", "local", Seconds(1), HOSTNAME, WEB_PORT)
+  val streamingContextFactory = new StreamingContextFactory(BASE_DISTRIBUTED_DIRECTORY, "local[16]", "local", Seconds(1), HOSTNAME, WEB_PORT)
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)
 
-  def deploy(pipelineId: String, stopGracefully: Boolean = true) {
+  def deploy(pipelineId: String, restore: Boolean, stopGracefully: Boolean = true) {
     pipelineRepository.get(pipelineId) match {
       case None => throw new IllegalArgumentException("Pipeline with id " + pipelineId + " does not exists")
       case Some(pipeline) => {
         check(pipeline)
         stop(stopGracefully)
-        start(pipeline)
+        start(pipeline, restore)
       }
     }
   }
@@ -50,11 +51,17 @@ class LocalClusterService(
     status = ClusterStatus(ClusterState.Stopped, None, None)
   }
 
-  def start(pipeline: PipelineConfiguration) {
+  def start(pipeline: PipelineConfiguration, restore: Boolean) {
     status = ClusterStatus(ClusterState.Deploying, Some(new Date()), Some(pipeline))
 
     try {
-      streamingContext = Some(streamingContextFactory.createStreamingContext(pipeline)._1)
+      val ssc = if(restore) {
+        streamingContextFactory.restoreStreamingContext(pipeline)
+      } else {
+        streamingContextFactory.createStreamingContext(pipeline)._1
+      }
+
+      streamingContext = Some(ssc)
       streamingContext.get.start()
 
       status = ClusterStatus(ClusterState.Running, Some(new Date()), Some(pipeline))

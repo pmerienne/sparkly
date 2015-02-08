@@ -7,13 +7,14 @@ import pythia.core.PropertyType._
 
 import pythia.utils.ScalaUtils._
 import scala.util.Try
+import scala.reflect.io.Path
 
 abstract class Component extends Serializable {
   def metadata: ComponentMetadata
 
   protected def initStreams(context: Context): Map[String, DStream[Instance]]
 
-  def init(ssc: StreamingContext, configuration: ComponentConfiguration, inputs: Map[String, DStream[Instance]]) = {
+  def init(ssc: StreamingContext, pipelineDirectory: String, pipelineId: String, configuration: ComponentConfiguration, inputs: Map[String, DStream[Instance]]) = {
 
     val inputMappers =  metadata.inputs.map{case (name, meta) =>
       val conf = configuration.inputs.get(name)
@@ -32,7 +33,7 @@ abstract class Component extends Serializable {
       (prop._1, Property(prop._2, value))
     }.toMap[String, Property]
 
-    initStreams(Context(inputs, inputMappers, outputMappers, properties, ssc, configuration.id))
+    initStreams(Context(inputs, inputMappers, outputMappers, properties, ssc, pipelineDirectory, configuration.id, pipelineId))
   }
 
 }
@@ -43,7 +44,8 @@ case class Context (
   outputMappers: Map[String, Mapper],
   properties: Map[String, Property],
   ssc: StreamingContext,
-  componentId: String) {
+  pipelineDirectory: String,
+  componentId: String, pipelineId: String) {
 
   val sc = ssc.sparkContext
 

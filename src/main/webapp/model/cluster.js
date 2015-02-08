@@ -11,6 +11,22 @@ app.factory('ClusterStatus', function(Pipeline) {
         return new ClusterStatus(data.state, data.time, pipeline);
     };
 
+    ClusterStatus.prototype.prettyString = function() {
+        switch(this.state) {
+            case 'Stopped':
+                return 'Stopped';
+            case 'Deploying':
+                return 'Deploying ' + this.pipeline.name;
+            case 'Running':
+                return 'Running ' + this.pipeline.name;
+            case 'Stopping':
+                return 'Stopping';
+            default:
+                return '';
+
+        }
+    };
+
     return ClusterStatus;
 });
 
@@ -34,6 +50,10 @@ app.factory('Cluster', function(ClusterStatus, $http) {
 
     Cluster.prototype.deploy = function(pipelineId) {
         return $http.post('api/clusters/' + this.id  + "/deploy?pipelineId=" + pipelineId);
+    };
+
+    Cluster.prototype.restart = function(pipelineId) {
+        return $http.post('api/clusters/' + this.id  + "/restart?pipelineId=" + pipelineId);
     };
 
     Cluster.prototype.stop = function(pipelineId) {

@@ -4,9 +4,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
 
 import scala.reflect.io.Path
+import pythia.utils.SparklyDirectoryStructure.{getPipelineDirectory, getCheckpointDirectory}
 
 class StreamingContextFactory (
-  val checkpointBaseDirectory: String,
+  val baseDistributedDirectory: String,
   val master: String,
   val clusterId: String,
   val batchDuration: Duration,
@@ -16,23 +17,26 @@ class StreamingContextFactory (
   val visualizationBuilder = new VisualizationBuilder(sparklyHostname, sparklyPort)
 
   def restoreStreamingContext(pipeline: PipelineConfiguration): StreamingContext = {
-    val checkpointDirectory = getCheckpointDirectory(pipeline).toString
-    StreamingContext.getOrCreate(checkpointDirectory, build(pipeline, checkpointDirectory)._1 _, createOnError = false)
+    val pipelineDirectory = getPipelineDirectory(baseDistributedDirectory, pipeline.id)
+    val checkpointDirectory = getCheckpointDirectory(pipelineDirectory, pipeline.id).toString
+    // TODO should give hadoop conf
+    StreamingContext.getOrCreate(checkpointDirectory, build(pipeline, pipelineDirectory, checkpointDirectory)._1 _, createOnError = false)
   }
 
   def createStreamingContext(pipeline: PipelineConfiguration): (StreamingContext, BuildResult) = {
-    val checkpointDirectory =  getCheckpointDirectory(pipeline)
-    checkpointDirectory.deleteRecursively()
-    build(pipeline, checkpointDirectory.toString)
+    val pipelineDirectory = getPipelineDirectory(baseDistributedDirectory, pipeline.id)
+    val checkpointDirectory =  getCheckpointDirectory(pipelineDirectory, pipeline.id)
+    Path(checkpointDirectory).deleteRecursively()
+    build(pipeline, pipelineDirectory, checkpointDirectory.toString)
   }
 
-  private def build(pipeline: PipelineConfiguration, checkpointDirectory: String): (StreamingContext, BuildResult) = {
+  private def build(pipeline: PipelineConfiguration, pipelineDirectory: String, checkpointDirectory: String): (StreamingContext, BuildResult) = {
     val conf = createSparkConf()
 
     val ssc = new StreamingContext(conf, batchDuration)
     ssc.checkpoint(checkpointDirectory)
 
-    val buildResult = pipelineBuilder.build(ssc, pipeline)
+    val buildResult = pipelineBuilder.build(ssc, pipelineDirectory, pipeline)
     visualizationBuilder.buildVisualizations(clusterId, ssc, pipeline, buildResult.outputs)
     (ssc, buildResult)
   }
@@ -44,5 +48,4 @@ class StreamingContextFactory (
       .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
   }
 
-  private def getCheckpointDirectory(pipeline: PipelineConfiguration) = Path(List(checkpointBaseDirectory, pipeline.id))
 }

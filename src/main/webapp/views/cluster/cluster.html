@@ -1,21 +1,18 @@
 <div>
     <header>
-        <span>{{cluster.name}} cluster</span>
+        <span>{{cluster.name}} cluster<small>({{cluster.status.prettyString()}})</small></span>
 
         <span class="pull-right btn-group">
-            <button type="button" class="btn btn-{{stateCss}}">
-                {{cluster.status.state}}
-            </button>
-            <button type="button" class="btn btn-{{stateCss}} dropdown-toggle" data-toggle="dropdown">
-                <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
-            </button>
+            <i ng-show="cluster.isRunning()" class="fa fa-power-off fa-2x clickable" ng-click="cluster.stop()" style="margin-right: 10px" tooltip-placement="bottom" tooltip="Stop"></i>
+        </span>
+
+        <span class="pull-right btn-group" ng-show="cluster.isReadyToDeploy()">
+            <i class="fa fa-cloud-upload fa-2x clickable dropdown-toggle" style="margin-right: 10px" data-toggle="dropdown" ng-click="saveAndLaunch()" tooltip-placement="left" tooltip="Deploy or Restart"></i>
             <span class="dropdown-arrow dropdown-arrow-inverse"></span>
             <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
-                <li ng-class="{'disabled' : !cluster.isRunning()}">
-                    <a ng-click="cluster.stop()">Stop {{pipeline.name}}</a>
-                <li ng-repeat="pipeline in pipelines" ng-class="{'disabled' : !cluster.isReadyToDeploy()}">
+                <li ng-repeat="pipeline in pipelines">
                     <a ng-click="deploy(pipeline)">Deploy {{pipeline.name}}</a>
+                    <a ng-click="restart(pipeline)">Restart {{pipeline.name}}</a>
                 </li>
             </ul>
         </span>

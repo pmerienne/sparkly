@@ -14,14 +14,14 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
-  var checkpointDirectory = Directory.makeTemp("sparkly-component-test")
-  val streamingContextFactory = new StreamingContextFactory(checkpointDirectory.toString, "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
+  var pipelineDirectory = Directory.makeTemp("sparkly-component-test")
+  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
 
   var ssc: Option[StreamingContext] = None
 
   override def beforeEach() {
     super.beforeEach()
-    checkpointDirectory.deleteRecursively()
+    pipelineDirectory.deleteRecursively()
   }
 
   override def afterEach() {
@@ -30,7 +30,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
       ssc.stop()
       ssc.awaitTermination(2000)
     }
-    checkpointDirectory.deleteRecursively()
+    pipelineDirectory.deleteRecursively()
   }
 
   def deployComponent(componentConfiguration: ComponentConfiguration): RunningComponent = {
