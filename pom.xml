@@ -6,7 +6,7 @@
 	<version>0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Sparkly Pythia</name>
+	<name>Sparkly</name>
 
 	<properties>
 		<maven.compiler.source>1.7</maven.compiler.source>
@@ -358,20 +358,20 @@
 
 
 	<scm>
-		<connection>scm:git:git@github.com:pmerienne/sparkly-pythia.git</connection>
-		<developerConnection>scm:git:git@github.com:pmerienne/sparkly-pythia.git</developerConnection>
-		<url>scm:git:git@github.com:pmerienne/sparkly-pythia.git</url>
+		<connection>scm:git:git@github.com:pmerienne/sparkly.git</connection>
+		<developerConnection>scm:git:git@github.com:pmerienne/sparkly.git</developerConnection>
+		<url>scm:git:git@github.com:pmerienne/sparkly.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
 		<repository>
 			<id>release-repo</id>
-			<url>https://pmerienne@github.com/pmerienne/sparkly-pythia/raw/master/releases</url>
+			<url>https://pmerienne@github.com/pmerienne/sparkly/raw/master/releases</url>
 		</repository>
 		<snapshotRepository>
 			<id>snapshot-repo</id>
-			<url>https://pmerienne@github.com/pmerienne/sparkly-pythia/raw/master/snapshots</url>
+			<url>https://pmerienne@github.com/pmerienne/sparkly/raw/master/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 

@@ -1,10 +1,10 @@
-sparkly-pythia
+Sparkly
 ==============
 
-Sparkly-Pythia goal is to make stream-mining easy.
+Sparkly goal is to make stream-mining easy.
 It aims at providing a simple web interface allowing user to build real time predictive features at large scale.
 
-Sparkly-Pythia helps extracting value from data streams through different steps : 
+Sparkly helps extracting value from data streams through different steps :
 * Get raw data (define/mix stream source)
 * Analyze data (analytics, vizualization)
 * Get good looking data (cleanup, featurization)
