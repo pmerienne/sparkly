@@ -19,6 +19,7 @@ default
 # Backup files
 *~
 *.bak
+*.cache
 
 #jEnv files
 .java-version
