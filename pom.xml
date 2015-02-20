@@ -20,6 +20,7 @@
 		<spark.version>1.2.0</spark.version>
 		<jetty.version>8.1.14.v20131031</jetty.version>
 		<slf4j.version>1.7.5</slf4j.version>
+		<spark-cassandra-connector>1.2.0-alpha2</spark-cassandra-connector>
 	</properties>
 
 	<modules>
@@ -77,6 +78,29 @@
 				<groupId>org.apache.spark</groupId>
 				<artifactId>spark-mllib_2.10</artifactId>
 				<version>${spark.version}</version>
+			</dependency>
+
+			<!-- Spark-Cassandra-Connector -->
+			<dependency>
+				<groupId>com.datastax.spark</groupId>
+				<artifactId>spark-cassandra-connector_2.10</artifactId>
+				<version>${spark-cassandra-connector}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-streaming_2.10</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-core-asl</artifactId>
+				<version>1.9.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>1.9.2</version>
 			</dependency>
 
 			<!-- Kafka -->
@@ -227,7 +251,7 @@
 				<artifactId>jsonpath_2.10</artifactId>
 				<version>0.6.2</version>
 			</dependency>
-			
+
 			<!-- Logs -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -247,6 +271,30 @@
 				<version>${project.version}</version>
 				<type>test-jar</type>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.datastax.spark</groupId>
+				<artifactId>spark-cassandra-connector-embedded_2.10</artifactId>
+				<version>${spark-cassandra-connector}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-streaming_2.10</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-core_2.10</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-sql_2.10</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.spark</groupId>
+						<artifactId>spark-catalyst_2.10</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -315,7 +363,7 @@
 					<configuration>
 						<sourceDir>src/main/scala</sourceDir>
 						<testSourceDir>src/test/scala</testSourceDir>
-                        <scalaCompatVersion>2.10</scalaCompatVersion>
+						<scalaCompatVersion>2.10</scalaCompatVersion>
 						<jvmArgs>
 							<jvmArg>-Xms64m</jvmArg>
 							<jvmArg>-Xmx1024m</jvmArg>

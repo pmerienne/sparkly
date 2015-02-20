@@ -28,6 +28,20 @@
 			<artifactId>zookeeper</artifactId>
 		</dependency>
 
+		<!-- Spark-Cassandra-Connector -->
+		<dependency>
+			<groupId>com.datastax.spark</groupId>
+			<artifactId>spark-cassandra-connector_2.10</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
+
 		<!-- Math/Analytics/DM lib -->
 		<dependency>
 			<groupId>org.scalanlp</groupId>
@@ -73,12 +87,17 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
-		
+
 		<!-- Test -->
 		<dependency>
 			<groupId>sparkly</groupId>
 			<artifactId>sparkly-core</artifactId>
 			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.datastax.spark</groupId>
+			<artifactId>spark-cassandra-connector-embedded_2.10</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

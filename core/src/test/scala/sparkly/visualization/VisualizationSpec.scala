@@ -35,7 +35,7 @@ class VisualizationSpec extends FlatSpec with Matchers with Eventually with Befo
 
   override def beforeEach() {
     val conf = new SparkConf()
-      .setMaster("local")
+      .setMaster("local[*]")
       .setAppName("test-" + this.getClass.getSimpleName)
 
     ssc = new StreamingContext(conf, Milliseconds(50))
