@@ -46,6 +46,7 @@ class StreamingContextFactory (
       .setAppName("sparkly")
       .setMaster(master)
       .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
+      .set("spark.cassandra.connection.host", "localhost")
   }
 
 }
