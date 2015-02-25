@@ -9,7 +9,7 @@ import sparkly.core._
 import scala.reflect.io.Directory
 import scala.util.Try
 
-trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with BeforeAndAfterAll with Eventually {
+trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with Eventually {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
