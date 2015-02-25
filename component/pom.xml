@@ -42,6 +42,12 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 		</dependency>
 
+        <!-- ES Client -->
+        <dependency>
+            <groupId>com.sksamuel.elastic4s</groupId>
+            <artifactId>elastic4s_2.10</artifactId>
+        </dependency>
+
 		<!-- Math/Analytics/DM lib -->
 		<dependency>
 			<groupId>org.scalanlp</groupId>

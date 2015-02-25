@@ -45,7 +45,7 @@ class CassandraStoreSpec extends ComponentSpec with SparklyEmbeddedCassandra {
         ("0", DateTime.parse("2015-02-19T21:47:18"), 8),
         ("0", DateTime.parse("2015-02-19T21:47:28"), 9),
         ("1", DateTime.parse("2015-02-19T21:47:18"), 19)
-      )
+        )
     }
   }
 

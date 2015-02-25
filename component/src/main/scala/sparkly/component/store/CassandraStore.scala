@@ -8,7 +8,7 @@ import sparkly.core._
 class CassandraStore extends Component {
 
   override def metadata = ComponentMetadata (
-    name = "Cassandra store", description = "Store features in cassandra.",
+    name = "Cassandra store", description = "Write stream into cassandra.",
     category = "Stores",
     inputs = Map (
       "In" -> InputStreamMetadata(listedFeatures = Map("Primary keys" -> FeatureType.ANY, "Features" -> FeatureType.ANY))

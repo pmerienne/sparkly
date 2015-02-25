@@ -103,7 +103,14 @@
 				<version>1.9.2</version>
 			</dependency>
 
-			<!-- Kafka -->
+            <!-- ES Client -->
+            <dependency>
+                <groupId>com.sksamuel.elastic4s</groupId>
+                <artifactId>elastic4s_2.10</artifactId>
+                <version>1.4.12</version>
+            </dependency>
+
+            <!-- Kafka -->
 			<dependency>
 				<groupId>org.apache.kafka</groupId>
 				<artifactId>kafka_2.10</artifactId>
