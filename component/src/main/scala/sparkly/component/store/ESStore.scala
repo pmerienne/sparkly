@@ -45,21 +45,16 @@ class ESStore extends Component {
 }
 
 
-class ESWriter(hosts: String, clusterName: Option[String], indexName: String, timeout: Duration = 10 seconds) extends Serializable with Logging {
+class ESWriter(hosts: String, clusterName: Option[String], indexName: String) extends Serializable with Logging {
 
   def write(taskContext: TaskContext, data: Iterator[Map[String, Any]]) {
     val client = createClient()
     taskContext.addTaskCompletionListener((context: TaskContext) => client.close())
 
-    import scala.concurrent.ExecutionContext.Implicits.global
-
-    val futures = mutable.MutableList[Future[Any]]()
-    while(data.hasNext) {
-      val future = client.execute{index into indexName fields data.next}
-      futures += future
+    val operations = data.map(features => index into indexName fields features).toSeq
+    if(!operations.isEmpty) {
+      client.execute{ bulk(operations) }.await
     }
-
-    Await.ready(Future.sequence(futures), timeout)
   }
 
   def createClient(): ElasticClient = {
