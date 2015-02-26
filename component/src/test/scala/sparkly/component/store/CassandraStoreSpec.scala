@@ -1,6 +1,6 @@
 package sparkly.component.store
 
-import com.datastax.spark.connector.streaming._
+import scala.collection.JavaConversions._
 import org.joda.time.DateTime
 import sparkly.core._
 import sparkly.testing._
@@ -13,15 +13,16 @@ class CassandraStoreSpec extends ComponentSpec with SparklyEmbeddedCassandra {
       name = "Cassandra store",
       clazz = classOf[CassandraStore].getName,
       inputs = Map (
-        "In" -> StreamConfiguration(selectedFeatures = Map("Primary keys" -> List("stationid", "timestamp"), "Features" -> List("temperature")))
+        "In" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("stationid", "timestamp", "temperature")))
       ),
       properties = Map (
         "Keyspace" -> "cassandra_store_spec",
-        "Table" -> "temperature"
+        "Table" -> "temperature",
+        "Hosts" -> cassandraHost.getHostAddress
       )
     )
 
-    conn.withSessionDo{ session =>
+    cassandraConnector.withSessionDo{ session =>
       session.execute("DROP KEYSPACE IF EXISTS cassandra_store_spec")
       session.execute("CREATE KEYSPACE cassandra_store_spec WITH REPLICATION = { 'class': 'SimpleStrategy', 'replication_factor': 1 }")
       session.execute("CREATE TABLE cassandra_store_spec.temperature (stationid TEXT, timestamp TIMESTAMP, temperature INT, PRIMARY KEY (stationid, timestamp))")
@@ -37,15 +38,16 @@ class CassandraStoreSpec extends ComponentSpec with SparklyEmbeddedCassandra {
 
     // Then
     eventually {
-      val actualTemperatures = ssc.get
-        .cassandraTable("cassandra_store_spec", "temperature")
-        .map(row => (row.getString(0), row.getDateTime(1), row.getInt(2))).collect()
-
-      actualTemperatures should contain only (
-        ("0", DateTime.parse("2015-02-19T21:47:18"), 8),
-        ("0", DateTime.parse("2015-02-19T21:47:28"), 9),
-        ("1", DateTime.parse("2015-02-19T21:47:18"), 19)
+      cassandraConnector.withSessionDo{ session =>
+        val station0Temperatures = session.execute("SELECT * FROM cassandra_store_spec.temperature WHERE stationid = '0'").all.map{row => List(row.getString(0), row.getDate(1), row.getInt(2))}
+        val station1Temperatures = session.execute("SELECT * FROM cassandra_store_spec.temperature WHERE stationid = '1'").all.map{row => List(row.getString(0), row.getDate(1), row.getInt(2))}
+        val temperatures = (station0Temperatures ++ station1Temperatures).toList
+        temperatures should contain only (
+          List("0", DateTime.parse("2015-02-19T21:47:18").toDate, 8),
+          List("0", DateTime.parse("2015-02-19T21:47:28").toDate, 9),
+          List("1", DateTime.parse("2015-02-19T21:47:18").toDate, 19)
         )
+      }
     }
   }
 

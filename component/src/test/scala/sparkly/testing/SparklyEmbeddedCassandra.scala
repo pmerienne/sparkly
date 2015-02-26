@@ -7,7 +7,7 @@ trait SparklyEmbeddedCassandra extends EmbeddedCassandra {
 
   useCassandraConfig("cassandra-default.yaml.template")
 
-  val conn = CassandraConnector(Set(EmbeddedCassandra.cassandraHost))
+  val cassandraConnector = CassandraConnector(Set(cassandraHost))
 
   def clearCache(): Unit = CassandraConnector.evictCache()
 
