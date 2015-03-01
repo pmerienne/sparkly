@@ -18,7 +18,8 @@ class CassandraWriterSpec extends ComponentSpec with SparklyEmbeddedCassandra {
       properties = Map (
         "Keyspace" -> "cassandra_store_spec",
         "Table" -> "temperature",
-        "Hosts" -> cassandraHost.getHostAddress
+        "Hosts" -> cassandraHost.getHostAddress,
+        "Parallelism" -> "1"
       )
     )
 
