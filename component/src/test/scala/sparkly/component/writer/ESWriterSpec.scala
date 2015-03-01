@@ -19,7 +19,8 @@ class ESWriterSpec extends ComponentSpec with EmbeddedElasticsearch {
       properties = Map (
         "Hosts" -> elasticsearchServer.hosts,
         "Cluster name" -> elasticsearchServer.clusterName,
-        "Index" -> "sensor"
+        "Index" -> "sensor",
+        "Parallelism" -> "1"
       )
     )
 

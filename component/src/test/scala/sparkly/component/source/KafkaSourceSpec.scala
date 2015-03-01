@@ -2,7 +2,6 @@ package sparkly.component.source
 
 import sparkly.testing._
 import sparkly.core._
-import sparkly.testing.kafka.EmbeddedZkKafkaCluster
 
 class KafkaSourceSpec extends ComponentSpec {
 

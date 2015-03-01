@@ -83,8 +83,13 @@
 			<groupId>io.gatling</groupId>
 			<artifactId>jsonpath_2.10</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_2.10</artifactId>
+        </dependency>
 
-		<!-- Logs -->
+
+        <!-- Logs -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
