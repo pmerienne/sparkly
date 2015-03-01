@@ -1,4 +1,4 @@
-package sparkly.component.store
+package sparkly.component.writer
 
 import com.datastax.spark.connector.util.Logging
 import com.sksamuel.elastic4s.ElasticDsl._
@@ -7,23 +7,26 @@ import org.apache.spark.TaskContext
 import org.apache.spark.streaming.dstream._
 import org.elasticsearch.common.settings.ImmutableSettings
 import sparkly.core._
+import sparkly.core.PropertyType._
+import sparkly.core.InputStreamMetadata
+import scala.Some
+import sparkly.core.PropertyType
+import sparkly.core.Context
+import sparkly.core.PropertyMetadata
 
-import scala.collection.mutable
-import scala.concurrent._
-import scala.concurrent.duration._
-
-class ESStore extends Component {
+class ESWriter extends Component {
 
   override def metadata = ComponentMetadata (
-    name = "Elasticsearch store", description = "Write stream into Elasticsearch.",
-    category = "Stores",
+    name = "Elasticsearch writer", description = "Write stream into Elasticsearch.",
+    category = "Writers",
     inputs = Map (
       "In" -> InputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.ANY))
     ),
     properties = Map (
       "Hosts" -> PropertyMetadata(PropertyType.STRING, description = "Comma separated list of remote with ports (i.e host:port,host:port,...)"),
       "Cluster name" -> PropertyMetadata(PropertyType.STRING, mandatory = false),
-      "Index" -> PropertyMetadata(PropertyType.STRING)
+      "Index" -> PropertyMetadata(PropertyType.STRING),
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
     )
   )
 
@@ -32,10 +35,13 @@ class ESStore extends Component {
     val hosts = context.property("Hosts").as[String]
     val clusterName = Some(context.property("Cluster name").as[String])
     val indexName = context.property("Index").as[String]
-    val writer = new ESWriter(hosts, clusterName, indexName)
+    val parallelism = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
+
+    val writer = new ESJobWriter(hosts, clusterName, indexName)
 
     context
       .dstream("In")
+      .repartition(parallelism)
       .map(instance => (featureNames zip instance.inputFeatures("Features").asRaw).toMap)
       .foreachRDD(rdd => rdd.sparkContext.runJob(rdd, writer.write _))
 
@@ -45,7 +51,7 @@ class ESStore extends Component {
 }
 
 
-class ESWriter(hosts: String, clusterName: Option[String], indexName: String) extends Serializable with Logging {
+class ESJobWriter(hosts: String, clusterName: Option[String], indexName: String) extends Serializable with Logging {
 
   def write(taskContext: TaskContext, data: Iterator[Map[String, Any]]) {
     val client = createClient()

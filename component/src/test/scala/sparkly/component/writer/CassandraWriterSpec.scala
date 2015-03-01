@@ -1,17 +1,17 @@
-package sparkly.component.store
+package sparkly.component.writer
 
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
 import sparkly.core._
 import sparkly.testing._
 
-class CassandraStoreSpec extends ComponentSpec with SparklyEmbeddedCassandra {
+class CassandraWriterSpec extends ComponentSpec with SparklyEmbeddedCassandra {
 
-  "Cassandra store " should "save features to cassandra" in {
+  "Cassandra writer" should "write features to cassandra" in {
     // Given
     val configuration = ComponentConfiguration (
       name = "Cassandra store",
-      clazz = classOf[CassandraStore].getName,
+      clazz = classOf[CassandraWriter].getName,
       inputs = Map (
         "In" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("stationid", "timestamp", "temperature")))
       ),

@@ -1,18 +1,18 @@
-package sparkly.component.store
+package sparkly.component.writer
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import sparkly.core._
 import sparkly.testing._
 
-class ESStoreSpec extends ComponentSpec with EmbeddedElasticsearch {
+class ESWriterSpec extends ComponentSpec with EmbeddedElasticsearch {
 
-  "Elasticsearch store " should "write features to ES" in {
+  "Elasticsearch writer" should "write features to ES" in {
     // Given
     elasticsearchServer.createIndex("sensor")
 
     val configuration = ComponentConfiguration (
       name = "Elasticsearch store",
-      clazz = classOf[ESStore].getName,
+      clazz = classOf[ESWriter].getName,
       inputs = Map (
         "In" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("stationid", "timestamp", "temperature")))
       ),
