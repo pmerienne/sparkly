@@ -31,7 +31,7 @@ class StreamingContextFactory (
   }
 
   private def build(pipeline: PipelineConfiguration, pipelineDirectory: String, checkpointDirectory: String): (StreamingContext, BuildResult) = {
-    val conf = createSparkConf()
+    val conf = createSparkConf(pipeline)
 
     val ssc = new StreamingContext(conf, batchDuration)
     ssc.checkpoint(checkpointDirectory)
@@ -41,11 +41,12 @@ class StreamingContextFactory (
     (ssc, buildResult)
   }
 
-  private def createSparkConf(): SparkConf = {
+  private def createSparkConf(pipeline: PipelineConfiguration): SparkConf = {
+    val settings = pipeline.settings.values.foldLeft(Map[String, String]())((a: Map[String, String], b: Map[String, String]) => a ++ b )
     new SparkConf()
       .setAppName("sparkly")
       .setMaster(master)
-      .set("spark.streaming.receiver.writeAheadLogs.enable", "true")
+      .setAll(settings)
   }
 
 }

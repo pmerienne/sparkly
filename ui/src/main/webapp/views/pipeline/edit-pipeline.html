@@ -1,30 +1,17 @@
 <div>
     <header>
         <div class="pull-left">
-            <span class="clickable" ng-click="currentView = 'Data workflow'">
+            <span style="padding:5px;padding-right: 20px;">
                 {{pipeline.name}}
                 <span ng-show="!validationReport.isEmpty()" class="badge" style="color: #fff;background-color: #E74C3C;"
-                        tooltip-placement="bottom" tooltip="{{validationReport.warningCount}} warnings, {{validationReport.errorCount}} errors">
+                      tooltip-placement="bottom" tooltip="{{validationReport.warningCount}} warnings, {{validationReport.errorCount}} errors">
                     !
                 </span>
             </span>
-            <span class="dropdown clickable">
-                <small class="dropdown-toggle">
-                    {{currentView}}
-                    <b class="caret"></b>
-                </small>
-                <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-                <ul class="dropdown-menu dropdown-menu-inverse">
-                    <li><a ng-click="currentView = 'Data workflow'">Data workflow</a></li>
-                    <li><a ng-click="currentView = 'Visualizations'">Visualizations</a></li>
-                    <li><a ng-click="currentView = 'Informations'">Informations</a></li>
-                    <li>
-                        <a ng-click="currentView = 'Messages'" ng-show="!validationReport.isEmpty()">
-                            Messages <span class="label label-warning">{{validationReport.size()}}</span>
-                        </a>
-                    </li>
-                </ul>
-            </span>
+            <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Data workflow']" ng-click="currentView = 'Data workflow'">Data workflow</span>
+            <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Visualizations']" ng-click="currentView = 'Visualizations'">Monitoring</span>
+            <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Settings']" ng-click="currentView = 'Settings'">Settings</span>
+            <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Errors']" ng-click="currentView = 'Errors'" ng-show="!validationReport.isEmpty()">Errors ({{validationReport.size()}})</span>
         </div>
 
         <div class="pull-right">
@@ -35,12 +22,6 @@
     </header>
 
     <pipeline-data-workflow ng-show="currentView == 'Data workflow'"></pipeline-data-workflow>
-
-    <div ng-show="currentView == 'Messages'" class="container-fluid">
-        <div class="bs-callout bs-callout-{{message.level.toLowerCase()}}" ng-repeat="message in validationReport.messages">
-            <p>{{message.text}}</p>
-        </div>
-    </div>
 
     <div ng-show="currentView == 'Visualizations'" class="container-fluid">
         <pipeline-visualization-edition ng-repeat="visualization in pipeline.visualizations" pipeline="pipeline" visualization="visualization"></pipeline-visualization-edition>
@@ -60,21 +41,41 @@
         </span>
     </div>
 
-    <div ng-show="currentView == 'Informations'" class="container-fluid">
+    <div ng-show="currentView == 'Settings'" class="container-fluid">
+        <h6>Informations</h6>
         <form class="form-horizontal" role="form">
             <div class="form-group">
-                <label class="col-sm-2 control-label">Name</label>
-                <div class="col-sm-10">
+                <label class="col-sm-3 control-label">Name</label>
+                <div class="col-sm-9">
                     <input type="text" ng-model="pipeline.name" class="form-control" ng-required="true"/>
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-2 control-label">Description</label>
-                <div class="col-sm-10">
+                <label class="col-sm-3 control-label">Description</label>
+                <div class="col-sm-9">
                     <textarea ng-model="pipeline.description" class="form-control" rows="5" ng-required="false"/>
                 </div>
             </div>
         </form>
+
+        <div ng-repeat="(name, values) in pipeline.settings">
+            <h6>{{name}}</h6>
+            <form class="form-horizontal">
+                <div class="form-group" ng-repeat="(key, value) in values">
+                    <label class="col-sm-3 control-label">{{key}}</label>
+                    <div class="col-sm-9">
+                        <input type="text" ng-model="values[key]" class="form-control" />
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <div ng-show="currentView == 'Errors'" class="container-fluid">
+        <div class="bs-callout bs-callout-{{message.level.toLowerCase()}}" ng-repeat="message in validationReport.messages">
+            <p>{{message.text}}</p>
+        </div>
+    </div>
+
 
 </div>

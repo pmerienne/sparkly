@@ -1,12 +1,13 @@
 app.factory('Pipeline', function($http, Component, Visualization, Connection, ValidationReport) {
 
-    function Pipeline(id, name, description, components, connections, visualizations) {
+    function Pipeline(id, name, description, components, connections, visualizations, settings) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.components = components;
         this.connections = connections;
         this.visualizations = visualizations;
+        this.settings = settings;
     };
 
     Pipeline.build = function (data) {
@@ -16,7 +17,8 @@ app.factory('Pipeline', function($http, Component, Visualization, Connection, Va
             data.description,
             data.components.map(Component.build),
             data.connections.map(Connection.build),
-            data.visualizations.map(Visualization.build)
+            data.visualizations.map(Visualization.build),
+            data.settings
         );
     };
 
@@ -36,8 +38,14 @@ app.factory('Pipeline', function($http, Component, Visualization, Connection, Va
         return $http.delete('api/pipelines/' + id);
     };
 
+    Pipeline.create = function(name) {
+        return $http.post('api/pipelines/' + name).then(function(pipeline) {
+            return Pipeline.build(pipeline.data);
+        });
+    };
+
     Pipeline.prototype.save = function() {
-        return $http.put('api/pipelines/', this);
+        return $http.put('api/pipelines/' + this.id, this);
     };
 
     Pipeline.validate = function(pipeline) {

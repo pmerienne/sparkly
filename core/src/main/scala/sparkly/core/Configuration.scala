@@ -1,5 +1,7 @@
 package sparkly.core
 
+import sparkly.core.SparkDefaultConfiguration.defaultSettings
+
 import scala.util.Random
 
 case class PipelineConfiguration (
@@ -7,7 +9,8 @@ case class PipelineConfiguration (
   name: String, description: String = "",
   components: List[ComponentConfiguration] = List(),
   connections: List[ConnectionConfiguration] = List(),
-  visualizations: List[VisualizationConfiguration] = List()
+  visualizations: List[VisualizationConfiguration] = List(),
+  settings: Map[String, Map[String, String]] = defaultSettings
 )
 
 case class ConnectionConfiguration(from: ConnectionPoint, to: ConnectionPoint) {

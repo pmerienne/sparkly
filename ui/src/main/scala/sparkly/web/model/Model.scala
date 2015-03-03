@@ -8,10 +8,11 @@ case class PipelineConfigurationModel (
   description: String,
   components: List[ComponentConfigurationModel] = List(),
   connections: List[ConnectionModel] = List(),
-  visualizations: List[VisualizationConfigurationModel] = List()
+  visualizations: List[VisualizationConfigurationModel] = List(),
+  settings: Map[String, Map[String, String]] = Map()
 )
 
-case class ConnectionModel(from: ConnectionPointModel, to: ConnectionPointModel) 
+case class ConnectionModel(from: ConnectionPointModel, to: ConnectionPointModel)
 case class ConnectionPointModel(component: String, stream: String)
 
 case class ComponentConfigurationModel (

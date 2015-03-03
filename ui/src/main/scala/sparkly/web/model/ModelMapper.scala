@@ -1,9 +1,8 @@
 package sparkly.web.model
 
 import sparkly.core._
-import sparkly.dao.{VisualizationRepository, ComponentRepository}
-import sparkly.service.{ValidationMessage, ValidationReport, ClusterStatus}
-import scala.util.Random
+import sparkly.dao.{ComponentRepository, VisualizationRepository}
+import sparkly.service.{ClusterStatus, ValidationMessage, ValidationReport}
 
 class ModelMapper(implicit val componentRepository: ComponentRepository, implicit val visualizationRepository: VisualizationRepository) {
 
@@ -13,7 +12,8 @@ class ModelMapper(implicit val componentRepository: ComponentRepository, implici
     description = pipeline.description,
     components = pipeline.components.map(convert),
     connections = pipeline.connections.map(convert),
-    visualizations = pipeline.visualizations.map(convert)
+    visualizations = pipeline.visualizations.map(convert),
+    settings = pipeline.settings
   )
 
   def convert(component: ComponentConfiguration): ComponentConfigurationModel = ComponentConfigurationModel (
@@ -110,7 +110,8 @@ class ModelMapper(implicit val componentRepository: ComponentRepository, implici
     description = pipeline.description,
     components = pipeline.components.map(convert),
     connections = pipeline.connections.map(convert),
-    visualizations = pipeline.visualizations.map(convert)
+    visualizations = pipeline.visualizations.map(convert),
+    settings = pipeline.settings
   )
 
   def convert(component: ComponentConfigurationModel): ComponentConfiguration = ComponentConfiguration (
