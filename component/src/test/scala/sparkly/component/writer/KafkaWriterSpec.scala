@@ -3,7 +3,7 @@ package sparkly.component.writer
 import sparkly.testing._
 import sparkly.core._
 
-class KafkaWriterSpec  extends ComponentSpec with EmbeddedZkKafka {
+class KafkaWriterSpec extends ComponentSpec with EmbeddedZkKafka {
 
   "Kafka writer" should "write features to kafka" in {
 
