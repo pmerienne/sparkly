@@ -26,13 +26,13 @@ class HdfsWriter extends Component {
     val featureNames = context.inputFeatureNames("In", "Features")
     val prefix = context.property("Location prefix").as[String]
     val suffix = context.property("Location suffix").as[String]
-    val window = context.property("Interval (ms)").as[Long]
+    val window = context.property("Interval (ms)").or(context.dstream("In").slideDuration.milliseconds)
     val format = context.property("Format").as[String]
     val parallelism = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
 
     val windowedStream = context.dstream("In")
       .repartition(parallelism)
-      .window(Milliseconds(window))
+      .window(Milliseconds(window), Milliseconds(window))
 
     format match {
       case "Text file (JSON)" => windowedStream.map(instance => HdfsWriter.toJson(featureNames, instance)).saveAsTextFiles(prefix, suffix)
