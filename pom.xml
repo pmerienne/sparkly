@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>sparkly</groupId>
 	<artifactId>sparkly</artifactId>
-	<version>0.5</version>
+	<version>0.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Sparkly</name>
@@ -425,7 +425,7 @@
 		<connection>scm:git:git@github.com:pmerienne/sparkly.git</connection>
 		<developerConnection>scm:git:git@github.com:pmerienne/sparkly.git</developerConnection>
 		<url>scm:git:git@github.com:pmerienne/sparkly.git</url>
-		<tag>0.5</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
