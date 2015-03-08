@@ -5,8 +5,12 @@ import sparkly.testing._
 import sparkly.core._
 
 import scala.util.Random
+import org.scalatest.time.{Millis, Span}
 
 trait ClassifierSpec extends ComponentSpec with BeforeAndAfterEach {
+
+  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
+
   def dataset: List[Instance]
   def split(dataset: List[Instance], percent: Double = 0.80) = Random.shuffle(dataset).partition(i => Random.nextDouble() < 0.80)
 
