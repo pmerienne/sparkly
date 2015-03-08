@@ -1,4 +1,4 @@
-app.controller('ListPipelinesCtrl', function ($scope, $location, Pipeline) {
+app.controller('ListPipelinesCtrl', function ($scope, $location, $modal, Pipeline) {
 	
 	$scope.pipelines = [];
 	
@@ -18,13 +18,23 @@ app.controller('ListPipelinesCtrl', function ($scope, $location, Pipeline) {
             console.log("Failing deletion of " + id);
 		});
     };
-    
-    $scope.createNewPipeline = function() {
-        var id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
-        var pipeline = new Pipeline(id, "New pipeline", "", [], []);
-        pipeline.save().then(function() {
-    		$location.path("pipelines/" + id);
-		});
+
+    $scope.openCreationModal = function() {
+        var modalInstance = $modal.open({
+            templateUrl : 'views/pipeline/create-pipeline-modal.html',
+            controller : 'CreatePipelineCtrl',
+            resolve: {
+                info: function() { return {'name': ''}; }
+            }
+        });
+
+        modalInstance.result.then(function(info) {
+            if (info) {
+                Pipeline.create(info.name).then(function(pipeline) {
+                    $location.path("pipelines/" + pipeline.id);
+                });
+            }
+        });
     };
 	
 	$scope.refreshPipelines();

@@ -19,6 +19,15 @@ header small {
     margin-left: 10px;
 }
 
+.header-tab {
+    padding:5px;
+    font-size:92%;
+}
+
+.header-tab.active {
+    color:#2c3e50
+}
+
 .bs-callout {
     padding: 15px;
     margin: 10px 0;
@@ -211,12 +220,18 @@ footer {
 	cursor: pointer;
 }
 
+.clickable:hover {
+    color: #ECF0F1;
+    text-decoration: none;
+    transition: .25s;
+    -webkit-transition: .25s;
+}
+
 .modal-dialog {
 	width: 900px;
 }
 
 .modal-body {
-	height: 600px;
 	max-height: 650px;
 	overflow-y: auto;
 }

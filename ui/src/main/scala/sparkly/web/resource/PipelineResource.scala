@@ -1,7 +1,8 @@
 package sparkly.web.resource
 
+import sparkly.core.PipelineConfiguration
 import sparkly.dao.PipelineRepository
-import sparkly.web.model.{ModelMapper, PipelineConfigurationModel}
+import sparkly.web.model._
 
 class PipelineResource(
   implicit val pipelineRepository: PipelineRepository,
@@ -26,9 +27,18 @@ class PipelineResource(
     pipelineRepository.delete(id)
   }
 
-  put("/") {
+  post("/:name") {
+    val name = params("name")
+    val pipeline = PipelineConfiguration(name = name)
+    pipelineRepository.store(pipeline.id, pipeline)
+    modelMapper.convert(pipeline)
+  }
+
+  put("/:id") {
+    val id = params("id")
     val pipeline = parsedBody.extract[PipelineConfigurationModel]
-    pipelineRepository.store(pipeline.id, modelMapper.convert(pipeline))
+    require(pipeline.id == id)
+    pipelineRepository.store(id, modelMapper.convert(pipeline))
   }
 
 }
