@@ -7,14 +7,11 @@ import org.scalatest.mock.MockitoSugar
 import sparkly.component.source.CsvFileDirectorySource
 import sparkly.core._
 import sparkly.dao._
-import sparkly.service._
-import sparkly.service.ClusterState._
 import sparkly.config.SparklyConfig._
 import sparkly.testing.SpamData
 import sparkly.component.debug.Log
 import sparkly.service.ClusterState._
 import scala.reflect.io.Directory
-import sparkly.config.SparklyConfig
 
 class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach {
 

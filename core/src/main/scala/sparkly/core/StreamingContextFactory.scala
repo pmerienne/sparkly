@@ -10,7 +10,6 @@ class StreamingContextFactory (
   val baseDistributedDirectory: String,
   val master: String,
   val clusterId: String,
-  val batchDuration: Duration,
   val sparklyHostname: String, val sparklyPort: Int) {
 
   val pipelineBuilder = new PipelineBuilder()
@@ -33,7 +32,7 @@ class StreamingContextFactory (
   private def build(pipeline: PipelineConfiguration, pipelineDirectory: String, checkpointDirectory: String): (StreamingContext, BuildResult) = {
     val conf = createSparkConf(pipeline)
 
-    val ssc = new StreamingContext(conf, batchDuration)
+    val ssc = new StreamingContext(conf, Milliseconds(pipeline.batchDurationMs))
     ssc.checkpoint(checkpointDirectory)
 
     val buildResult = pipelineBuilder.build(ssc, pipelineDirectory, pipeline)

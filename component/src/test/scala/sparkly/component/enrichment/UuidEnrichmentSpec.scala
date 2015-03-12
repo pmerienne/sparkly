@@ -19,22 +19,17 @@ class UuidEnrichmentSpec extends ComponentSpec {
 
     // When
     val component = deployComponent(configuration)
-    component.inputs("In").push(
-      Instance("date" -> "2015-02-04T00:00:00.000Z"),
-      Instance("date" -> DateTime.parse("2015-02-05T00:00:00.000Z").toDate),
-      Instance("date" -> null)
-    )
+    val instances = (1 to 1000).map(index => Instance("date" -> "2015-02-04T00:00:00.000Z"))
+    component.inputs("In").push(instances.toList)
 
     // Then
     eventually {
-      val uuid1 = component.outputs("Out").features.filter(data => data("date") == "2015-02-04T00:00:00.000Z").head("uuid").asInstanceOf[String]
-      UUIDGen.getAdjustedTimestamp(UUID.fromString(uuid1)) should equal (DateTime.parse("2015-02-04T00:00:00.000Z").getMillis)
+      val uuids = component.outputs("Out").features.map(data => data("uuid").asInstanceOf[String])
+      uuids.toSet should have size (1000)
 
-      val uuid2 = component.outputs("Out").features.filter(data => data("date") == DateTime.parse("2015-02-05T00:00:00.000Z").toDate).head("uuid").asInstanceOf[String]
-      UUIDGen.getAdjustedTimestamp(UUID.fromString(uuid2)) should equal (DateTime.parse("2015-02-05T00:00:00.000Z").getMillis)
-
-      val uuid3 = component.outputs("Out").features.filter(data => data("date") == null).head("uuid").asInstanceOf[String]
-      UUIDGen.getAdjustedTimestamp(UUID.fromString(uuid3)) should equal (System.currentTimeMillis +- 60 * 1000)
+      uuids.foreach{ uuid =>
+        UUIDGen.getAdjustedTimestamp(UUID.fromString(uuid)) should equal (DateTime.parse("2015-02-04T00:00:00.000Z").getMillis)
+      }
     }
   }
 
@@ -50,16 +45,17 @@ class UuidEnrichmentSpec extends ComponentSpec {
 
     // When
     val component = deployComponent(configuration)
-    component.inputs("In").push(Instance(), Instance(), Instance())
+    val instances = (1 to 1000).map(index => Instance())
+    component.inputs("In").push(instances.toList)
 
     // Then
     eventually {
       val uuids = component.outputs("Out").features.map(data => data("uuid").asInstanceOf[String])
+      uuids.toSet should have size (1000)
+
       uuids.foreach{ uuid =>
         UUIDGen.getAdjustedTimestamp(UUID.fromString(uuid)) should equal (System.currentTimeMillis +- 60 * 1000)
       }
-
-      uuids.toSet should have size (3)
     }
   }
 }

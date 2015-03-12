@@ -7,6 +7,7 @@ import scala.util.Random
 case class PipelineConfiguration (
   id: String = Random.alphanumeric.take(10).mkString,
   name: String, description: String = "",
+  batchDurationMs: Long = 1000,
   components: List[ComponentConfiguration] = List(),
   connections: List[ConnectionConfiguration] = List(),
   visualizations: List[VisualizationConfiguration] = List(),

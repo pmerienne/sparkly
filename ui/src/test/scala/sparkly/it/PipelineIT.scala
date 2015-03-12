@@ -1,26 +1,25 @@
 package sparkly.it
 
-import org.apache.spark.streaming._
+import java.io.File
+import java.nio.file.Files
+
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FlatSpec, Matchers}
-import sparkly.testing._
-import scala.reflect.io.Directory
-import org.scalatest.Finders
-import sparkly.core._
-import sparkly.component.source.CsvFileDirectorySource
-import sparkly.component.preprocess.Normalizer
 import sparkly.component.classifier.Perceptron
-import java.io.File
-import java.nio.file.Files
-import org.apache.commons.io.FileUtils
+import sparkly.component.preprocess.Normalizer
+import sparkly.component.source.CsvFileDirectorySource
+import sparkly.core._
+import sparkly.testing._
+
+import scala.reflect.io.Directory
 
 class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
   val pipelineDirectory = Directory.makeTemp()
-  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString, "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
+  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString, "local[8]", "test-cluster", "localhost", 8080)
   val workingDirectory = Directory.makeTemp()
 
   "Pipeline" should "build and connect components together" in {
@@ -69,7 +68,8 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
       connections = List (
         ConnectionConfiguration("csv_source", "Instances", "normalizer", "Input"),
         ConnectionConfiguration("normalizer", "Output", "perceptron", "Train")
-      )
+      ),
+      batchDurationMs = 200
     )
 
     // System init

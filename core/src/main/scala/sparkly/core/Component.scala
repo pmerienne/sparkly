@@ -5,8 +5,8 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.PropertyType._
 import sparkly.utils.ScalaUtils._
+
 import scala.util.Try
-import scala.reflect.io.Path
 
 abstract class Component extends Serializable {
   def metadata: ComponentMetadata
@@ -85,8 +85,8 @@ case class Mapper(namedFeatures: Map[String, String] = Map(), listedFeatures: Ma
   def featuresNames(name: String): List[String] = listedFeatures.getOrElse(name, List())
   def size(name:String): Int = featuresNames(name).size
 
-  def isFeatureMapped(name: String): Boolean = namedFeatures.contains(name)
-  def areFeaturesMapped(name: String): Boolean = listedFeatures.contains(name)
+  def isFeatureMapped(name: String): Boolean = namedFeatures.contains(name) && namedFeatures(name) != null
+  def areFeaturesMapped(name: String): Boolean = listedFeatures.contains(name) && !listedFeatures(name).isEmpty
 }
 
 case class Property (

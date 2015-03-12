@@ -64,7 +64,7 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 
         var outputs = metadata.outputs.map(function(streamMetadata) {
             var streamData = data.outputs.tryFind(function(output){return output.name == streamMetadata.name});
-            return streamData == null ? Stream.newStream(streamMetadata) : Stream.build(streamMetadata, streamData);
+            return streamData == null ? Stream.newPreFilledStream(streamMetadata) : Stream.build(streamMetadata, streamData);
         });
 
         var inputs = metadata.inputs.map(function(streamMetadata) {
@@ -84,7 +84,7 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
         var id = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
         var name = metadata.name;
         var inputs = metadata.inputs.map(Stream.newStream)
-        var outputs = metadata.outputs.map(Stream.newStream)
+        var outputs = metadata.outputs.map(Stream.newPreFilledStream)
         var properties = metadata.properties.map(Property.newProperty)
 
         return new Component(metadata, id, name, inputs, outputs, properties, 50, 50);

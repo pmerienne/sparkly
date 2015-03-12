@@ -1,22 +1,16 @@
 package sparkly.component.writer
 
-import com.datastax.spark.connector._
-import com.datastax.spark.connector.streaming._
-import org.apache.spark.streaming.dstream.DStream
-import sparkly.core._
-import com.datastax.driver.core._
-import com.datastax.spark.connector.cql._
-import com.datastax.spark.connector.writer.{CassandraRowWriter, WriteConf}
-import com.datastax.spark.connector.cql.CassandraConnectorConf._
 import java.net.InetAddress
+
+import com.datastax.driver.core._
+import com.datastax.spark.connector.{ColumnName, _}
+import com.datastax.spark.connector.cql.CassandraConnectorConf._
+import com.datastax.spark.connector.cql.{PasswordAuthConf, _}
+import com.datastax.spark.connector.streaming._
+import com.datastax.spark.connector.writer.{CassandraRowWriter, WriteConf}
+import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.PropertyType._
-import sparkly.core.InputStreamMetadata
-import com.datastax.spark.connector.ColumnName
-import com.datastax.spark.connector.cql.PasswordAuthConf
-import scala.Some
-import sparkly.core.PropertyType
-import sparkly.core.Context
-import sparkly.core.PropertyMetadata
+import sparkly.core.{Context, InputStreamMetadata, PropertyMetadata, PropertyType, _}
 
 class CassandraWriter extends Component {
 
@@ -31,8 +25,8 @@ class CassandraWriter extends Component {
       "Table" -> PropertyMetadata(PropertyType.STRING),
       "Hosts" -> PropertyMetadata(PropertyType.STRING, description = "Comma separated list of hosts"),
       "Native port" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(DefaultNativePort), description = "Cassandra native port"),
-      "Username" -> PropertyMetadata(PropertyType.STRING, mandatory = false),
-      "Password" -> PropertyMetadata(PropertyType.STRING, mandatory = false),
+      "Username" -> PropertyMetadata(PropertyType.STRING, mandatory = false, defaultValue = Some("")),
+      "Password" -> PropertyMetadata(PropertyType.STRING, mandatory = false, defaultValue = Some("")),
       "Consistency" -> PropertyMetadata(PropertyType.STRING, defaultValue = Some(WriteConf.DefaultConsistencyLevel.name), acceptedValues = ConsistencyLevel.values().map(_.name).toList),
       "Query retry count"-> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(DefaultQueryRetryCount), description = "Number of times to retry a timed-out query"),
       "Reconnection delay millis (min)"-> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(DefaultMinReconnectionDelayMillis), description = "Minimum period of time to wait before reconnecting to a dead node"),
@@ -51,12 +45,9 @@ class CassandraWriter extends Component {
     val keyspace = context.property("Keyspace").as[String]
     val table = context.property("Table").as[String]
 
-    val username = if(context.property("Username").or("").isEmpty) None else Some(context.property("Username").as[String])
-    val password = Some(context.property("Password").or(""))
-    val authConf = (username, password) match {
-      case (Some(username), Some(password)) => PasswordAuthConf(username, password)
-      case _ =>  NoAuthConf
-    }
+    val username = context.property("Username").as[String]
+    val password = context.property("Password").as[String]
+    val authConf = if(username.isEmpty) NoAuthConf else PasswordAuthConf(username, password)
 
     val writeConf = WriteConf(consistencyLevel = ConsistencyLevel.valueOf(context.property("Consistency").as[String]))
     val connector = CassandraConnector(

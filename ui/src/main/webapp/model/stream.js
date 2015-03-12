@@ -43,6 +43,24 @@ app.factory('Stream', function(StreamMetadata) {
         var mappedFeatures = {};
         for(var featureName in metadata.namedFeatures) {
             if (metadata.namedFeatures.hasOwnProperty(featureName)){
+                mappedFeatures[featureName] = null;
+            }
+        }
+
+        return new Stream(metadata, metadata.name, selectedFeatures, mappedFeatures);
+    };
+
+    Stream.newPreFilledStream = function (metadata) {
+        var selectedFeatures = {}
+        for(var featureName in metadata.listedFeatures) {
+            if (metadata.listedFeatures.hasOwnProperty(featureName)){
+                selectedFeatures[featureName] = [];
+            }
+        }
+
+        var mappedFeatures = {};
+        for(var featureName in metadata.namedFeatures) {
+            if (metadata.namedFeatures.hasOwnProperty(featureName)){
                 mappedFeatures[featureName] = featureName;
             }
         }

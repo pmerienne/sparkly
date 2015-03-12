@@ -1,6 +1,6 @@
 package sparkly.testing
 
-import org.apache.spark.streaming.{Milliseconds, StreamingContext}
+import org.apache.spark.streaming.StreamingContext
 import org.scalatest._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time._
@@ -14,7 +14,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
   var pipelineDirectory = Directory.makeTemp("sparkly-component-test")
-  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster", Milliseconds(200), "localhost", 8080)
+  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster", "localhost", 8080)
 
   var ssc: Option[StreamingContext] = None
 
@@ -37,7 +37,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
     val connections = inputComponents.map(inputComponent => ConnectionConfiguration(inputComponent._2.id, MockStream.OUTPUT_NAME, componentConfiguration.id, inputComponent._1)).toList
     val components = componentConfiguration :: inputComponents.values.toList
 
-    val pipeline = PipelineConfiguration(name = this.getClass.getSimpleName, components = components, connections = connections)
+    val pipeline = PipelineConfiguration(name = this.getClass.getSimpleName, components = components, connections = connections, batchDurationMs = 200)
     val (streamingContext, buildResult) = streamingContextFactory.createStreamingContext(pipeline)
 
     val mockedInputs = inputComponents.map{case(name, config) => // TODO ugly!

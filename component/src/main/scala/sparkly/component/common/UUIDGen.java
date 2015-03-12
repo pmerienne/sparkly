@@ -8,7 +8,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-
 /**
  * The goods are here: www.ietf.org/rfc/rfc4122.txt.
  */
@@ -299,7 +298,6 @@ public class UUIDGen
             throw new RuntimeException("MD5 digest algorithm is not available", nsae);
         }
     }
-
 
     private static Collection<InetAddress> getAllLocalAddresses()
     {

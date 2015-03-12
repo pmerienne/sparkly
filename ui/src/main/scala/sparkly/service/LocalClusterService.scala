@@ -6,13 +6,12 @@ import org.apache.spark.streaming._
 import sparkly.config.SparklyConfig._
 import sparkly.core._
 import sparkly.dao.PipelineRepository
-import sparkly.config.SparklyConfig
 
 class LocalClusterService(
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val streamingContextFactory = new StreamingContextFactory(BASE_DISTRIBUTED_DIRECTORY, "local[16]", "local", Seconds(1), HOSTNAME, WEB_PORT)
+  val streamingContextFactory = new StreamingContextFactory(BASE_DISTRIBUTED_DIRECTORY, "local[16]", "local", HOSTNAME, WEB_PORT)
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)
