@@ -15,7 +15,7 @@ class DateEnrichment extends Component {
     name = "Date time",  category = "Data Enrichments",
     description = "Add time features",
     inputs = Map("In" -> InputStreamMetadata(namedFeatures = Map("Date" -> FeatureType.DATE))),
-    outputs = Map("Out" -> OutputStreamMetadata(from = Some("in"), namedFeatures = Map(
+    outputs = Map("Out" -> OutputStreamMetadata(from = Some("In"), namedFeatures = Map (
       "Timestamp ms" -> FeatureType.LONG,
       "Timestamp unix" -> FeatureType.LONG,
       "ISO-8601 format" -> FeatureType.STRING,
