@@ -30,27 +30,27 @@
 		<!-- Scalatra -->
 		<dependency>
 			<groupId>org.scalatra</groupId>
-			<artifactId>scalatra_2.10</artifactId>
+			<artifactId>scalatra_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.scalatra</groupId>
-			<artifactId>scalatra-atmosphere_2.10</artifactId>
+			<artifactId>scalatra-atmosphere_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.scalatra</groupId>
-			<artifactId>scalatra-json_2.10</artifactId>
+			<artifactId>scalatra-json_${scala.version}</artifactId>
 		</dependency>
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_2.10</artifactId>
+            <artifactId>json4s-jackson_${scala.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-native_2.10</artifactId>
+            <artifactId>json4s-native_${scala.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-core_2.10</artifactId>
+            <artifactId>json4s-core_${scala.version}</artifactId>
         </dependency>
 
 		<!-- Jetty -->
@@ -92,12 +92,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.10</artifactId>
+			<artifactId>scalatest_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.scalatra</groupId>
-			<artifactId>scalatra-scalatest_2.10</artifactId>
+			<artifactId>scalatra-scalatest_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

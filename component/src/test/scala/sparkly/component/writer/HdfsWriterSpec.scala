@@ -1,12 +1,13 @@
 package sparkly.component.writer
 
 import org.apache.commons.lang.SerializationUtils
-import sparkly.component.common.JsonSerializer
 import sparkly.core._
 import sparkly.testing._
 
 import scala.io.Source
 import scala.reflect.io.Directory
+import sparkly.common.JsonSerializer
+import com.fasterxml.jackson.databind.ObjectMapper
 
 class HdfsWriterSpec extends ComponentSpec {
 
@@ -115,19 +116,19 @@ class HdfsWriterSpec extends ComponentSpec {
     }
   }
 
-  private val serializer = new JsonSerializer[Map[String, Any]]()
+  private val mapper = new ObjectMapper()
 
   def javaDeserialization(line: String):  Map[String, Any] = SerializationUtils.deserialize(line.getBytes).asInstanceOf[Map[String, Any]]
-  def jsonDeserialization(line: String):  Map[String, Any] = serializer.deserialize(line.getBytes)
+  def jsonDeserialization(line: String):  Map[String, Any] = mapper.readValue(line, classOf[Map[String, Any]])
   def csvDeserialization(line: String):  Map[String, Any] = {
     val Array(stationId, timestamp, temperature) = line.split(",")
     Map("stationid" -> stationId, "timestamp" -> timestamp, "temperature" -> temperature.toInt)
   }
 
-  def writtenData(directory: Directory, deserilizer:(String) => Map[String, Any]): List[Map[String, Any]] = {
+  def writtenData(directory: Directory, deserializer:(String) => Map[String, Any]): List[Map[String, Any]] = {
     directory.deepFiles
       .flatMap(file => Source.fromFile(file.path).getLines)
-      .map(line => deserilizer(line))
+      .map(line => deserializer(line))
       .toList
   }
 }

@@ -14,27 +14,27 @@
 		<!-- Spark -->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_2.10</artifactId>
+			<artifactId>spark-core_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.10</artifactId>
+			<artifactId>spark-sql_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming_2.10</artifactId>
+			<artifactId>spark-streaming_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming-twitter_2.10</artifactId>
+			<artifactId>spark-streaming-twitter_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming-kafka_2.10</artifactId>
+			<artifactId>spark-streaming-kafka_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-mllib_2.10</artifactId>
+			<artifactId>spark-mllib_${scala.version}</artifactId>
 		</dependency>
 
 		<!-- Utils -->
@@ -44,7 +44,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.nscala-time</groupId>
-			<artifactId>nscala-time_2.10</artifactId>
+			<artifactId>nscala-time_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.atmosphere</groupId>
@@ -54,6 +54,40 @@
 			<groupId>org.apache.mahout</groupId>
 			<artifactId>mahout-math</artifactId>
 		</dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-native_${scala.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_${scala.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-core_${scala.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
 
 		<!-- Logs -->
 		<dependency>
@@ -73,12 +107,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.10</artifactId>
+			<artifactId>scalatest_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.scalatra</groupId>
-			<artifactId>scalatra-scalatest_2.10</artifactId>
+			<artifactId>scalatra-scalatest_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

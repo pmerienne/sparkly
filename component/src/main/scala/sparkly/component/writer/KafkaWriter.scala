@@ -5,10 +5,10 @@ import org.apache.spark.streaming.dstream.DStream
 import kafka.producer._
 import java.util.Properties
 import org.apache.spark.TaskContext
-import sparkly.component.common._
 import sparkly.core.PropertyType._
 import scala.Some
 import com.datastax.spark.connector.util.Logging
+import sparkly.common._
 
 class KafkaWriter extends Component {
 

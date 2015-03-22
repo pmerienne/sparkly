@@ -1,4 +1,4 @@
-package sparkly.component.common
+package sparkly.common
 
 import org.scalatest.{Matchers, FlatSpec}
 import org.joda.time.DateTime

@@ -1,4 +1,4 @@
-package sparkly.component.common
+package sparkly.common
 
 import org.scalatest.{Matchers, FlatSpec}
 import org.joda.time.DateTime
@@ -13,11 +13,9 @@ class JsonSerializerSpec extends FlatSpec with Matchers {
 
     // When
     val serializedData = serializer.serialize(expectedData)
-    val actualData = serializer.deserialize(serializedData)
 
     // Then
-    actualData("name") should be ("juju")
-    actualData("age") should be (33)
+    new String(serializedData) should be ("""{"name":"juju","age":33}""")
   }
 
   "Json serializer" should "serialize case class" in {
@@ -27,12 +25,9 @@ class JsonSerializerSpec extends FlatSpec with Matchers {
 
     // When
     val serializedData = serializer.serialize(expectedData)
-    val actualData = serializer.deserialize(serializedData)
 
     // Then
-    actualData.name should be ("juju")
-    actualData.age should be (33)
-    actualData.birth should be (DateTime.parse("1982-11-17").toDate)
+    new String(serializedData) should be ("""{"name":"juju","age":33,"birth":"1982-11-17T00:00:00Z"}""")
   }
 
   case class User(name: String, age: Int, birth: Date)

@@ -5,7 +5,7 @@ import com.datastax.spark.connector.embedded.EmbeddedCassandra
 
 trait SparklyEmbeddedCassandra extends EmbeddedCassandra {
 
-  useCassandraConfig("cassandra-default.yaml.template")
+  useCassandraConfig("cassandra-default.yaml.template", forceReload = true)
 
   val cassandraConnector = CassandraConnector(Set(cassandraHost))
 

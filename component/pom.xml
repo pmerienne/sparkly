@@ -20,7 +20,7 @@
 		<!-- Kafka -->
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.10</artifactId>
+			<artifactId>kafka_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>
@@ -30,35 +30,27 @@
 		<!-- Spark-Cassandra-Connector -->
 		<dependency>
 			<groupId>com.datastax.spark</groupId>
-			<artifactId>spark-cassandra-connector_2.10</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
+			<artifactId>spark-cassandra-connector_${scala.version}</artifactId>
 		</dependency>
 
         <!-- ES Client -->
         <dependency>
             <groupId>com.sksamuel.elastic4s</groupId>
-            <artifactId>elastic4s_2.10</artifactId>
+            <artifactId>elastic4s_${scala.version}</artifactId>
         </dependency>
 
 		<!-- Math/Analytics/DM lib -->
 		<dependency>
 			<groupId>org.scalanlp</groupId>
-			<artifactId>breeze_2.10</artifactId>
+			<artifactId>breeze_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.scalanlp</groupId>
-			<artifactId>breeze-natives_2.10</artifactId>
+			<artifactId>breeze-natives_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.twitter</groupId>
-			<artifactId>algebird-core_2.10</artifactId>
+			<artifactId>algebird-core_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -76,17 +68,12 @@
 		<!-- Utils -->
 		<dependency>
 			<groupId>com.jsuereth</groupId>
-			<artifactId>scala-arm_2.10</artifactId>
+			<artifactId>scala-arm_${scala.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.gatling</groupId>
-			<artifactId>jsonpath_2.10</artifactId>
+			<artifactId>jsonpath_${scala.version}</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_2.10</artifactId>
-        </dependency>
-
 
         <!-- Logs -->
 		<dependency>
@@ -107,7 +94,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.spark</groupId>
-			<artifactId>spark-cassandra-connector-embedded_2.10</artifactId>
+			<artifactId>spark-cassandra-connector-embedded_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -117,13 +104,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.10</artifactId>
+			<artifactId>kafka_${scala.version}</artifactId>
 			<scope>test</scope>
 			<classifier>test</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.10</artifactId>
+			<artifactId>scalatest_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

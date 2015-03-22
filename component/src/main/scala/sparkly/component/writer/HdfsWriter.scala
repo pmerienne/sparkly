@@ -2,8 +2,8 @@ package sparkly.component.writer
 
 import org.apache.spark.streaming.Milliseconds
 import org.apache.spark.streaming.dstream.DStream
-import sparkly.component.common.JsonSerializer
 import sparkly.core._
+import sparkly.common.JsonSerializer
 
 class HdfsWriter extends Component {
 

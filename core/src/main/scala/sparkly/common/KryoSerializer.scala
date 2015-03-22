@@ -1,4 +1,4 @@
-package sparkly.component.common
+package sparkly.common
 
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.{Input, Output}
@@ -17,7 +17,7 @@ class KryoSerializer[T](initialBufferSize: Int = 256, maxBufferSize: Int = 16 * 
     output.getBuffer()
   }
 
-  override def deserialize(bytes: Array[Byte]): T = {
+  def deserialize(bytes: Array[Byte]): T = {
     val kryo = KryoSerializer.createKryo()
 
     val input = new Input(bytes)

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>sparkly</groupId>
 	<artifactId>sparkly</artifactId>
@@ -15,9 +16,10 @@
 		<altDeploymentRepository>release-repo::default::file:../../releases</altDeploymentRepository>
 
 		<!-- Main dependencies version -->
-		<scala.version>2.10.4</scala.version>
+		<scala.version>2.10</scala.version>
 		<spark.version>1.2.1</spark.version>
 		<jetty.version>8.1.14.v20131031</jetty.version>
+		<json4s.version>3.2.10</json4s.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<spark-cassandra-connector>1.2.0-alpha2</spark-cassandra-connector>
 	</properties>
@@ -50,69 +52,59 @@
 			<!-- Spark -->
 			<dependency>
 				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-core_2.10</artifactId>
+				<artifactId>spark-core_${scala.version}</artifactId>
 				<version>${spark.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-sql_2.10</artifactId>
+				<artifactId>spark-sql_${scala.version}</artifactId>
 				<version>${spark.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-streaming_2.10</artifactId>
+				<artifactId>spark-streaming_${scala.version}</artifactId>
 				<version>${spark.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-streaming-twitter_2.10</artifactId>
+				<artifactId>spark-streaming-twitter_${scala.version}</artifactId>
 				<version>${spark.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-streaming-kafka_2.10</artifactId>
+				<artifactId>spark-streaming-kafka_${scala.version}</artifactId>
 				<version>${spark.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-mllib_2.10</artifactId>
+				<artifactId>spark-mllib_${scala.version}</artifactId>
 				<version>${spark.version}</version>
 			</dependency>
 
 			<!-- Spark-Cassandra-Connector -->
 			<dependency>
 				<groupId>com.datastax.spark</groupId>
-				<artifactId>spark-cassandra-connector_2.10</artifactId>
+				<artifactId>spark-cassandra-connector_${scala.version}</artifactId>
 				<version>${spark-cassandra-connector}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-streaming_2.10</artifactId>
+						<artifactId>spark-streaming_${scala.version}</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
+
+			<!-- ES Client -->
 			<dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-core-asl</artifactId>
-				<version>1.9.2</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-mapper-asl</artifactId>
-				<version>1.9.2</version>
+				<groupId>com.sksamuel.elastic4s</groupId>
+				<artifactId>elastic4s_${scala.version}</artifactId>
+				<version>1.4.12</version>
 			</dependency>
 
-            <!-- ES Client -->
-            <dependency>
-                <groupId>com.sksamuel.elastic4s</groupId>
-                <artifactId>elastic4s_2.10</artifactId>
-                <version>1.4.12</version>
-            </dependency>
-
-            <!-- Kafka -->
+			<!-- Kafka -->
 			<dependency>
 				<groupId>org.apache.kafka</groupId>
-				<artifactId>kafka_2.10</artifactId>
+				<artifactId>kafka_${scala.version}</artifactId>
 				<version>0.8.0</version>
 				<exclusions>
 					<exclusion>
@@ -151,44 +143,71 @@
 			<!-- Scalatra -->
 			<dependency>
 				<groupId>org.scalatra</groupId>
-				<artifactId>scalatra_2.10</artifactId>
+				<artifactId>scalatra_${scala.version}</artifactId>
 				<version>2.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.scalatra</groupId>
-				<artifactId>scalatra-atmosphere_2.10</artifactId>
+				<artifactId>scalatra-atmosphere_${scala.version}</artifactId>
 				<version>2.3.0</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.typesafe.akka</groupId>
-						<artifactId>akka-actor_2.10</artifactId>
+						<artifactId>akka-actor_${scala.version}</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.scalatra</groupId>
-				<artifactId>scalatra-json_2.10</artifactId>
+				<artifactId>scalatra-json_${scala.version}</artifactId>
 				<version>2.3.0</version>
 			</dependency>
-            <dependency>
-                <groupId>org.json4s</groupId>
-                <artifactId>json4s-jackson_2.10</artifactId>
-                <version>3.2.11</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json4s</groupId>
-                <artifactId>json4s-native_2.10</artifactId>
-                <version>3.2.11</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json4s</groupId>
-                <artifactId>json4s-core_2.10</artifactId>
-                <version>3.2.11</version>
-            </dependency>
 			<dependency>
 				<groupId>org.atmosphere</groupId>
 				<artifactId>wasync</artifactId>
 				<version>1.4.0</version>
+			</dependency>
+
+			<!-- JSON -->
+			<dependency>
+				<groupId>org.json4s</groupId>
+				<artifactId>json4s-native_${scala.version}</artifactId>
+				<version>${json4s.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.json4s</groupId>
+				<artifactId>json4s-jackson_${scala.version}</artifactId>
+				<version>${json4s.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.json4s</groupId>
+				<artifactId>json4s-core_${scala.version}</artifactId>
+				<version>${json4s.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>2.3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>2.3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.3.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-core-asl</artifactId>
+				<version>1.9.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>1.9.2</version>
 			</dependency>
 
 			<!-- Jetty -->
@@ -212,17 +231,17 @@
 			<!-- Math/Analytics/DM lib -->
 			<dependency>
 				<groupId>org.scalanlp</groupId>
-				<artifactId>breeze_2.10</artifactId>
+				<artifactId>breeze_${scala.version}</artifactId>
 				<version>0.8.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.scalanlp</groupId>
-				<artifactId>breeze-natives_2.10</artifactId>
+				<artifactId>breeze-natives_${scala.version}</artifactId>
 				<version>0.8.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.twitter</groupId>
-				<artifactId>algebird-core_2.10</artifactId>
+				<artifactId>algebird-core_${scala.version}</artifactId>
 				<version>0.8.1</version>
 			</dependency>
 			<dependency>
@@ -244,7 +263,7 @@
 			<!-- Utils -->
 			<dependency>
 				<groupId>com.github.nscala-time</groupId>
-				<artifactId>nscala-time_2.10</artifactId>
+				<artifactId>nscala-time_${scala.version}</artifactId>
 				<version>1.8.0</version>
 			</dependency>
 			<dependency>
@@ -254,7 +273,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.jsuereth</groupId>
-				<artifactId>scala-arm_2.10</artifactId>
+				<artifactId>scala-arm_${scala.version}</artifactId>
 				<version>1.3</version>
 			</dependency>
 			<dependency>
@@ -264,11 +283,11 @@
 			</dependency>
 			<dependency>
 				<groupId>io.gatling</groupId>
-				<artifactId>jsonpath_2.10</artifactId>
+				<artifactId>jsonpath_${scala.version}</artifactId>
 				<version>0.6.2</version>
 			</dependency>
 
-            <!-- Logs -->
+			<!-- Logs -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
@@ -290,25 +309,25 @@
 			</dependency>
 			<dependency>
 				<groupId>com.datastax.spark</groupId>
-				<artifactId>spark-cassandra-connector-embedded_2.10</artifactId>
+				<artifactId>spark-cassandra-connector-embedded_${scala.version}</artifactId>
 				<version>${spark-cassandra-connector}</version>
 				<scope>test</scope>
 				<exclusions>
 					<exclusion>
 						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-streaming_2.10</artifactId>
+						<artifactId>spark-streaming_${scala.version}</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-core_2.10</artifactId>
+						<artifactId>spark-core_${scala.version}</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-sql_2.10</artifactId>
+						<artifactId>spark-sql_${scala.version}</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-catalyst_2.10</artifactId>
+						<artifactId>spark-catalyst_${scala.version}</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -326,7 +345,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.kafka</groupId>
-				<artifactId>kafka_2.10</artifactId>
+				<artifactId>kafka_${scala.version}</artifactId>
 				<version>0.8.0</version>
 				<scope>test</scope>
 				<classifier>test</classifier>
@@ -339,13 +358,13 @@
 			</dependency>
 			<dependency>
 				<groupId>org.scalatest</groupId>
-				<artifactId>scalatest_2.10</artifactId>
+				<artifactId>scalatest_${scala.version}</artifactId>
 				<version>2.2.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.scalatra</groupId>
-				<artifactId>scalatra-scalatest_2.10</artifactId>
+				<artifactId>scalatra-scalatest_${scala.version}</artifactId>
 				<version>2.3.0</version>
 				<scope>test</scope>
 			</dependency>
@@ -379,12 +398,12 @@
 					<configuration>
 						<sourceDir>src/main/scala</sourceDir>
 						<testSourceDir>src/test/scala</testSourceDir>
-						<scalaCompatVersion>2.10</scalaCompatVersion>
+						<scalaCompatVersion>2.11.4</scalaCompatVersion>
 						<jvmArgs>
 							<jvmArg>-Xms64m</jvmArg>
 							<jvmArg>-Xmx1024m</jvmArg>
 						</jvmArgs>
-						<scalaVersion>${scala.version}</scalaVersion>
+						<scalaVersion>2.10.4</scalaVersion>
 					</configuration>
 				</plugin>
 
@@ -420,7 +439,6 @@
 		</pluginManagement>
 	</build>
 
-
 	<scm>
 		<connection>scm:git:git@github.com:pmerienne/sparkly.git</connection>
 		<developerConnection>scm:git:git@github.com:pmerienne/sparkly.git</developerConnection>
@@ -438,5 +456,4 @@
 			<url>https://pmerienne@github.com/pmerienne/sparkly/raw/master/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-
 </project>
