@@ -4,6 +4,7 @@ import sparkly.core._
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.Context
 import sparkly.core.ComponentMetadata
+import sparkly.component.common.ThroughputMonitoringFactory
 
 class BasicFilter extends Component {
 
@@ -14,12 +15,23 @@ class BasicFilter extends Component {
       "Operand" -> PropertyMetadata(PropertyType.STRING)
     ),
     inputs = Map("In" -> InputStreamMetadata(namedFeatures = Map("Feature" -> FeatureType.STRING))),
-    outputs = Map("Out" -> OutputStreamMetadata(from = Some("In")))
+    outputs = Map("Out" -> OutputStreamMetadata(from = Some("In"))),
+    monitorings = Map (
+      "Throughput (In)" -> MonitoringMetadata(ChartType.LINES, values = List("Throughput"), primaryValues = List("Throughput"), unit = "instance/s"),
+      "Throughput (Out)" -> MonitoringMetadata(ChartType.LINES, values = List("Throughput"), primaryValues = List("Throughput"), unit = "instance/s")
+    )
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
     val predicate = createPredicate(context.properties)
-    Map("Out" -> context.dstream("In").filter(instance => predicate(instance.inputFeature("Feature"))))
+
+    val in = context.dstream("In")
+    val out = in.filter(instance => predicate(instance.inputFeature("Feature")))
+
+    ThroughputMonitoringFactory.create("Throughput (In)", in, context)
+    ThroughputMonitoringFactory.create("Throughput (Out)", out, context)
+
+    Map("Out" -> out)
   }
 
   def createPredicate(properties: Map[String, Property]): (Feature[Any]) => Boolean = properties("Operator").as[String] match {

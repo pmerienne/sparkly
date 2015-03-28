@@ -5,8 +5,8 @@ import org.apache.spark.streaming.StreamingContext._
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.FeatureType.{DOUBLE, STRING, NUMBER, ANY}
 import sparkly.core._
-
 import scala.reflect._
+
 abstract class ClassifierComponent[L : ClassTag] extends Component {
 
   def metadata = ComponentMetadata("Classifier",

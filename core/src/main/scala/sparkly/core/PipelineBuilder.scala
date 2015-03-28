@@ -6,7 +6,6 @@ import org.apache.spark.streaming.dstream.DStream
 
 import scala.collection.mutable
 import scala.collection.mutable.{Map => MutableMap}
-import scala.reflect.io.Path
 
 class PipelineBuilder {
 

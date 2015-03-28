@@ -7,6 +7,7 @@ import sparkly.core.PropertyType._
 import sparkly.utils.ScalaUtils._
 
 import scala.util.Try
+import org.apache.spark.metrics.SparklyMonitoringSource
 
 abstract class Component extends Serializable {
   def metadata: ComponentMetadata
@@ -32,7 +33,12 @@ abstract class Component extends Serializable {
       (prop._1, Property(prop._2, value))
     }.toMap[String, Property]
 
-    initStreams(Context(inputs, inputMappers, outputMappers, properties, ssc, pipelineDirectory, configuration.id, pipelineId))
+    val monitorings: Map[String, Boolean] = metadata.monitorings.map(_._1).map{name =>
+      val active = configuration.monitorings.get(name).map(_.active).getOrElse(false)
+      (name, active)
+    }.toMap
+
+    initStreams(Context(inputs, inputMappers, outputMappers, properties, monitorings, ssc, pipelineDirectory, configuration.id, pipelineId))
   }
 
 }
@@ -42,6 +48,7 @@ case class Context (
   inputMappers: Map[String, Mapper],
   outputMappers: Map[String, Mapper],
   properties: Map[String, Property],
+  monitorings: Map[String, Boolean],
   ssc: StreamingContext,
   pipelineDirectory: String,
   componentId: String, pipelineId: String) {
@@ -78,6 +85,20 @@ case class Context (
   def outputFeatureNames(output: String, feature: String): List[String] = outputMappers(output).featuresNames(feature)
 
   def hadoopConfiguration() = ssc.sparkContext.hadoopConfiguration
+
+  def createMonitoring(name: String): Monitoring = {
+    val monitoring = new Monitoring(name)
+    add(monitoring)
+    monitoring
+  }
+
+  def add(monitoring: Monitoring): Unit = {
+    if(monitorings.getOrElse(monitoring.name, false)) {
+      val id = componentId + "-" + Monitoring.cleanName(monitoring.name)
+      val metric = monitoring.createMetric()
+      SparklyMonitoringSource.metricRegistry.register(id, metric)
+    }
+  }
 }
 
 case class Mapper(namedFeatures: Map[String, String] = Map(), listedFeatures: Map[String, List[String]] = Map()) {

@@ -11,7 +11,6 @@ class FeatureStatistics(val count: Long, val missing: Long, val stats: FeatureSt
   def max: Double = stats.max
   def quantile(q: Double) = stats.quantile(q)
 
-
   def merge(other: FeatureStatistics): FeatureStatistics = {
     new FeatureStatistics(this.count + other.count, this.missing + other.missing, this.stats.merge(other.stats))
   }
@@ -24,6 +23,11 @@ object FeatureStatistics {
   def apply(features: Iterator[Feature[_]]) : FeatureStatistics = {
     val values = features.toList
     new FeatureStatistics(values.size, values.filter(!_.isDefined).size, FeatureStatistic(values.map(_.as[Double])))
+  }
+
+  def apply(feature: Feature[_]) : FeatureStatistics = {
+    val missing = if(feature.isEmpty) 1 else 0
+    new FeatureStatistics(1, missing , FeatureStatistic(feature.as[Double]))
   }
 
   def zero(): FeatureStatistics = {

@@ -8,13 +8,14 @@ import sparkly.core._
 
 import scala.reflect.io.Directory
 import scala.util.Try
+import org.apache.spark.metrics.sink.MonitoringTestingData
 
 trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with Eventually {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
   var pipelineDirectory = Directory.makeTemp("sparkly-component-test")
-  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster", "localhost", 8080)
+  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster")
 
   var ssc: Option[StreamingContext] = None
 
@@ -50,7 +51,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
     ssc = Some(streamingContext)
     ssc.get.start()
 
-    RunningComponent(mockedInputs, inspectedOutputs)
+    RunningComponent(componentConfiguration.id, mockedInputs, inspectedOutputs)
   }
 
   private def inputMockStream(component: ComponentConfiguration) = {
@@ -59,4 +60,15 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
 
 }
 
-case class RunningComponent(inputs: Map[String, MockStream], outputs: Map[String, InspectedStream])
+case class RunningComponent(componentId: String, inputs: Map[String, MockStream], outputs: Map[String, InspectedStream]) {
+  def monitoringData(monitoring: String): List[MonitoringData] = {
+    val id = componentId + "-" + Monitoring.cleanName(monitoring)
+    MonitoringTestingData.all(id)
+  }
+
+  def latestMonitoringData(monitoring: String): MonitoringData = {
+    val id = componentId + "-" + Monitoring.cleanName(monitoring)
+    MonitoringTestingData.latest(id)
+  }
+
+}

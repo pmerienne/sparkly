@@ -8,15 +8,22 @@ case class ComponentMetadata (
   description: String = "", category: String = "Others",
   properties: Map[String, PropertyMetadata] = Map(),
   inputs: Map[String, InputStreamMetadata] = Map(),
-  outputs: Map[String, OutputStreamMetadata] = Map()
+  outputs: Map[String, OutputStreamMetadata] = Map(),
+  monitorings: Map[String, MonitoringMetadata] = Map()
 )
 
-case class VisualizationMetadata (
-  name: String,
-  properties: Map[String, PropertyMetadata] = Map(),
-  streams: List[String] = List(),
-  features: List[String] = List()
+case class MonitoringMetadata (
+  chartType: String,
+  values: List[String] = List(),
+  primaryValues: List[String] = List(),
+  unit: String = ""
 )
+
+object ChartType {
+  val LINES = "LINES"
+  val AREAS = "AREAS"
+  val STACKED_AREAS = "STACKED_AREAS"
+}
 
 case class PropertyMetadata (
   propertyType: PropertyType,

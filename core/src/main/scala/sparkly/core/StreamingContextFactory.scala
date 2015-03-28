@@ -5,28 +5,37 @@ import org.apache.spark.streaming._
 
 import scala.reflect.io.Path
 import sparkly.utils.SparklyDirectoryStructure._
+import org.apache.spark.metrics.SparklyMonitoringSource
 
 class StreamingContextFactory (
   val baseDistributedDirectory: String,
   val master: String,
-  val clusterId: String,
-  val sparklyHostname: String, val sparklyPort: Int) {
+  val clusterId: String) {
 
   val pipelineBuilder = new PipelineBuilder()
-  val visualizationBuilder = new VisualizationBuilder(sparklyHostname, sparklyPort)
 
   def restoreStreamingContext(pipeline: PipelineConfiguration): StreamingContext = {
     val pipelineDirectory = getPipelineDirectory(baseDistributedDirectory, pipeline.id)
     val checkpointDirectory = getCheckpointDirectory(pipelineDirectory, pipeline.id).toString
     // TODO should give hadoop conf
-    StreamingContext.getOrCreate(checkpointDirectory, build(pipeline, pipelineDirectory, checkpointDirectory)._1 _, createOnError = false)
+
+    SparklyMonitoringSource.init()
+    val ssc = StreamingContext.getOrCreate(checkpointDirectory, build(pipeline, pipelineDirectory, checkpointDirectory)._1 _, createOnError = false)
+    SparklyMonitoringSource.registerToMetricsSystem()
+
+    ssc
   }
 
   def createStreamingContext(pipeline: PipelineConfiguration): (StreamingContext, BuildResult) = {
     val pipelineDirectory = getPipelineDirectory(baseDistributedDirectory, pipeline.id)
     val checkpointDirectory =  getCheckpointDirectory(pipelineDirectory, pipeline.id)
     Path(checkpointDirectory).deleteRecursively()
-    build(pipeline, pipelineDirectory, checkpointDirectory.toString)
+
+    SparklyMonitoringSource.init()
+    val (ssc, buildResult) = build(pipeline, pipelineDirectory, checkpointDirectory.toString)
+    SparklyMonitoringSource.registerToMetricsSystem()
+
+    (ssc, buildResult)
   }
 
   private def build(pipeline: PipelineConfiguration, pipelineDirectory: String, checkpointDirectory: String): (StreamingContext, BuildResult) = {
@@ -36,7 +45,6 @@ class StreamingContextFactory (
     ssc.checkpoint(checkpointDirectory)
 
     val buildResult = pipelineBuilder.build(ssc, pipelineDirectory, pipeline)
-    visualizationBuilder.buildVisualizations(clusterId, ssc, pipeline, buildResult.outputs)
     (ssc, buildResult)
   }
 

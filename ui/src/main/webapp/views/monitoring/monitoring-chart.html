@@ -1,0 +1,12 @@
+<div class="col-xs-6">
+    <div class="chart-container">
+        <div class="chart-title">{{componentname}} : {{monitoring.name}}</div>
+        <div class="chart"></div>
+        <div class="chart-legend"></div>
+        <div class="chart-value" ng-show="primaryValues != null && primaryValues.length > 0">
+            <small style="font-size:50%">
+                <div ng-repeat="primaryValue in primaryValues">{{primaryValue.name}} : {{primaryValue.value}} {{monitoring.unit}}</div>
+            </small>
+        </div>
+    </div>
+</div>
