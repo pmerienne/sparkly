@@ -9,7 +9,7 @@
                 </span>
             </span>
             <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Data workflow']" ng-click="currentView = 'Data workflow'">Data workflow</span>
-            <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Visualizations']" ng-click="currentView = 'Visualizations'">Monitoring</span>
+            <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Monitoring']" ng-click="currentView = 'Monitoring'">Monitoring</span>
             <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Settings']" ng-click="currentView = 'Settings'">Settings</span>
             <span class="header-tab" ng-class="{true:'active', false:'clickable'}[currentView == 'Errors']" ng-click="currentView = 'Errors'" ng-show="!validationReport.isEmpty()">Errors ({{validationReport.size()}})</span>
         </div>
@@ -23,22 +23,15 @@
 
     <pipeline-data-workflow ng-show="currentView == 'Data workflow'"></pipeline-data-workflow>
 
-    <div ng-show="currentView == 'Visualizations'" class="container-fluid">
-        <pipeline-visualization-edition ng-repeat="visualization in pipeline.visualizations" pipeline="pipeline" visualization="visualization"></pipeline-visualization-edition>
-
-        <span class="btn-group">
-            <button type="button" class="btn btn-primary">Add new visualization</button>
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                <span class="caret"></span>
-                <span class="sr-only"></span>
-            </button>
-            <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-            <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
-                <li ng-repeat="visualizationMetadata in visualizationMetadatas">
-                    <a ng-click="addNewVisualization(visualizationMetadata);">{{visualizationMetadata.name}}</a>
-                </li>
-            </ul>
-        </span>
+    <div ng-show="currentView == 'Monitoring'" class="container-fluid">
+        <form ng-repeat="component in pipeline.components" role="form">
+            <div ng-if="component.hasMonitoring()">
+                <h4>{{component.name}} : </h4>
+                <form role="form">
+                    <pipeline-monitoring-edition ng-repeat="monitoring in component.monitorings"  monitoring="monitoring"></pipeline-monitoring-edition>
+                </form>
+            </div>
+        </form>
     </div>
 
     <div ng-show="currentView == 'Settings'" class="container-fluid">

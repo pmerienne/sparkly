@@ -1,8 +1,12 @@
 app.controller('ManageClusterCtrl', function($scope, $route, $location, $routeParams, $timeout,
-    NotificationService, Cluster, Pipeline) {
+    NotificationService, Cluster, Pipeline, MonitoringMetadata) {
 
 	$scope.cluster = {};
 	$scope.clusterId = $routeParams.clusterId;
+	$scope.monitorings = [];
+
+	$scope.memoryMonitoring = new MonitoringMetadata("Memory", "VALUES", ['Memory used', 'Memory committed', 'Max memory'], ['Memory used'], "GB");
+	$scope.latencyMonitoring = new MonitoringMetadata("Latency", "STACKED_VALUES", ["Scheduling delay", "Processing delay"], ["Total delay"], "ms");
 
     Cluster.findById($scope.clusterId).then(function(cluster) {
         $scope.cluster = cluster;

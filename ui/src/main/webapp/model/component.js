@@ -1,6 +1,6 @@
-app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadata) {
+app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadata, MonitoringMetadata) {
 
-    function ComponentMetadata(id, name, description, category, properties, inputs, outputs) {
+    function ComponentMetadata(id, name, description, category, properties, inputs, outputs, monitorings) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -8,6 +8,7 @@ app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadat
         this.properties = properties;
         this.inputs = inputs;
         this.outputs = outputs;
+        this.monitorings = monitorings;
     };
 
     ComponentMetadata.prototype.property = function(name) {
@@ -30,7 +31,8 @@ app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadat
             data.category,
             data.properties.map(PropertyMetadata.build),
             data.inputs.map(StreamMetadata.build),
-            data.outputs.map(StreamMetadata.build)
+            data.outputs.map(StreamMetadata.build),
+            data.monitorings.map(MonitoringMetadata.build)
         );
     };
 
@@ -43,9 +45,9 @@ app.factory('ComponentMetadata', function($http, PropertyMetadata, StreamMetadat
     return ComponentMetadata;
 });
 
-app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
+app.factory('Component', function($http, ComponentMetadata, Property, Stream, Monitoring) {
 
-	function Component(metadata, id, name, inputs, outputs, properties, x, y) {
+	function Component(metadata, id, name, inputs, outputs, properties, monitorings, x, y) {
 		this.metadata = metadata;
 
 		this.id = id;
@@ -54,6 +56,7 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.properties = properties;
+		this.monitorings = monitorings;
 
 		this.x = x;
 		this.y = y;
@@ -77,7 +80,12 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
             return propertyData == null ? Property.newProperty(propertyMetadata) : Property.build(propertyMetadata, propertyData);
         });
 
-        return new Component(metadata, data.id, data.name, inputs, outputs, properties, data.x, data.y);
+        var monitorings = metadata.monitorings.map(function(monitoringMetadata){
+            var monitoringData = data.monitorings.tryFind(function(monitoring){return monitoring.name == monitoringMetadata.name});
+            return monitoringData == null ? Monitoring.newMonitoring(monitoringMetadata) : Monitoring.build(monitoringMetadata, monitoringData);
+        });
+
+        return new Component(metadata, data.id, data.name, inputs, outputs, properties, monitorings, data.x, data.y);
     };
 
     Component.newComponent = function(metadata) {
@@ -86,8 +94,9 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
         var inputs = metadata.inputs.map(Stream.newStream)
         var outputs = metadata.outputs.map(Stream.newPreFilledStream)
         var properties = metadata.properties.map(Property.newProperty)
+        var monitorings = metadata.monitorings.map(Monitoring.newMonitoring)
 
-        return new Component(metadata, id, name, inputs, outputs, properties, 50, 50);
+        return new Component(metadata, id, name, inputs, outputs, properties, monitorings, 50, 50);
     };
 
     Component.prototype.hasInputs = function () {
@@ -108,6 +117,10 @@ app.factory('Component', function($http, ComponentMetadata, Property, Stream) {
 
     Component.prototype.outputStream = function(name) {
         return $.grep(this.outputs, function (outputStream) { return outputStream.name == name })[0]
+    };
+
+    Component.prototype.hasMonitoring = function () {
+        return this.monitorings.length > 0;
     };
 
     return Component;

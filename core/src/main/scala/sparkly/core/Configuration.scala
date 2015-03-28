@@ -10,7 +10,6 @@ case class PipelineConfiguration (
   batchDurationMs: Long = 1000,
   components: List[ComponentConfiguration] = List(),
   connections: List[ConnectionConfiguration] = List(),
-  visualizations: List[VisualizationConfiguration] = List(),
   settings: Map[String, Map[String, String]] = defaultSettings
 )
 
@@ -27,28 +26,16 @@ case class ComponentConfiguration (
   clazz: String,
   properties: Map[String, String] = Map(),
   inputs: Map[String, StreamConfiguration] = Map(),
-  outputs: Map[String, StreamConfiguration] = Map()
+  outputs: Map[String, StreamConfiguration] = Map(),
+  monitorings: Map[String, MonitoringConfiguration] = Map()
 )
 
 case class StreamConfiguration(mappedFeatures: Map[String, String] = Map(), selectedFeatures: Map[String, List[String]] = Map())
+
+case class MonitoringConfiguration(active: Boolean = true)
 
 object ConnectionConfiguration {
   def apply(fromComponent: String, fromStream: String, toComponent: String, toStream: String) = {
     new ConnectionConfiguration(ConnectionPoint(fromComponent, fromStream), ConnectionPoint(toComponent, toStream))
   }
-}
-
-case class VisualizationConfiguration (
-  id: String = Random.alphanumeric.take(10).mkString,  name: String,
-  clazz: String,
-  properties: Map[String, String] = Map(),
-  streams: Map[String, StreamIdentifier] = Map(),
-  features: Map[String, FeatureIdentifier] = Map()
-)
-
-case class StreamIdentifier(component: String, stream: String) {
-  def hasMissingFields(): Boolean = Option(component).getOrElse("").isEmpty || Option(stream).getOrElse("").isEmpty
-}
-case class FeatureIdentifier(component: String, stream: String, feature: String) {
-  def hasMissingFields(): Boolean = Option(component).getOrElse("").isEmpty || Option(stream).getOrElse("").isEmpty || Option(feature).getOrElse("").isEmpty
 }

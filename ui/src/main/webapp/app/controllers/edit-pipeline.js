@@ -1,5 +1,5 @@
 app.controller('EditPipelineCtrl', function($scope, $location, $routeParams, $modal, $timeout,
-		NotificationService, JsPlumbService, Pipeline, Component, ComponentMetadata, Visualization, VisualizationMetadata, ValidationReport, Cluster) {
+		NotificationService, JsPlumbService, Pipeline, Component, ComponentMetadata, ValidationReport, Cluster) {
 
     $scope.currentView = "Data workflow";
 
@@ -52,15 +52,5 @@ app.controller('EditPipelineCtrl', function($scope, $location, $routeParams, $mo
                 NotificationService.notify("Unable to deploy pipeline " + $scope.pipeline.name + " on " + cluster.name, "danger");
             });
         });
-    };
-
-    VisualizationMetadata.findAll().then(function(metadatas) {
-        $scope.visualizationMetadatas = metadatas;
-    });
-
-    $scope.addNewVisualization = function(visualizationMetadata) {
-        var viz = new Visualization.newVisualization(visualizationMetadata);
-        $scope.pipeline.visualizations.push(viz);
-        $scope.validate();
     };
 });

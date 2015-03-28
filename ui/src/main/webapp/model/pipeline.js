@@ -1,12 +1,11 @@
-app.factory('Pipeline', function($http, Component, Visualization, Connection, ValidationReport) {
+app.factory('Pipeline', function($http, Component, Connection, ValidationReport) {
 
-    function Pipeline(id, name, description, components, connections, visualizations, settings) {
+    function Pipeline(id, name, description, components, connections, settings) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.components = components;
         this.connections = connections;
-        this.visualizations = visualizations;
         this.settings = settings;
     };
 
@@ -17,7 +16,6 @@ app.factory('Pipeline', function($http, Component, Visualization, Connection, Va
             data.description,
             data.components.map(Component.build),
             data.connections.map(Connection.build),
-            data.visualizations.map(Visualization.build),
             data.settings
         );
     };
@@ -98,8 +96,17 @@ app.factory('Pipeline', function($http, Component, Visualization, Connection, Va
         return $.grep(this.components, function (component) { return component.id == componentId})[0];
     };
 
-    Pipeline.prototype.visualization = function(visualizationId) {
-        return $.grep(this.visualizations, function (visualization) { return visualization.id == visualizationId})[0];
+    Pipeline.prototype.activeMonitorings = function() {
+        var results = [];
+        for(var i = 0; i < this.components.length; i++ ) {
+            var component = this.components[i];
+            for(var j = 0; j < component.monitorings.length; j ++) {
+                if(component.monitorings[j].active) {
+                    results.push({metadata: component.monitorings[j].metadata, component: component});
+                }
+            }
+        }
+        return results;
     };
 
     return Pipeline;

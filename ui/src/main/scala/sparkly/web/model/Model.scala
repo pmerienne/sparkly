@@ -8,7 +8,6 @@ case class PipelineConfigurationModel (
   description: String,
   components: List[ComponentConfigurationModel] = List(),
   connections: List[ConnectionModel] = List(),
-  visualizations: List[VisualizationConfigurationModel] = List(),
   settings: Map[String, Map[String, String]] = Map()
 )
 
@@ -21,7 +20,8 @@ case class ComponentConfigurationModel (
   metadata: ComponentMetadataModel,
   properties: List[PropertyConfigurationModel] = List(),
   inputs: List[StreamConfigurationModel] = List(),
-  outputs: List[StreamConfigurationModel] = List()
+  outputs: List[StreamConfigurationModel] = List(),
+  monitorings: List[MonitoringConfigurationModel] = List()
 )
 
 case class StreamConfigurationModel (
@@ -37,7 +37,8 @@ case class ComponentMetadataModel (
   description: String = "", category: String = "Others",
   properties: List[PropertyMetadataModel] = List(),
   inputs: List[InputStreamMetadataModel] = List(),
-  outputs: List[OutputStreamMetadataModel] = List()
+  outputs: List[OutputStreamMetadataModel] = List(),
+  monitorings: List[MonitoringMetadataModel] = List()
 )
 
 case class PropertyMetadataModel (
@@ -53,27 +54,17 @@ case class InputStreamMetadataModel(name: String, namedFeatures: Map[String, Str
 
 case class OutputStreamMetadataModel(name: String, from: Option[String] = None, namedFeatures: Map[String, String] = Map(), listedFeatures: Map[String, String] = Map())
 
+case class MonitoringMetadataModel(name: String, chartType: String, values: List[String], primaryValues: List[String], unit: String)
+
 case class PropertyConfigurationModel(name: String, value: String)
+
+case class MonitoringConfigurationModel(name: String, active: Boolean)
 
 case class ClusterModel(id: String, name: String, status: ClusterStatusModel)
 case class ClusterStatusModel(state: String, time: Option[Date], pipeline: Option[PipelineConfigurationModel])
 
 case class ValidationReportModel(messages: List[ValidationMessageModel] = List())
 case class ValidationMessageModel(text: String, level: String)
-
-case class VisualizationConfigurationModel (
-  id: String,  name: String, metadata: VisualizationMetadataModel,
-  properties: List[PropertyConfigurationModel] = List(),
-  streams: List[StreamIdentifierModel] = List(),
-  features: List[FeatureIdentifierModel] = List()
-)
-
-case class VisualizationMetadataModel (
-  id: String, name: String,
-  properties: List[PropertyMetadataModel] = List(),
-  streams: List[String] = List(),
-  features: List[String] = List()
-)
 
 case class StreamIdentifierModel(name: String, component: String, stream: String)
 case class FeatureIdentifierModel(name: String, component: String, stream: String, feature: String)

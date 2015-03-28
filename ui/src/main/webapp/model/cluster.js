@@ -36,6 +36,7 @@ app.factory('Cluster', function(ClusterStatus, $http) {
         this.id = id;
         this.name = name;
         this.status = status;
+        this.monitorings = [];
     }
 
     Cluster.build = function (data) {
@@ -72,6 +73,9 @@ app.factory('Cluster', function(ClusterStatus, $http) {
         var self = this;
         $http.get('api/clusters/' + self.id + '/status').then(function(status) {
             self.status = ClusterStatus.build(status.data);
+            if(self.status.pipeline != null && self.monitorings.length != self.status.pipeline.activeMonitorings().length) {
+                self.monitorings = self.status.pipeline.activeMonitorings();
+            }
         });
     };
 
