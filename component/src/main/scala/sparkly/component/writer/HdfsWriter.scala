@@ -15,9 +15,9 @@ class HdfsWriter extends Component {
     ),
     properties = Map (
       "Location prefix" -> PropertyMetadata(PropertyType.STRING),
-      "Location suffix" -> PropertyMetadata(PropertyType.STRING, mandatory = false, defaultValue = Some("")),
-      "Interval (ms)" -> PropertyMetadata(PropertyType.LONG),
-      "Format" -> PropertyMetadata(PropertyType.STRING, acceptedValues = List("Text file (JSON)", "Text file (CSV)", "Sequence file (Java serialization)")),
+      "Location suffix" -> PropertyMetadata(PropertyType.STRING, mandatory = false, defaultValue = Some("csv")),
+      "Interval (ms)" -> PropertyMetadata(PropertyType.LONG, defaultValue = Some(SparkDefaultConfiguration.defaultBatchDurationMs)),
+      "Format" -> PropertyMetadata(PropertyType.STRING, defaultValue = Some("Text file (CSV)"), acceptedValues = List("Text file (JSON)", "Text file (CSV)", "Sequence file (Java serialization)")),
       "Parallelism" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
     )
   )

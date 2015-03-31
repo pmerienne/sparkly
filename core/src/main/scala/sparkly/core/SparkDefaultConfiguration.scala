@@ -2,6 +2,9 @@ package sparkly.core
 
 
 object SparkDefaultConfiguration {
+
+  val defaultBatchDurationMs = 1000L
+
   val defaultApplicationConfiguraion = Map (
     "spark.app.name" -> "sparkly",
     "spark.executor.memory" -> "512m",

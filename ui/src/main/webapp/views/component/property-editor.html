@@ -7,9 +7,9 @@
 
     <div ng-if="!property.metadata.hasLimitedValues()">
         <input ng-if="property.metadata.propertyType == 'STRING'" id="{{property.name.removeSpaces()}}" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" type="text" ng-required="property.metadata.mandatory">
-        <input ng-if="property.metadata.propertyType == 'INTEGER'" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" rpattern="/^\d+$/" ng-required="property.metadata.mandatory">
-        <input ng-if="property.metadata.propertyType == 'LONG'" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" rpattern="/^\d+$/" ng-required="property.metadata.mandatory">
-        <input ng-if="property.metadata.propertyType == 'DECIMAL'" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" rpattern="/^\d+(\.\d{1,2})?$/" step="any" ng-required="property.metadata.mandatory">
+        <input ng-if="property.metadata.propertyType == 'INTEGER'" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" rpattern="/^-?\d+$/" ng-required="property.metadata.mandatory">
+        <input ng-if="property.metadata.propertyType == 'LONG'" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" rpattern="/^-?\d+$/" ng-required="property.metadata.mandatory">
+        <input ng-if="property.metadata.propertyType == 'DECIMAL'" name="{{property.name.removeSpaces()}}" class="form-control" ng-model="property.value" rpattern="/^-?\d+(\.\d{1,2})?$/" step="any" ng-required="property.metadata.mandatory">
         <div ng-if="property.metadata.propertyType == 'BOOLEAN'" name="{{property.name.removeSpaces()}}"><input name="{{property.name.removeSpaces()}}" type="checkbox" switch></div>
     </div>
 
