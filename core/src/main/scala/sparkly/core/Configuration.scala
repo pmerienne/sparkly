@@ -1,13 +1,13 @@
 package sparkly.core
 
-import sparkly.core.SparkDefaultConfiguration.defaultSettings
+import sparkly.core.SparkDefaultConfiguration._
 
 import scala.util.Random
 
 case class PipelineConfiguration (
   id: String = Random.alphanumeric.take(10).mkString,
   name: String, description: String = "",
-  batchDurationMs: Long = 1000,
+  batchDurationMs: Long = defaultBatchDurationMs,
   components: List[ComponentConfiguration] = List(),
   connections: List[ConnectionConfiguration] = List(),
   settings: Map[String, Map[String, String]] = defaultSettings
@@ -28,7 +28,11 @@ case class ComponentConfiguration (
   inputs: Map[String, StreamConfiguration] = Map(),
   outputs: Map[String, StreamConfiguration] = Map(),
   monitorings: Map[String, MonitoringConfiguration] = Map()
-)
+) {
+  def propertyExists(property: String): Boolean = {
+    properties.contains(property) && properties(property) != null
+  }
+}
 
 case class StreamConfiguration(mappedFeatures: Map[String, String] = Map(), selectedFeatures: Map[String, List[String]] = Map())
 

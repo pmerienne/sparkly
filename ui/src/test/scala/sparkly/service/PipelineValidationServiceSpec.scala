@@ -2,13 +2,11 @@ package sparkly.service
 
 import org.mockito.BDDMockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{Matchers, FlatSpec}
-
-import sparkly.core._
+import org.scalatest._
 import sparkly.core.FeatureType._
 import sparkly.core.PropertyType._
+import sparkly.core._
 import sparkly.dao._
-import sparkly.service._
 
 class PipelineValidationServiceSpec extends FlatSpec with Matchers with MockitoSugar {
 
@@ -34,21 +32,25 @@ class PipelineValidationServiceSpec extends FlatSpec with Matchers with MockitoS
         properties = Map (
           "Not mandatory" -> PropertyMetadata(DECIMAL, mandatory = false),
           "Mandatory" -> PropertyMetadata(DECIMAL, mandatory = true),
-          "Mandatory 2" -> PropertyMetadata(DECIMAL, defaultValue = Some(0.25), mandatory = true)
+          "Mandatory 2" -> PropertyMetadata(DECIMAL, mandatory = true),
+          "Mandatory 3" -> PropertyMetadata(DECIMAL, defaultValue = Some(0.25), mandatory = true)
         )
       )
     ))
 
     val configuration = ComponentConfiguration (name = "Test",
       clazz = "Test",
-      properties = Map()
+      properties = Map("Mandatory 2" -> null)
     )
 
     // When
     val messages = componentValidator.validate(configuration)
 
     // Then
-    messages should contain only (ValidationMessage("'Mandatory' property of 'Test' component is mandatory.", MessageLevel.Error))
+    messages should contain only (
+      ValidationMessage("'Mandatory' property of 'Test' component is mandatory.", MessageLevel.Error),
+      ValidationMessage("'Mandatory 2' property of 'Test' component is mandatory.", MessageLevel.Error)
+    )
   }
 
   "ComponentValidator" should "detect bad property value" in {

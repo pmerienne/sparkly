@@ -5,10 +5,6 @@ import sparkly.dao._
 import sparkly.service.MessageLevel.MessageLevel
 
 import scala.util.Try
-import sparkly.core.StreamConfiguration
-import sparkly.core.ComponentConfiguration
-import sparkly.core.PipelineConfiguration
-import scala.Some
 
 class PipelineValidationService(implicit val componentRepository: ComponentRepository) {
 
@@ -32,7 +28,7 @@ class ComponentValidator(implicit val componentRepository: ComponentRepository) 
     }
 
     val missingPropertiesReport = componentMetadata.properties
-      .filter{case (name, metadata) => metadata.mandatory && metadata.defaultValue.isEmpty && !componentConfiguration.properties.contains(name)}
+      .filter{case (name, metadata) => metadata.mandatory && metadata.defaultValue.isEmpty && !componentConfiguration.propertyExists(name)}
       .map{case (name, metadata) => ValidationMessage(s"'${name}' property of '${componentName}' component is mandatory.", MessageLevel.Error)}
 
     val badPropertyValuesReport = componentMetadata.properties
