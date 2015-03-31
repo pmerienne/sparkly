@@ -49,6 +49,12 @@
                     <textarea ng-model="pipeline.description" class="form-control" rows="5" ng-required="false"/>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Batch duration (ms)</label>
+                <div class="col-sm-9">
+                    <input type="number" ng-model="pipeline.batchDurationMs" class="form-control" ng-required="true"/>
+                </div>
+            </div>
         </form>
 
         <div ng-repeat="(name, values) in pipeline.settings">

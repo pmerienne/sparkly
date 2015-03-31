@@ -1,9 +1,10 @@
 app.factory('Pipeline', function($http, Component, Connection, ValidationReport) {
 
-    function Pipeline(id, name, description, components, connections, settings) {
+    function Pipeline(id, name, description, batchDurationMs, components, connections, settings) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.batchDurationMs = batchDurationMs;
         this.components = components;
         this.connections = connections;
         this.settings = settings;
@@ -14,6 +15,7 @@ app.factory('Pipeline', function($http, Component, Connection, ValidationReport)
             data.id,
             data.name,
             data.description,
+            data.batchDurationMs,
             data.components.map(Component.build),
             data.connections.map(Connection.build),
             data.settings

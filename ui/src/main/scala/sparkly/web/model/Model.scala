@@ -6,6 +6,7 @@ case class PipelineConfigurationModel (
   id: String,
   name: String,
   description: String,
+  batchDurationMs: Long,
   components: List[ComponentConfigurationModel] = List(),
   connections: List[ConnectionModel] = List(),
   settings: Map[String, Map[String, String]] = Map()

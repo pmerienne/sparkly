@@ -10,6 +10,7 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     id = pipeline.id,
     name = pipeline.name,
     description = pipeline.description,
+    batchDurationMs = pipeline.batchDurationMs,
     components = pipeline.components.map(convert),
     connections = pipeline.connections.map(convert),
     settings = pipeline.settings
@@ -93,6 +94,7 @@ class ModelMapper(implicit val componentRepository: ComponentRepository) {
     id = pipeline.id,
     name = pipeline.name,
     description = pipeline.description,
+    batchDurationMs = pipeline.batchDurationMs,
     components = pipeline.components.map(convert),
     connections = pipeline.connections.map(convert),
     settings = pipeline.settings
