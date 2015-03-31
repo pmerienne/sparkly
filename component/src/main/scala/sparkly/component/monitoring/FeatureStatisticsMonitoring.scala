@@ -1,11 +1,12 @@
 package sparkly.component.monitoring
 
-import sparkly.core._
-import sparkly.core.PropertyType._
-import sparkly.utils.{NumberUtils, FeatureStatistics}
 import org.apache.spark.streaming._
-import scala.util.Try
 import org.apache.spark.streaming.dstream.DStream
+import sparkly.core.PropertyType._
+import sparkly.core._
+import sparkly.utils.FeatureStatistics
+
+import scala.util.Try
 
 class FeatureStatisticsMonitoring extends Component {
 
@@ -13,7 +14,7 @@ class FeatureStatisticsMonitoring extends Component {
     name = "Feature statistics", category = "Monitoring",
     description = "Create feature statistics monitoring",
     properties = Map(
-      "Window length (in ms)" -> PropertyMetadata(LONG),
+      "Window length (in ms)" -> PropertyMetadata(PropertyType.LONG, defaultValue = Some(SparkDefaultConfiguration.defaultBatchDurationMs)),
       "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
     ),
     inputs = Map("In" -> InputStreamMetadata(namedFeatures = Map("Number feature" -> FeatureType.NUMBER))),
