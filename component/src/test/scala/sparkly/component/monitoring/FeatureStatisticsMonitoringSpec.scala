@@ -27,12 +27,12 @@ class FeatureStatisticsMonitoringSpec extends ComponentSpec {
       data("missing") should equal (2.0)
       data("min") should equal (-10.0)
       data("max") should equal (25.0)
-      data("mean") should equal (7.5 +- 2)
-      data("std") should equal (12.5 +- 2)
-      data("quantile 0.25") should equal (-10.0 +- 20)
-      data("quantile 0.50") should equal (17.5 +- 20)
+      data("mean") should equal (7.5 +- 1)
+      data("std") should equal (12.5 +- 1)
+      data("quantile 0.25") should equal (-10.0 +- 1)
+      data("quantile 0.50") should equal (17.5 +- 1)
       data("quantile 0.75") should equal (15.0 +- 1)
-      data("quantile 0.90") should equal (22.5 +- 1)
+      data("quantile 0.90") should equal (27.5 +- 1)
       data("quantile 0.99") should equal (27.5 +- 1)
     }
   }

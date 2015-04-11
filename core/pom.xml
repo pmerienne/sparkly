@@ -11,6 +11,12 @@
 	<name>Sparkly Core</name>
 
 	<dependencies>
+		<!-- Sparkly -->
+		<dependency>
+			<groupId>sparkly</groupId>
+			<artifactId>sparkly-math</artifactId>
+		</dependency>
+
 		<!-- Spark -->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
@@ -50,44 +56,40 @@
 			<groupId>org.atmosphere</groupId>
 			<artifactId>wasync</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.mahout</groupId>
-			<artifactId>mahout-math</artifactId>
-		</dependency>
 
-        <!-- JSON -->
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-native_${scala.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_${scala.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-core_${scala.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
+    <!-- JSON -->
+    <dependency>
+        <groupId>org.json4s</groupId>
+        <artifactId>json4s-native_${scala.version}</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.json4s</groupId>
+        <artifactId>json4s-jackson_${scala.version}</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.json4s</groupId>
+        <artifactId>json4s-core_${scala.version}</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-core-asl</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+    </dependency>
 
 		<!-- Logs -->
 		<dependency>

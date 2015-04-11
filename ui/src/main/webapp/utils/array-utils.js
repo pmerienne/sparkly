@@ -6,6 +6,14 @@ Array.prototype.indexOfObject = function(obj) {
 	return -1;
 };
 
+Array.prototype.contains = function(obj) {
+	for ( var i = 0, len = this.length; i < len; i++) {
+		if (angular.equals(this[i], obj))
+			return true;
+	}
+	return false;
+};
+
 Array.prototype.remove = function(obj) {
 	var index = this.indexOfObject(obj);
 

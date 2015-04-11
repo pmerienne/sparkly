@@ -5,6 +5,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core._
 import scala.collection.mutable
+import scala.concurrent.{ExecutionContext, Future}
+
+
+import ExecutionContext.Implicits.global
 
 class MockStream extends Component {
 
@@ -22,13 +26,21 @@ class MockStream extends Component {
   }
 
   def push(instances: Instance*): Unit = push(instances.toList)
+
   def push(instances: List[Instance]): Unit = sc match{
     case Some(sparkContext) => queue += sparkContext.makeRDD(instances)
     case None => throw new IllegalStateException("You can't push data before the fake input stream is initiated")
   }
+
+  def push(rate: Int, generator: () => Instance): Unit = Future {
+    while(true) {
+      val instances = (1 to rate).map(i => generator()).toList
+      push(instances)
+      Thread.sleep(1000)
+    }
+  }
 }
 
 object MockStream {
-
   val OUTPUT_NAME = "output"
 }

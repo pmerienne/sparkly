@@ -22,9 +22,8 @@
         <div class="row">
             <stacked-areas-monitoring-chart monitoring="latencyMonitoring" clusterid="clusterId" componentid="'pipeline'" componentname="'Pipeline'"></stacked-areas-monitoring-chart>
             <lines-monitoring-chart monitoring="memoryMonitoring" clusterid="clusterId" componentid="'pipeline'" componentname="'Pipeline'"></lines-monitoring-chart>
-        </div>
 
-        <div class="row">
+
             <div ng-repeat="monitoring in cluster.monitorings">
                 <monitoring-chart monitoring="monitoring.metadata" clusterid="clusterId" componentid="monitoring.component.id" componentname="monitoring.component.name"></monitoring-chart>
             </div>
