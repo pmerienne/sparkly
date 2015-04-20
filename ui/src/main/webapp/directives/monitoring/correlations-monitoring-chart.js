@@ -11,20 +11,22 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
 		},
 		link : function(scope, element, attrs) {
 		    scope.timeSeries = {};
-		    scope.size = $(element).width();
+		    scope.size = $(element).height();
+
+		    scope.time_series_options = {
+                type: 'line',
+                series_names: ['correlation'],
+                value_names: [],
+                height: scope.size,
+                y_range: [-1.0, 1.0],
+                legend: false
+            };
 
             scope.dataSource = new MonitoringDataSource(scope.clusterid, scope.componentid, scope.monitoring.name);
             scope.dataSource.listen(function(event){
                 scope.addEvent(event);
             }, function(pastData) {
-                var options = {
-                    type: 'line',
-                    series_names: ['correlation'],
-                    value_names: ['correlation'],
-                    height: scope.size,
-                    y_range: [-1.0, 1.0]
-                };
-                scope.timeSeries.init(options, []);
+                scope.timeSeries.init(scope.time_series_options, []);
                 $(pastData).each(function(index, event){scope.addEvent(event);});
             });
 
@@ -75,8 +77,6 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
                         if(correlation == null) {
                             correlation = {
                                 "name" : parts[0] + "/" + parts[1],
-                                "position": "translate(" + x + "," + y + ")",
-                                "size": cell_size,
                                 "history": FixedQueue(100)
                             };
                             scope.correlations[combination] = correlation;
@@ -86,6 +86,8 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
                         correlation.opacity = Math.abs(value);
                         correlation.color = color(value);
                         correlation.tooltip = correlation.name + " : " + formatValue(value);
+                        correlation.position = "translate(" + x + "," + y + ")";
+                        correlation.size = cell_size;
                         var correlation_event = {'timestamp': event.timestamp, data: {'correlation': value}};
                         correlation.history.push(correlation_event);
                         if(scope.selectedCombination == combination) {
@@ -93,6 +95,14 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
                         }
                     }
                 }
+
+                // Remove deprecated correlations
+                for (var combination in scope.correlations) {
+                    if (scope.correlations.hasOwnProperty(combination) && !event.data.hasOwnProperty(combination)) {
+                        delete scope.correlations[combination]
+                    }
+                }
+
             };
 
             scope.show_correlations_plot = function() {
@@ -108,9 +118,8 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
 
                 scope.selectedCombination = combination;
 
-                scope.timeSeries.clearData();
                 scope.timeSeries.title(scope.componentname + " : " + scope.correlations[combination].name);
-                scope.timeSeries.addAll(scope.correlations[combination].history);
+                scope.timeSeries.replaceData(scope.correlations[combination].history);
             };
         }
 	};
