@@ -33,8 +33,8 @@ class CorrelationsMonitoringSpec extends ComponentSpec {
       data("zipcode.zipcode") should equal (1.0 +- 0.1)
 
       data("age.salary") should be > 0.75
-      data("age.salary") should be > 0.75
       data("age.debt") should be < -0.75
+
       Math.abs(data("age.zipcode")) should be < 0.1
     }
   }

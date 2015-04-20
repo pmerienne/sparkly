@@ -14,16 +14,25 @@ class PearsonCorrelationsSpec extends FlatSpec with Matchers {
     val correlations = PearsonCorrelations(data.iterator).correlations()
 
     // Then
+    correlations(0, 0) should be (1.0 +- 0.1)
     correlations(0, 1) should be (1.0 +- 0.1)
-    correlations(1, 1) should be (1.0 +- 0.1)
-
-    correlations(2, 3) should be (-1.0 +- 0.1)
-    correlations(3, 2) should be (-1.0 +- 0.1)
-
     correlations(0, 2) should be (0.0 +- 0.1)
     correlations(0, 3) should be (0.0 +- 0.1)
+
+    correlations(1, 0) should be (1.0 +- 0.1)
+    correlations(1, 1) should be (1.0 +- 0.1)
     correlations(1, 2) should be (0.0 +- 0.1)
     correlations(1, 3) should be (0.0 +- 0.1)
+
+    correlations(2, 0) should be (0.0 +- 0.1)
+    correlations(2, 1) should be (0.0 +- 0.1)
+    correlations(2, 2) should be (1.0 +- 0.1)
+    correlations(2, 3) should be (-1.0 +- 0.1)
+
+    correlations(3, 0) should be (0.0 +- 0.1)
+    correlations(3, 1) should be (0.0 +- 0.1)
+    correlations(3, 2) should be (-1.0 +- 0.1)
+    correlations(3, 3) should be (1.0 +- 0.1)
   }
 
   def generateFeatures(i: Int): DenseVector[Double] = {
