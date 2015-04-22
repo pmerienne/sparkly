@@ -11,13 +11,13 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
 		},
 		link : function(scope, element, attrs) {
 		    scope.timeSeries = {};
-		    scope.size = $(element).height();
+		    scope.width = Math.floor($(element).width() / 2);
+		    scope.size = Math.min(scope.width, 300);
 
 		    scope.time_series_options = {
                 type: 'line',
                 series_names: ['correlation'],
                 value_names: [],
-                height: scope.size,
                 y_range: [-1.0, 1.0],
                 legend: false
             };
@@ -103,19 +103,13 @@ app.directive('correlationsMonitoringChart', function(MonitoringDataSource) {
                     }
                 }
 
+                // Init time series data
+                if(typeof scope.selectedCombination === 'undefined' && Object.keys(scope.correlations).length > 0) {
+                    scope.show_correlation_history(Object.keys(scope.correlations)[0]);
+                }
             };
 
-            scope.show_correlations_plot = function() {
-                $(element).find("#correlation_history").hide();
-                $(element).find("#correlations_plot").show();
-
-                scope.selectedCombination = null;
-            }
-
             scope.show_correlation_history = function(combination) {
-                $(element).find("#correlations_plot").hide();
-                $(element).find("#correlation_history").show();
-
                 scope.selectedCombination = combination;
 
                 scope.timeSeries.title(scope.componentname + " : " + scope.correlations[combination].name);
