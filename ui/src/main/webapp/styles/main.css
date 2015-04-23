@@ -375,7 +375,6 @@ select.form-control {
 .chart-value {
     display: inline-block;
     vertical-align: top;
-    margin: 0px 0 0 30px;
     z-index: 10;
     color: #ffffff;
     background: #404040;
@@ -384,7 +383,8 @@ select.form-control {
     font-weight: 500;
     font-size: 28px;
     position: absolute;
-    right: 10px;
+    left: 10px;
+    bottom: 10px;
 }
 
 .chart-value .small {

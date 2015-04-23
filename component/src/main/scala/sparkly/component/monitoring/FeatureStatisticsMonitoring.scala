@@ -4,9 +4,9 @@ import org.apache.spark.streaming._
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.PropertyType._
 import sparkly.core._
-import sparkly.utils.FeatureStatistics
 
 import scala.util.Try
+import sparkly.math.FeatureSummary
 
 class FeatureStatisticsMonitoring extends Component {
 
@@ -32,10 +32,10 @@ class FeatureStatisticsMonitoring extends Component {
 
     dstream
       .repartition(partitions)
-      .mapPartitions(instances => Iterator(FeatureStatistics(instances.map(_.inputFeature("Number feature")))))
+      .mapPartitions(instances => Iterator(FeatureSummary(instances.map(_.inputFeature("Number feature").or(Double.NaN)))))
       .reduceByWindow((stat1, stat2) => stat1.merge(stat2), Milliseconds(windowDuration), dstream.slideDuration)
       .foreachRDD((rdd, time) => {
-        val stats = Try(rdd.take(1)(0)).getOrElse(FeatureStatistics.zero())
+        val stats = Try(rdd.take(1)(0)).getOrElse(FeatureSummary.zero())
 
         val data = Map(
           "count" -> stats.count.toDouble,

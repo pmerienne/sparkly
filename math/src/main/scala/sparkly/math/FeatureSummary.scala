@@ -1,37 +1,34 @@
-package sparkly.utils
+package sparkly.math
 
 import java.nio.ByteBuffer
-import sparkly.core.Feature
 import org.apache.mahout.math.stats.TDigest
 
-class FeatureStatistics(val count: Long, val missing: Long, val stats: FeatureStatistic) extends Serializable {
+class FeatureSummary(val count: Long, val missing: Long, val stats: FeatureStatistic) extends Serializable {
   def mean: Double = stats.mean
   def stdev: Double = stats.stdev
   def min: Double = stats.min
   def max: Double = stats.max
   def quantile(q: Double) = stats.quantile(q)
 
-  def merge(other: FeatureStatistics): FeatureStatistics = {
-    new FeatureStatistics(this.count + other.count, this.missing + other.missing, this.stats.merge(other.stats))
+  def merge(other: FeatureSummary): FeatureSummary = {
+    new FeatureSummary(this.count + other.count, this.missing + other.missing, this.stats.merge(other.stats))
   }
 }
 
+object FeatureSummary {
 
-
-object FeatureStatistics {
-
-  def apply(features: Iterator[Feature[_]]) : FeatureStatistics = {
-    val values = features.toList
-    new FeatureStatistics(values.size, values.filter(!_.isDefined).size, FeatureStatistic(values.map(_.as[Double])))
+  def apply(features: Iterator[Double]) : FeatureSummary = {
+    val (missing, values) = features.toList.partition(feature => feature.isNaN)
+    new FeatureSummary(missing.size + values.size, missing.size, FeatureStatistic(values))
   }
 
-  def apply(feature: Feature[_]) : FeatureStatistics = {
-    val missing = if(feature.isEmpty) 1 else 0
-    new FeatureStatistics(1, missing , FeatureStatistic(feature.as[Double]))
+  def apply(feature: Double) : FeatureSummary = {
+    val missing = if(feature.isNaN) 1 else 0
+    new FeatureSummary(1, missing , FeatureStatistic(feature))
   }
 
-  def zero(): FeatureStatistics = {
-    new FeatureStatistics(0L, 0L, new FeatureStatistic())
+  def zero(): FeatureSummary = {
+    new FeatureSummary(0L, 0L, new FeatureStatistic())
   }
 }
 
@@ -147,15 +144,12 @@ class FeatureStatistic(values: TraversableOnce[Double]) extends Serializable {
 
 object FeatureStatistic {
   def apply(values: TraversableOnce[Double]) = new FeatureStatistic(values)
-
   def apply(values: Double*) = new FeatureStatistic(values)
-
   def apply() = new FeatureStatistic()
 }
 
 
 class SerializableTDigest(val bytes: Array[Byte]) extends Serializable {
-
 
   @transient private var tDigest: TDigest = null
 

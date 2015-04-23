@@ -14,6 +14,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
+  val batchDurationMs = 200
   var pipelineDirectory = Directory.makeTemp("sparkly-component-test")
   val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster")
 
@@ -38,7 +39,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
     val connections = inputComponents.map(inputComponent => ConnectionConfiguration(inputComponent._2.id, MockStream.OUTPUT_NAME, componentConfiguration.id, inputComponent._1)).toList
     val components = componentConfiguration :: inputComponents.values.toList
 
-    val pipeline = PipelineConfiguration(name = this.getClass.getSimpleName, components = components, connections = connections, batchDurationMs = 200)
+    val pipeline = PipelineConfiguration(name = this.getClass.getSimpleName, components = components, connections = connections, batchDurationMs = batchDurationMs)
     val (streamingContext, buildResult) = streamingContextFactory.createStreamingContext(pipeline)
 
     val mockedInputs = inputComponents.map{case(name, config) => // TODO ugly!

@@ -24,6 +24,7 @@
 	</properties>
 
 	<modules>
+		<module>math</module>
 		<module>core</module>
 		<module>component</module>
 		<module>ui</module>
@@ -32,6 +33,11 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- Sparkly -->
+			<dependency>
+				<groupId>sparkly</groupId>
+				<artifactId>sparkly-math</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>sparkly</groupId>
 				<artifactId>sparkly-core</artifactId>

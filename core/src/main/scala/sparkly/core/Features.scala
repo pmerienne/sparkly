@@ -14,6 +14,7 @@ case class FeatureList(values: List[Feature[_]] = List()) {
   def asRaw = values.map(_.value.getOrElse(null))
   def asArrayOf[T : ClassTag]  = as[T].toArray
   def asDenseVector = DenseVector(asArrayOf[Double])
+  def containsUndefined() = values.exists(_.isEmpty)
 }
 
 case class Feature[U : ClassTag](value: Option[U]) {

@@ -14,6 +14,10 @@
 		<!-- Sparkly -->
 		<dependency>
 			<groupId>sparkly</groupId>
+			<artifactId>sparkly-math</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>sparkly</groupId>
 			<artifactId>sparkly-core</artifactId>
 		</dependency>
 
