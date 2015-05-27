@@ -62,14 +62,14 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
 }
 
 case class RunningComponent(componentId: String, inputs: Map[String, MockStream], outputs: Map[String, InspectedStream]) {
-  def monitoringData(monitoring: String): List[MonitoringData] = {
+  def monitoringData[T](monitoring: String): List[MonitoringData[T]] = {
     val id = componentId + "-" + Monitoring.cleanName(monitoring)
-    MonitoringTestingData.all(id)
+    MonitoringTestingData.all[T](id)
   }
 
-  def latestMonitoringData(monitoring: String): MonitoringData = {
+  def latestMonitoringData[T](monitoring: String): MonitoringData[T] = {
     val id = componentId + "-" + Monitoring.cleanName(monitoring)
-    MonitoringTestingData.latest(id)
+    MonitoringTestingData.latest[T](id)
   }
 
 }

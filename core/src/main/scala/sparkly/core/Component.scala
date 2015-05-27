@@ -86,13 +86,13 @@ case class Context (
 
   def hadoopConfiguration() = ssc.sparkContext.hadoopConfiguration
 
-  def createMonitoring(name: String): Monitoring = {
-    val monitoring = new Monitoring(name)
+  def createMonitoring[T](name: String): Monitoring[T] = {
+    val monitoring = new Monitoring[T](name)
     add(monitoring)
     monitoring
   }
 
-  def add(monitoring: Monitoring): Unit = {
+  def add[T](monitoring: Monitoring[T]): Unit = {
     if(monitorings.getOrElse(monitoring.name, false)) {
       val id = componentId + "-" + Monitoring.cleanName(monitoring.name)
       val metric = monitoring.createMetric()

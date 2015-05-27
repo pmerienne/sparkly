@@ -26,7 +26,7 @@ class CorrelationsMonitoringSpec extends ComponentSpec {
 
     // Then
     eventually {
-      val data = component.latestMonitoringData("Correlations").data
+      val data = component.latestMonitoringData[Map[String, Double]]("Correlations").data
       data("age.age") should equal (1.0 +- 0.1)
       data("salary.salary") should equal (1.0 +- 0.1)
       data("debt.debt") should equal (1.0 +- 0.1)

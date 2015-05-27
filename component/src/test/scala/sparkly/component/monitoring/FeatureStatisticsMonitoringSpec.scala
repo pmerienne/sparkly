@@ -22,7 +22,7 @@ class FeatureStatisticsMonitoringSpec extends ComponentSpec {
 
     // Then
     eventually {
-      val data = component.latestMonitoringData("Feature statistics").data
+      val data = component.latestMonitoringData[Map[String, Double]]("Feature statistics").data
       data("count") should equal (10.0)
       data("missing") should equal (2.0)
       data("min") should equal (-10.0)

@@ -26,7 +26,7 @@ class CorrelationsMonitoring extends Component {
     val dstream = context.dstream("In")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
     val partitions = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
-    val monitoring = context.createMonitoring("Correlations")
+    val monitoring = context.createMonitoring[Map[String, Double]]("Correlations")
     val featureNames = context.inputFeatureNames("In", "Number features")
 
     dstream
@@ -49,12 +49,12 @@ class CorrelationsMonitoring extends Component {
 }
 
 object CorrelationsMonitoring {
-  def update(monitoring: Monitoring, featureNames: List[String], timestamp: Long, correlations: DenseMatrix[Double]) {
+  def update(monitoring: Monitoring[Map[String, Double]], featureNames: List[String], timestamp: Long, correlations: DenseMatrix[Double]) {
     val data = correlations
       .iterator
       .map{case ((i, j), correlation) =>  (s"${featureNames(i)}.${featureNames(j)}", correlation)}
       .toMap
 
-    monitoring.set(timestamp, data)
+    monitoring.add(timestamp, data)
   }
 }

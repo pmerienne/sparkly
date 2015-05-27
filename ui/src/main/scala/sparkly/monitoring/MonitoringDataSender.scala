@@ -14,7 +14,7 @@ class MonitoringDataSender(val hostname: String, val port: Int) {
   implicit val formats = DefaultFormats
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def send(data: MonitoringData, clusterId: String, monitoringId: String): Unit = {
+  def send(data: MonitoringData[_], clusterId: String, monitoringId: String): Unit = {
     val url = s"ws://${hostname}:${port}/api/monitoring/data/${clusterId}/${monitoringId}"
     val socket = SocketFactory.create(url)
 
@@ -28,7 +28,7 @@ object SocketFactory {
   import scala.collection.mutable.Map
 
   private val client: Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder] = ClientFactory.getDefault.newClient.asInstanceOf[Client[DefaultOptions, DefaultOptionsBuilder, DefaultRequestBuilder]]
-  private val opts = client.newOptionsBuilder().reconnect(false).build()
+  private val opts = client.newOptionsBuilder().build()
 
   private val sockets: Map[String, Socket] = Map()
   sys.addShutdownHook{ sockets.map(_._2).foreach(_.close()) }
@@ -39,7 +39,6 @@ object SocketFactory {
       val req = client.newRequestBuilder.method(Request.METHOD.GET).uri(url).transport(Request.TRANSPORT.WEBSOCKET)
       val socket = client.create(opts).open(req.build())
       sockets += url -> socket
-
       socket
     }
   }

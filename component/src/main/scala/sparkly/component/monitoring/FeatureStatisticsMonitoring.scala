@@ -28,7 +28,7 @@ class FeatureStatisticsMonitoring extends Component {
     val dstream = context.dstream("In")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
     val partitions = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
-    val monitoring = context.createMonitoring("Feature statistics")
+    val monitoring = context.createMonitoring[Map[String, Double]]("Feature statistics")
 
     dstream
       .repartition(partitions)
@@ -50,7 +50,7 @@ class FeatureStatisticsMonitoring extends Component {
           "quantile 0.90" -> stats.quantile(0.90),
           "quantile 0.99" -> stats.quantile(0.99)
         )
-        monitoring.set(time.milliseconds, data)
+        monitoring.add(time.milliseconds, data)
       })
 
     Map()
