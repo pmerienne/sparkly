@@ -27,6 +27,7 @@ object Boot {
     context setContextPath "/"
     context.setResourceBase(WEB_SOURCES)
     context.addEventListener(new ScalatraListener)
+    context.setInitParameter("org.atmosphere.websocket.maxTextMessageSize", "327280")
 
     server.setHandler(context)
     server.start

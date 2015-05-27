@@ -7,8 +7,8 @@ import scala.util.Try
 object ThroughputMonitoringFactory {
   val unit = "instance/s"
 
-  def create(name: String, stream: DStream[Instance], context: Context) = {
-    val throughputMonitoring = context.createMonitoring(name)
+  def create(name: String, stream: DStream[Instance], context: Context): Unit = {
+    val throughputMonitoring = context.createMonitoring[Map[String, Double]](name)
 
     val windowDurationMs = stream.slideDuration.milliseconds
     stream
@@ -16,7 +16,7 @@ object ThroughputMonitoringFactory {
       .foreachRDD((rdd, time) => {
         val count = Try(rdd.take(1)(0)).getOrElse(0L)
         val throughput = count * 1000.0 / windowDurationMs.toDouble
-        throughputMonitoring.set(time.milliseconds, "Throughput" -> throughput)
+        throughputMonitoring.add(time.milliseconds, Map("Throughput" -> throughput))
       })
   }
 

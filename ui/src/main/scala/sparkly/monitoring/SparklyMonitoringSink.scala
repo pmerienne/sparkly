@@ -56,32 +56,34 @@ class SparklyMonitoringReporter (
       .filter(_._1 contains "monitoring.")
       .foreach{case (name, gauge) =>
         val Array(sourceId, monitoringId) = name.split("-monitoring.")
-        val data = gauge.getValue.asInstanceOf[MonitoringData]
-        dataSender.send(data, clusterId, monitoringId)
+        gauge.getValue.asInstanceOf[Option[MonitoringData[_]]] match {
+          case Some(data) => dataSender.send(data, clusterId, monitoringId)
+          case None => // do nothing
+        }
       }
 
     dataSender.send(jvmData(gauges), clusterId, "pipeline-memory")
     dataSender.send(latencyData(gauges), clusterId, "pipeline-latency")
   }
 
-  private def jvmData(gauges: SortedMap[String, Gauge[_]]): MonitoringData = {
+  private def jvmData(gauges: SortedMap[String, Gauge[_]]): MonitoringData[Map[String, Double]] = {
     val memoryUsed = gauges.filter(_._1 endsWith "jvm.total.used").map(_._2).map(gauge => gauge.getValue.toString.toLong).foldLeft(0L)(_ + _)
     val memoryCommitted = gauges.filter(_._1 endsWith "jvm.total.committed").map(_._2).map(gauge => gauge.getValue.toString.toLong).foldLeft(0L)(_ + _)
     val maxMemory = gauges.filter(_._1 endsWith "jvm.total.max").map(_._2).map(gauge => gauge.getValue.toString.toLong).foldLeft(0L)(_ + _)
 
-    MonitoringData(System.currentTimeMillis, Map (
+    MonitoringData(System.currentTimeMillis, Map(
       "Memory used" -> NumberUtils.toGB(memoryUsed, 2),
       "Memory committed" -> NumberUtils.toGB(memoryCommitted, 2),
       "Max memory" -> NumberUtils.toGB(maxMemory, 2)
     ))
   }
 
-  private def latencyData(gauges: SortedMap[String, Gauge[_]]): MonitoringData = {
+  private def latencyData(gauges: SortedMap[String, Gauge[_]]): MonitoringData[Map[String, Double]] = {
     val processingDelay = gauges.find(_._1 endsWith "StreamingMetrics.streaming.lastCompletedBatch_processingDelay").map(_._2).map(gauge => gauge.getValue.toString.toDouble).getOrElse(0.0)
     val schedulingDelay = gauges.find(_._1 endsWith "StreamingMetrics.streaming.lastCompletedBatch_schedulingDelay").map(_._2).map(gauge => gauge.getValue.toString.toDouble).getOrElse(0.0)
     val totalDelay = gauges.find(_._1 endsWith "StreamingMetrics.streaming.lastCompletedBatch_totalDelay").map(_._2).map(gauge => gauge.getValue.toString.toDouble).getOrElse(0.0)
 
-    MonitoringData(System.currentTimeMillis, Map (
+    MonitoringData(System.currentTimeMillis, Map(
       "Processing delay" -> processingDelay,
       "Scheduling delay" -> schedulingDelay,
       "Total delay" -> totalDelay

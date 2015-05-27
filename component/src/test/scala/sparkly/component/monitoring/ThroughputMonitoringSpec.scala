@@ -22,7 +22,7 @@ class ThroughputMonitoringSpec extends ComponentSpec {
 
     // Then
     eventually {
-      val data = component.latestMonitoringData("Throughput").data
+      val data = component.latestMonitoringData[Map[String, Double]]("Throughput").data
       data("Throughput") should be equals(100.0)
     }
   }

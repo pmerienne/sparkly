@@ -42,17 +42,15 @@ class SparklyMonitoringTestingReporter (
      histograms: SortedMap[String, Histogram],
      meters: SortedMap[String, Meter],
      timers: SortedMap[String, Timer]): Unit = {
-
-    // TODO : We may have multiple gauges! 1 per worker ??!?
-
     gauges
       .filter(_._1 contains "monitoring.")
       .foreach{case (name, gauge) =>
       val Array(sourceId, monitoringId) = name.split("-monitoring.")
-      val data = gauge.getValue.asInstanceOf[MonitoringData]
-      MonitoringTestingData.add(monitoringId, data)
+      gauge.getValue.asInstanceOf[Option[MonitoringData[_]]] match {
+        case Some(data) => MonitoringTestingData.add(monitoringId, data)
+        case None => // do nothing
+      }
     }
-
   }
 
 }
@@ -61,12 +59,12 @@ import collection.mutable.{HashMap, MultiMap, Set}
 
 object MonitoringTestingData {
 
-  private val allData = new HashMap[String, Set[MonitoringData]] with MultiMap[String, MonitoringData]
+  private val allData = new HashMap[String, Set[MonitoringData[_]]] with MultiMap[String, MonitoringData[_]]
 
-  def all(monitoringId: String): List[MonitoringData] = allData(monitoringId).toList.sortBy(_.timestamp)
-  def latest(monitoringId: String) : MonitoringData = all(monitoringId).last
+  def all[T](monitoringId: String): List[MonitoringData[T]] = allData(monitoringId).toList.sortBy(_.timestamp).map(_.asInstanceOf[MonitoringData[T]])
+  def latest[T](monitoringId: String) : MonitoringData[T] = all(monitoringId).last
 
-  def add(monitoringId: String, data: MonitoringData): Unit = {
+  def add(monitoringId: String, data: MonitoringData[_]): Unit = {
     allData.addBinding(monitoringId, data)
   }
 

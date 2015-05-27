@@ -23,7 +23,7 @@ class ThroughputMonitoring extends Component {
     val dstream = context.dstream("In")
     val windowDuration = context.properties("Window length (in ms)").as[Long]
     val partitions = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
-    val monitoring = context.createMonitoring("Throughput")
+    val monitoring = context.createMonitoring[Map[String, Double]]("Throughput")
 
     dstream
       .repartition(partitions)
@@ -32,7 +32,7 @@ class ThroughputMonitoring extends Component {
         val count = Try(rdd.take(1)(0)).toOption.getOrElse(0L)
         val throughput = 1000 * count / windowDuration.toDouble
 
-        monitoring.set(time.milliseconds, "Throughput" -> throughput)
+        monitoring.add(time.milliseconds, Map("Throughput" -> throughput))
       })
 
     Map()
