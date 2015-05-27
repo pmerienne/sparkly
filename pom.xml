@@ -379,6 +379,14 @@
 				<version>1.4.185</version>
 				<scope>test</scope>
 			</dependency>
+
+            <!-- Bench -->
+            <dependency>
+                <groupId>com.storm-enroute</groupId>
+                <artifactId>scalameter_2.10</artifactId>
+                <version>0.6</version>
+                <scope>test</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -461,4 +469,11 @@
 			<url>https://pmerienne@github.com/pmerienne/sparkly/raw/master/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>bintray.com/meetup</id>
+            <url>http://dl.bintray.com/meetup/maven</url>
+        </repository>
+    </repositories>
 </project>
