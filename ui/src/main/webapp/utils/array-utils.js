@@ -1,3 +1,8 @@
+Array.fill = function(length, value) {
+    for (var i = 0, a = new Array(100); i < 100;) a[i++] = 0;
+    return a;
+}
+
 Array.prototype.indexOfObject = function(obj) {
 	for ( var i = 0, len = this.length; i < len; i++) {
 		if (angular.equals(this[i], obj))
