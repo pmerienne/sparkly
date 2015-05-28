@@ -6,6 +6,7 @@ import sparkly.core.PropertyType
 import sparkly.core.PropertyType._
 
 import sparkly.core._
+import org.apache.spark.rdd.RDD
 
 
 class Inputer extends Component {
@@ -49,30 +50,26 @@ class Inputer extends Component {
   }
 
   private def initMeanStrategyStream(stream: DStream[Instance], detector: MissingValueDetector, partitions: Int) : DStream[Instance] = {
-    val features: DStream[(Int, (Feature[_], Instance))] = stream.flatMap{ i => i.inputFeatures("Features").values.zipWithIndex.map{case (feature, index) => (index, (feature, i))} }
+    var means = RunningMeans()
 
-    val means = features.updateStateByKey((values: Seq[(Feature[_], Instance)], previous: Option[RunningMean]) => {
-      val state = previous.getOrElse(RunningMean())
-      Some(state + values.map(_._1).filter(f => !detector.isMissing(f)).map(_.as[Double]))
-    }, partitions)
+    stream
+      .flatMap(i => i.inputFeatures("Features").values.zipWithIndex)
+      .filter{case (f, index) => detector.isDefined(f)}
+      .map{case (f, index) => (index, RunningMean(1L, f.asDouble))}
+      .reduceByKey(_ + _, numPartitions = partitions)
+      .foreachRDD{ rdd: RDD[(Int, RunningMean)] =>
+        means = means.update(rdd.collect())
+      }
 
-    features
-      .join(means, partitions)
-      .map{case (index, ((feature, instance), mean)) =>
-        val imputed = if(detector.isMissing(feature)) mean.mean else feature.as[Double]
-        (instance.uuid, (instance, imputed, index))
-      }
-      .groupByKey(partitions)
-      .map{case (uuid, data) =>
-        val instance = data.head._1
-        val features = data.toList.sortBy(_._3).map(_._2)
-        instance.inputFeatures("Features", features)
-      }
+    stream.map{ i =>
+      val features = i.inputFeatures("Features").values.zipWithIndex.map{case (f, index) => if(detector.isMissing(f)) means(index) else f.asDouble}
+      i.inputFeatures("Features", features)
+    }
   }
 
   private def initDefaultStrategyStream(stream: DStream[Instance], detector: MissingValueDetector, default: Double) : DStream[Instance] = {
     stream.map{ instance =>
-      val features = instance.inputFeatures("Features").values.map(f => if(detector.isMissing(f)) default else f.as[Double])
+      val features = instance.inputFeatures("Features").values.map(f => if(detector.isMissing(f)) default else f.asDouble)
       instance.inputFeatures("Features", features)
     }
   }
@@ -83,11 +80,26 @@ class Inputer extends Component {
 
 }
 
+case class RunningMeans(means: Map[Int, RunningMean] = Map()) {
+  def apply(index: Int): Double = means.getOrElse(index, RunningMean()).mean
+
+  def update(index: Int, mean: RunningMean): RunningMeans = {
+    val updatedMean = means.getOrElse(index, RunningMean()) + mean
+    this.copy(means = this.means + (index -> updatedMean))
+  }
+
+  def update(values: Iterable[(Int, RunningMean)]): RunningMeans = {
+    values.foldLeft(this)((current, t) => current.update(t._1, t._2))
+  }
+}
+
 case class RunningMean(n: Long = 0L, sum: Double = 0.0) {
+  def +(other: RunningMean): RunningMean = this.copy(n = this.n + other.n, sum = this.sum + other.sum)
   def +(values: Seq[Double]): RunningMean = this.copy(n = n + values.size, sum = sum + values.sum)
   def mean: Double = sum / n
 }
 
 case class MissingValueDetector(missing: Option[Double]) {
-  def isMissing(feature: Feature[_]): Boolean = feature.isEmpty || (missing.isDefined && feature.as[Double] == missing.get)
+  def isMissing(feature: Feature[_]): Boolean = feature.isEmpty || (missing.isDefined && feature.asDouble == missing.get)
+  def isDefined(feature: Feature[_]) = !isMissing(feature)
 }

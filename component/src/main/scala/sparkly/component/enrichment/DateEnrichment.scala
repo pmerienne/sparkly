@@ -33,7 +33,7 @@ class DateEnrichment extends Component {
     val dateFeatureExists = context.inputFeatureMapped("In", "Date")
 
     val inputs = if(dateFeatureExists) {
-      context.dstream("In", "Out").map(instance => (instance, instance.inputFeature("Date").as[Date]))
+      context.dstream("In", "Out").map(instance => (instance, instance.inputFeature("Date").asDate))
     } else {
       context.dstream("In", "Out").transform((rdd, time) => rdd.map(instance => (instance, new Date(time.milliseconds))))
     }

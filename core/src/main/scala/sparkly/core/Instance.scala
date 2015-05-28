@@ -8,9 +8,9 @@ object Instance {
 
 case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Mapper] = None, outputMapper: Option[Mapper] = None, uuid: String = UUIDGen.getTimeUUID.toString) {
 
-  def inputFeature(name: String): Feature[Any] = {
+  def inputFeature(name: String): Feature[_] = {
     val realName = inputMapper.get.featureName(name)
-    Feature(rawFeatures.get(realName).flatMap(Option(_)))
+    Feature(rawFeatures.get(realName))
   }
 
   def inputFeature(name: String, value: Any): Instance = {
@@ -21,7 +21,7 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
   def inputFeatures(name: String): FeatureList = {
     val realNames = inputMapper.get.featuresNames(name)
     val values = realNames.map(realName => rawFeatures.get(realName))
-    FeatureList(values.map(value => Feature(value.flatMap(Option(_)))))
+    FeatureList(values.map(value => Feature(value)))
   }
 
   def inputFeatures(name: String, values: List[_]): Instance = {
@@ -30,9 +30,9 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
     this.copy(rawFeatures = rawFeatures ++ newFeatures)
   }
 
-  def outputFeature(name: String): Feature[Any] = {
+  def outputFeature(name: String): Feature[_] = {
     val realName = outputMapper.get.featureName(name)
-    Feature(rawFeatures.get(realName).flatMap(Option(_)))
+    Feature(rawFeatures.get(realName))
   }
 
   def outputFeature(name: String, value: Any): Instance = {
@@ -58,8 +58,8 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
     FeatureList(values.map(value => Feature(value)))
   }
 
-  def rawFeature(name: String): Feature[Any] = {
-    Feature(rawFeatures.get(name).flatMap(Option(_)))
+  def rawFeature(name: String): Feature[_] = {
+    Feature(rawFeatures.get(name))
   }
 
 }

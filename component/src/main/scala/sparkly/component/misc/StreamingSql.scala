@@ -29,7 +29,7 @@ class StreamingSql extends Component {
     val output = inputs
       .transform { rdd =>
         (1 to STREAM_COUNT).foreach{i =>
-          sqlContext.applySchema(rdd.filter(_._1 == "stream" + i).map(instance => Row.fromSeq(instance._2.inputFeatures("Fields").as[String])), schemas(i - 1)).registerTempTable("stream" + i)
+          sqlContext.applySchema(rdd.filter(_._1 == "stream" + i).map(instance => Row.fromSeq(instance._2.inputFeatures("Fields").asStrings)), schemas(i - 1)).registerTempTable("stream" + i)
         }
 
       val results = sqlContext.sql(query).map(row => Instance((outputFields zip row.toList).toMap))

@@ -7,7 +7,7 @@ import sparkly.core.FeatureType.{DOUBLE, STRING, NUMBER, ANY}
 import sparkly.core._
 import scala.reflect._
 
-abstract class ClassifierComponent[L : ClassTag] extends Component {
+abstract class ClassifierComponent extends Component {
 
   def metadata = ComponentMetadata("Classifier",
     inputs = Map (
@@ -20,7 +20,7 @@ abstract class ClassifierComponent[L : ClassTag] extends Component {
     )
   )
 
-  def initModel(context: Context): ClassifierModel[L]
+  def initModel(context: Context): OneClassClassifierModel
   def modelName(context: Context) = this.getClass.getSimpleName
 
   override def initStreams(context: Context):Map[String, DStream[Instance]] = {
@@ -57,14 +57,14 @@ abstract class ClassifierComponent[L : ClassTag] extends Component {
     Map("Prediction result" -> results, "Accuracy" -> accuracies)
   }
 
-  def updateModel[L : ClassTag](initialModel: (ClassifierModel[L], Accuracy))(values: Seq[Instance], state: Option[(ClassifierModel[L], Accuracy)]): Option[(ClassifierModel[L], Accuracy)] = {
+  def updateModel[L : ClassTag](initialModel: (OneClassClassifierModel, Accuracy))(values: Seq[Instance], state: Option[(OneClassClassifierModel, Accuracy)]): Option[(OneClassClassifierModel, Accuracy)] = {
     val previous = state.getOrElse(initialModel)
     var previousModel = previous._1;
     var previousAccuracy = previous._2;
 
     values.foreach(instance => {
-      val label = instance.inputFeature("Label").as[L]
-      val features = instance.inputFeatures("Features").asDenseVector;
+      val label = instance.inputFeature("Label").asBoolean
+      val features = instance.inputFeatures("Features").asDenseVector
       val prediction = previousModel.classify(features)
 
       previousModel = previousModel.update(label, prediction, features)
@@ -76,9 +76,9 @@ abstract class ClassifierComponent[L : ClassTag] extends Component {
 
 }
 
-abstract class ClassifierModel[L] extends Serializable {
-  def classify(features: DenseVector[Double]): L
-  def update(expected: L, prediction: L, features: DenseVector[Double]): ClassifierModel[L]
+abstract class OneClassClassifierModel extends Serializable {
+  def classify(features: DenseVector[Double]): Boolean
+  def update(expected: Boolean, prediction: Boolean, features: DenseVector[Double]): OneClassClassifierModel
 
 }
 

@@ -1,10 +1,8 @@
 package sparkly.component.enrichment
 
-import java.util.Date
-
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core._
-import sparkly.utils.UUIDGen
+import sparkly.utils._
 
 import scala.util.Random
 
@@ -19,7 +17,7 @@ class UuidEnrichment  extends Component {
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
     val out = context.dstream("In", "Out").map{ instance =>
-      val uuid = Option(instance.inputFeature("Date").as[Date]) match {
+      val uuid = Option(instance.inputFeature("Date").asDate) match {
         case Some(date) => UUIDGen.getTimeUUID(date.getTime, Random.nextLong).toString
         case None => UUIDGen.getTimeUUID.toString
       }

@@ -30,16 +30,16 @@ class AgrawalGeneratorSpec extends ComponentSpec {
 
     eventually {
       component.outputs("Instances").instances.foreach { instance =>
-        instance.outputFeature("salary").as[Double] should be > 0.0
-        instance.outputFeature("commission").as[Double] should be >= 0.0
-        instance.outputFeature("age").as[Int] should be > 0
-        instance.outputFeature("elevel").as[String] should startWith("level")
-        instance.outputFeature("car").as[String] should startWith("car")
-        instance.outputFeature("zipcode").as[String] should startWith("zipcode")
-        instance.outputFeature("hvalue").as[Double] should be > 0.0
-        instance.outputFeature("hyears").as[Int] should be > 0
-        instance.outputFeature("loan").as[Double] should be >= 0.0
-        instance.outputFeature("class").as[String] should startWith("group")
+        instance.outputFeature("salary").asDouble should be > 0.0
+        instance.outputFeature("commission").asDouble should be >= 0.0
+        instance.outputFeature("age").asInt should be > 0
+        instance.outputFeature("elevel").asString should startWith("level")
+        instance.outputFeature("car").asString should startWith("car")
+        instance.outputFeature("zipcode").asString should startWith("zipcode")
+        instance.outputFeature("hvalue").asDouble should be > 0.0
+        instance.outputFeature("hyears").asInt should be > 0
+        instance.outputFeature("loan").asDouble should be >= 0.0
+        instance.outputFeature("class").asString should startWith("group")
       }
 
       // Check it generates random instances

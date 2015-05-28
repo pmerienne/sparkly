@@ -8,7 +8,7 @@ class InstanceSpec extends FlatSpec with Matchers {
     val instance = Instance("name" -> "Julie", "age" -> 30, "city" -> "Paris")
       .copy(inputMapper = Some(Mapper(namedFeatures = Map("id" -> "name"), listedFeatures = Map("values" -> List("age", "city", "gender")))))
 
-    instance.inputFeature("id").as[String] should be ("Julie")
+    instance.inputFeature("id").asString should be ("Julie")
     instance.inputFeatures("values").asList should contain only (Feature(Some(30)), Feature(Some("Paris")), Feature(None))
   }
 
@@ -17,7 +17,7 @@ class InstanceSpec extends FlatSpec with Matchers {
       .copy(outputMapper = Some(Mapper(namedFeatures = Map("id" -> "name"))))
       .outputFeature("id", "Julie")
 
-    instance.outputFeature("id").as[String] should be ("Julie")
+    instance.outputFeature("id").asString should be ("Julie")
   }
 
   "Instance" should "support new output features" in {
@@ -42,7 +42,7 @@ class InstanceSpec extends FlatSpec with Matchers {
       .inputFeature("id", "Julie")
       .inputFeatures("values", List(30, "Paris", "Female"))
 
-    instance.inputFeature("id").as[String] should be ("Julie")
+    instance.inputFeature("id").asString should be ("Julie")
     instance.inputFeatures("values").asList should contain only (Feature(Some(30)), Feature(Some("Paris")), Feature(Some("Female")))
   }
 }

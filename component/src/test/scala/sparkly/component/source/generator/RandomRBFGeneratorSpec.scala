@@ -19,7 +19,7 @@ class RandomRBFGeneratorSpec extends ComponentSpec {
     eventually {
       component.outputs("Instances").instances.foreach{ instance =>
         instance.outputFeatures("Features").asList.exists(_.isEmpty) should be(false)
-        instance.outputFeature("Class").as[String] should startWith("class")
+        instance.outputFeature("Class").asString should startWith("class")
       }
 
       // Check it generates random instances

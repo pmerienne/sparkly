@@ -23,10 +23,10 @@ class STAGGERGeneratorSpec extends ComponentSpec {
 
     eventually {
       component.outputs("Instances").instances.foreach { instance =>
-        instance.outputFeature("size").as[String] should (be("small") or be("medium") or be("large"))
-        instance.outputFeature("color").as[String] should (be("green") or be("blue") or be("red"))
-        instance.outputFeature("shape").as[String] should (be("circle") or be("triangle") or be("square"))
-        instance.outputFeature("class").as[String] should (be("true") or be("false"))
+        instance.outputFeature("size").asString should (be("small") or be("medium") or be("large"))
+        instance.outputFeature("color").asString should (be("green") or be("blue") or be("red"))
+        instance.outputFeature("shape").asString should (be("circle") or be("triangle") or be("square"))
+        instance.outputFeature("class").asString should (be("true") or be("false"))
       }
 
       // Check it generates random instances
