@@ -36,7 +36,7 @@ class ScatterPlotMonitoring extends Component {
 
     stream
       .mapPartitions{ instances =>
-        val features = instances.map(_.inputFeatures("Number features")).filter(!_.containsUndefined).map(_.asDoubles).toList
+        val features = instances.map(_.inputFeatures("Number features")).filter(!_.containsUndefined).map(_.asDoubleList).toList
         if(features.isEmpty) {
           Iterator()
         }  else {

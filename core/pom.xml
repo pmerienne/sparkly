@@ -117,6 +117,13 @@
 			<artifactId>scalatra-scalatest_${scala.version}</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+        <!-- Bench -->
+        <dependency>
+            <groupId>com.storm-enroute</groupId>
+            <artifactId>scalameter_${scala.version}</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

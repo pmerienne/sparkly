@@ -24,7 +24,7 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
     FeatureList(values.map(value => Feature(value)))
   }
 
-  def inputFeatures(name: String, values: List[_]): Instance = {
+  def inputFeatures(name: String, values: Iterable[_]): Instance = {
     val realNames = inputMapper.get.featuresNames(name)
     val newFeatures = (realNames zip values).toMap
     this.copy(rawFeatures = rawFeatures ++ newFeatures)

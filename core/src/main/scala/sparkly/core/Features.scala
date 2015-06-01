@@ -6,20 +6,51 @@ import breeze.linalg.DenseVector
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 
+import scala.collection.mutable.ListBuffer
+
 case class FeatureList(values: List[Feature[_]] = List()) {
   def asList: List[Feature[_]] = values
   def asRaw: List[_] = values.map(_.get)
   def asRawOr(default: => Any): List[_] = values.map(_.getOrElse(default))
-  def asDoubleArray: Array[Double] = asDoubles.toArray
-  def asDenseVector[DenseVector] = DenseVector(asDoubleArray)
   def containsUndefined() = values.exists(_.isEmpty)
 
-  def asStrings = values.map(_.asString)
-  def asDoubles = values.map(_.asDouble)
-  def asInts = values.map(_.asInt)
-  def asLongs = values.map(_.asLong)
-  def asDates = values.map(_.asDate)
-  def asBooleans = values.map(_.asBoolean)
+  def asStringList = values.map(_.asString)
+  def asStringList(default: => String) = values.map(_.asStringOr(default))
+
+  def asIntList = values.map(_.asInt)
+  def asIntList(default: => Int) = values.map(_.asIntOr(default))
+
+  def asLongList = values.map(_.asLong)
+  def asLongList(default: => Long) = values.map(_.asLongOr(default))
+
+  def asDateList = values.map(_.asDate)
+  def asDateList(default: => Date) = values.map(_.asDateOr(default))
+
+  def asBooleanList = values.map(_.asBoolean)
+  def asBooleanList(default: => Boolean) = values.map(_.asBooleanOr(default))
+
+  def asDoubleList = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.asDoubleArray
+    case _ => list += f.asDouble
+  }}.toList
+
+  def asDoubleList(default: => Double) = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.get
+    case _ => list += f.asDoubleOr(default)
+  }}.toList
+
+  def asDoubleArray: Array[Double] = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.asDoubleArray
+    case _ => list += f.asDouble
+  }}.toArray
+
+  def asDoubleArray(default: => Double): Array[Double] = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.get
+    case _ => list += f.asDoubleOr(default)
+  }}.toArray
+
+  def asDenseVector = DenseVector(asDoubleArray)
+  def asDenseVector(default: => Double) = DenseVector(asDoubleArray(default))
 }
 
 object Feature {
@@ -31,6 +62,7 @@ object Feature {
     case Some(l: Long) => new LongFeature(Some(l))
     case Some(d: Date) => new DateFeature(Some(d))
     case Some(b: Boolean) => new BooleanFeature(Some(b))
+    case Some(arr: Array[Double]) => new DoubleArrayFeature(Some(arr))
     case Some(null) => new EmptyFeature()
     case None => new EmptyFeature()
     case _ => ???
@@ -44,13 +76,15 @@ object Feature {
       case v: Long => new LongFeature(Option(v))
       case v: Date => new DateFeature(Option(v))
       case v: Boolean => new BooleanFeature(Option(v))
+      case arr: Array[Double] => new DoubleArrayFeature(Option(arr))
       case _ => ???
     }
   } else {
     new EmptyFeature()
   }
 
-  def apply(): Feature[_] = new EmptyFeature()
+  def apply() = empty
+  def empty = new EmptyFeature()
 }
 
 abstract class Feature[T](val value: Option[T]) extends Serializable {
@@ -67,6 +101,7 @@ abstract class Feature[T](val value: Option[T]) extends Serializable {
   def asLong: Long
   def asDate: Date
   def asBoolean: Boolean
+  def asDoubleArray: Array[Double] = Array(asDouble)
 
   def asStringOr(default: => String): String = if (isEmpty) default else asString
   def asDoubleOr(default: => Double): Double = if (isEmpty) default else asDouble
@@ -74,6 +109,7 @@ abstract class Feature[T](val value: Option[T]) extends Serializable {
   def asLongOr(default: => Long): Long = if (isEmpty) default else asLong
   def asDateOr(default: => Date): Date = if (isEmpty) default else asDate
   def asBooleanOr(default: => Boolean): Boolean = if (isEmpty) default else asBoolean
+  def asDoubleArrayOr(default: => Array[Double]): Array[Double] = if (isEmpty) default else asDoubleArray
 
 
   override def equals(o: Any) = o match {
@@ -82,6 +118,7 @@ abstract class Feature[T](val value: Option[T]) extends Serializable {
   }
 
   override def hashCode = this.value.hashCode
+  override def toString = this.value.toString
 
 }
 
@@ -155,6 +192,18 @@ class BooleanFeature(value: Option[Boolean]) extends Feature[Boolean](value) {
   def asLong: Long = if(value.get) 1L else 0L
   def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
   def asBoolean: Boolean = value.get
+
+}
+
+class DoubleArrayFeature(value: Option[Array[Double]]) extends Feature[Array[Double]](value) {
+
+  def asString: String = ???
+  def asDouble: Double = ???
+  def asInt: Int = ???
+  def asLong: Long = ???
+  def asDate: Date = ???
+  def asBoolean: Boolean = ???
+  override def asDoubleArray: Array[Double] = value.get
 
 }
 
