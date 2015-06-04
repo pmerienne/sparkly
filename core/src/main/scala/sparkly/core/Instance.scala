@@ -1,6 +1,12 @@
 package sparkly.core
 
-case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Mapper] = None, outputMapper: Option[Mapper] = None) {
+import sparkly.utils.UUIDGen
+
+object Instance {
+  def apply(features: (String, _)*): Instance = new Instance(features.toMap)
+}
+
+case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Mapper] = None, outputMapper: Option[Mapper] = None, uuid: String = UUIDGen.getTimeUUID.toString) {
 
   def inputFeature(name: String): Feature[Any] = {
     val realName = inputMapper.get.featureName(name)
@@ -9,7 +15,7 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
 
   def inputFeature(name: String, value: Any): Instance = {
     val realName = inputMapper.get.featureName(name)
-    copy(rawFeatures = rawFeatures + (realName -> value))
+    this.copy(rawFeatures = rawFeatures + (realName -> value))
   }
 
   def inputFeatures(name: String): FeatureList = {
@@ -21,7 +27,7 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
   def inputFeatures(name: String, values: List[_]): Instance = {
     val realNames = inputMapper.get.featuresNames(name)
     val newFeatures = (realNames zip values).toMap
-    copy(rawFeatures = rawFeatures ++ newFeatures)
+    this.copy(rawFeatures = rawFeatures ++ newFeatures)
   }
 
   def outputFeature(name: String): Feature[Any] = {
@@ -31,19 +37,19 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
 
   def outputFeature(name: String, value: Any): Instance = {
     val realName = outputMapper.get.featureName(name)
-    copy(rawFeatures = rawFeatures + (realName -> value))
+    this.copy(rawFeatures = rawFeatures + (realName -> value))
   }
 
   def outputFeatures(features: (String, _)*): Instance = {
     val realNames = features.map(_._1).map(outputMapper.get.featureName(_))
     val newFeatures = (realNames zip features.map(_._2)).toMap
-    copy(rawFeatures = rawFeatures ++ newFeatures)
+    this.copy(rawFeatures = rawFeatures ++ newFeatures)
   }
 
   def outputFeatures(name: String, values:List[_]): Instance = {
     val realNames = outputMapper.get.featuresNames(name)
     val newFeatures = (realNames zip values).toMap
-    copy(rawFeatures =rawFeatures ++ newFeatures)
+    this.copy(rawFeatures =rawFeatures ++ newFeatures)
   }
 
   def outputFeatures[T](name: String): FeatureList = {
@@ -56,8 +62,4 @@ case class Instance(rawFeatures: Map[String, _] = Map(), inputMapper: Option[Map
     Feature(rawFeatures.get(name).flatMap(Option(_)))
   }
 
-}
-
-object Instance {
-  def apply(features: (String, _)*): Instance = new Instance(features.toMap)
 }

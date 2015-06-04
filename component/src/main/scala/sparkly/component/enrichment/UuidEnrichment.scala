@@ -1,9 +1,11 @@
 package sparkly.component.enrichment
 
-import sparkly.core._
-import org.apache.spark.streaming.dstream.DStream
 import java.util.Date
-import sparkly.component.common.UUIDGen
+
+import org.apache.spark.streaming.dstream.DStream
+import sparkly.core._
+import sparkly.utils.UUIDGen
+
 import scala.util.Random
 
 class UuidEnrichment  extends Component {
