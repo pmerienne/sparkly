@@ -2,14 +2,11 @@ package sparkly.component.monitoring
 
 import org.apache.spark.streaming.Milliseconds
 import org.apache.spark.streaming.dstream.DStream
-
 import sparkly.core.PropertyType._
 import sparkly.core._
 import sparkly.math._
 
 import scala.util.Try
-import java.lang.Math
-import scala.Some
 
 class ScatterPlotMonitoring extends Component {
 
@@ -39,7 +36,7 @@ class ScatterPlotMonitoring extends Component {
 
     stream
       .mapPartitions{ instances =>
-        val features = instances.map(_.inputFeatures("Number features")).filter(!_.containsUndefined).map(_.as[Double]).toList
+        val features = instances.map(_.inputFeatures("Number features")).filter(!_.containsUndefined).map(_.asDoubleList).toList
         if(features.isEmpty) {
           Iterator()
         }  else {

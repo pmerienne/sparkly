@@ -1,9 +1,8 @@
 package sparkly.component.store
 
-import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.StreamingContext._
+import org.apache.spark.streaming.dstream.DStream
 import sparkly.core._
-import scala.Some
 
 class InMemoryStore extends Component {
 
@@ -27,12 +26,12 @@ class InMemoryStore extends Component {
 
     val updatedModels = context
       .dstream("Update")
-      .map(instance => (instance.inputFeature("Id").as[String], instance.inputFeatures("Features")))
+      .map(instance => (instance.inputFeature("Id").asString, instance.inputFeatures("Features")))
       .updateStateByKey(InMemoryStore.updateState _, parallelism)
 
     val queryResults = context
       .dstream("Query", "Query result")
-      .map(instance => (instance.inputFeature("Id").as[String], instance))
+      .map(instance => (instance.inputFeature("Id").asString, instance))
       .join(updatedModels)
       .map{case(id, (instance, features)) => instance.outputFeatures("Features", features)}
 

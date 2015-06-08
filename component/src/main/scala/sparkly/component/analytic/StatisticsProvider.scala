@@ -44,12 +44,12 @@ class StatisticsProvider extends Component {
     dstream: DStream[Instance], parallelism: Int): DStream[Instance] = {
 
     val groupedInstances = dstream.map{instance =>
-      val key = if(isGrouped) instance.inputFeature("Group by").as[String] else  "$GLOBAL$"
+      val key = if(isGrouped) instance.inputFeature("Group by").asString else  "$GLOBAL$"
       (key, instance)
     }.cache()
 
     val states = groupedInstances
-      .map{case (key, instance) => (key, instance.inputFeature("Compute on").as[Double])}
+      .map{case (key, instance) => (key, instance.inputFeature("Compute on").asDouble)}
       .updateStateByKey[T]((newValues: Seq[Double], previousState: Option[T]) => {
         val state = previousState.getOrElse(aggregableStatistic.zero())
         val newState = aggregableStatistic.update(state, newValues)
@@ -71,12 +71,12 @@ class StatisticsProvider extends Component {
     val slideDuration = dstream.slideDuration
 
     val groupedInstances = dstream.map{instance =>
-      val key = if(isGrouped) instance.inputFeature("Group by").as[String] else  "$GLOBAL$"
+      val key = if(isGrouped) instance.inputFeature("Group by").asString else  "$GLOBAL$"
       (key, instance)
     }.cache()
 
     val states = groupedInstances
-      .map{case (key, instance) => (key, aggregableStatistic.init(instance.inputFeature("Compute on").as[Double]))}
+      .map{case (key, instance) => (key, aggregableStatistic.init(instance.inputFeature("Compute on").asDouble))}
       .reduceByKeyAndWindow((a: T, b: T) => aggregableStatistic.combine(a, b), windowDuration, slideDuration, parallelism)
 
     groupedInstances

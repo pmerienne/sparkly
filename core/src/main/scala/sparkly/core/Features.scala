@@ -3,128 +3,217 @@ package sparkly.core
 import java.util.Date
 
 import breeze.linalg.DenseVector
-import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 
-import scala.reflect._
+import scala.collection.mutable.ListBuffer
 
 case class FeatureList(values: List[Feature[_]] = List()) {
-  def asList = values
-  def as[T : ClassTag] = values.map(_.as[T])
-  def asRaw = values.map(_.value.getOrElse(null))
-  def asArrayOf[T : ClassTag]  = as[T].toArray
-  def asDenseVector = DenseVector(asArrayOf[Double])
+  def asList: List[Feature[_]] = values
+  def asRaw: List[_] = values.map(_.get)
+  def asRawOr(default: => Any): List[_] = values.map(_.getOrElse(default))
   def containsUndefined() = values.exists(_.isEmpty)
+
+  def asStringList = values.map(_.asString)
+  def asStringList(default: => String) = values.map(_.asStringOr(default))
+
+  def asIntList = values.map(_.asInt)
+  def asIntList(default: => Int) = values.map(_.asIntOr(default))
+
+  def asLongList = values.map(_.asLong)
+  def asLongList(default: => Long) = values.map(_.asLongOr(default))
+
+  def asDateList = values.map(_.asDate)
+  def asDateList(default: => Date) = values.map(_.asDateOr(default))
+
+  def asBooleanList = values.map(_.asBoolean)
+  def asBooleanList(default: => Boolean) = values.map(_.asBooleanOr(default))
+
+  def asDoubleList = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.asDoubleArray
+    case _ => list += f.asDouble
+  }}.toList
+
+  def asDoubleList(default: => Double) = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.get
+    case _ => list += f.asDoubleOr(default)
+  }}.toList
+
+  def asDoubleArray: Array[Double] = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.asDoubleArray
+    case _ => list += f.asDouble
+  }}.toArray
+
+  def asDoubleArray(default: => Double): Array[Double] = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
+    case arr: DoubleArrayFeature => list ++= arr.get
+    case _ => list += f.asDoubleOr(default)
+  }}.toArray
+
+  def asDenseVector = DenseVector(asDoubleArray)
+  def asDenseVector(default: => Double) = DenseVector(asDoubleArray(default))
 }
 
-case class Feature[U : ClassTag](value: Option[U]) {
+object Feature {
 
-  def isDefined: Boolean = value.isDefined && value.get != null
-  def isEmpty: Boolean = value.isEmpty || value.get == null
-
-  def or[V: ClassTag](other: V): V = value match {
-    case Some(_) => as[V]
-    case None => other
+  def apply(value: Option[Any]): Feature[_] = value match {
+    case Some(s: String) => new StringFeature(Some(s))
+    case Some(d: Double) => new DoubleFeature(Some(d))
+    case Some(i: Int) => new IntFeature(Some(i))
+    case Some(l: Long) => new LongFeature(Some(l))
+    case Some(d: Date) => new DateFeature(Some(d))
+    case Some(b: Boolean) => new BooleanFeature(Some(b))
+    case Some(arr: Array[Double]) => new DoubleArrayFeature(Some(arr))
+    case Some(null) => new EmptyFeature()
+    case None => new EmptyFeature()
+    case _ => ???
   }
 
-  def as[V: ClassTag]: V = {
-    try {
-      convertTo[V]()
-    } catch {
-      case e: MatchError => throw new IllegalArgumentException(s"Unsupported feature conversion from ${classTag[U]} to ${classTag[V]}");
+  def apply(value: Any): Feature[_] = if(value != null) {
+    value match {
+      case v: String => new StringFeature(Option(v))
+      case v: Double => new DoubleFeature(Option(v))
+      case v: Int => new IntFeature(Option(v))
+      case v: Long => new LongFeature(Option(v))
+      case v: Date => new DateFeature(Option(v))
+      case v: Boolean => new BooleanFeature(Option(v))
+      case arr: Array[Double] => new DoubleArrayFeature(Option(arr))
+      case _ => ???
     }
-  }
-
-  private def convertTo[V : ClassTag]():V = if (isEmpty) {
-    null.asInstanceOf[V]
   } else {
-    val transformed = value.get match {
-      case stringValue: String => fromString[V](stringValue)
-      case doubleValue: Double => fromDouble[V](doubleValue)
-      case intValue: Int => fromInt[V](intValue)
-      case longValue: Long => fromLong[V](longValue)
-      case dateValue: Date => fromDate[V](dateValue)
-      case booleanValue: Boolean => fromBoolean[V](booleanValue)
-    }
-    transformed.asInstanceOf[V]
+    new EmptyFeature()
   }
 
-  private def fromDouble[T: ClassTag](value:Double):T = {
-    val transformed = classTag[T] match {
-      case t if t == classTag[Double] => value
-      case t if t == classTag[String] => value.toString
-      case t if t == classTag[Int] => value.toInt
-      case t if t == classTag[Long] => value.toLong
-      // case t if t == classTag[Date] => DateTime.parse(value).toDate
-      case t if t == classTag[Boolean] => value > 0.0
-    }
-    transformed.asInstanceOf[T]
+  def apply() = empty
+  def empty = new EmptyFeature()
+}
+
+abstract class Feature[T](val value: Option[T]) extends Serializable {
+
+  def isDefined: Boolean = value.isDefined
+  def isEmpty: Boolean = value.isEmpty
+
+  def get: T = value.get
+  def getOrElse(default: => Any) = value.getOrElse(default)
+
+  def asString: String
+  def asDouble: Double
+  def asInt: Int
+  def asLong: Long
+  def asDate: Date
+  def asBoolean: Boolean
+  def asDoubleArray: Array[Double] = Array(asDouble)
+
+  def asStringOr(default: => String): String = if (isEmpty) default else asString
+  def asDoubleOr(default: => Double): Double = if (isEmpty) default else asDouble
+  def asIntOr(default: => Int): Int = if (isEmpty) default else asInt
+  def asLongOr(default: => Long): Long = if (isEmpty) default else asLong
+  def asDateOr(default: => Date): Date = if (isEmpty) default else asDate
+  def asBooleanOr(default: => Boolean): Boolean = if (isEmpty) default else asBoolean
+  def asDoubleArrayOr(default: => Array[Double]): Array[Double] = if (isEmpty) default else asDoubleArray
+
+
+  override def equals(o: Any) = o match {
+    case other: Feature[T] => this.value == other.value
+    case _ => false
   }
 
-  private def fromString[T: ClassTag](value:String):T = {
-    val transformed = classTag[T] match {
-      case t if t == classTag[Double] => value.toDouble
-      case t if t == classTag[String] => value
-      case t if t == classTag[Int] => value.toInt
-      case t if t == classTag[Long] => value.toLong
-      case t if t == classTag[Date] => DateTime.parse(value, ISODateTimeFormat.dateTimeParser.withZoneUTC()).toDate
-      case t if t == classTag[Boolean] => value match {
-        case "true" => true
-        case "false" => false
-        case "1" => true
-        case "0" => false
-        case "-1" => false
-      }
-    }
-    transformed.asInstanceOf[T]
+  override def hashCode = this.value.hashCode
+  override def toString = this.value.toString
+
+}
+
+class StringFeature(value: Option[String]) extends Feature[String](value) {
+
+  def asString: String = value.get
+  def asDouble: Double = value.get.toDouble
+  def asInt: Int = value.get.toInt
+  def asLong: Long = value.get.toLong
+  def asDate: Date = DateTime.parse(value.get, ISODateTimeFormat.dateTimeParser.withZoneUTC()).toDate
+  def asBoolean: Boolean = value.get match {
+    case "true" => true
+    case "false" => false
+    case "1" => true
+    case "0" => false
+    case "-1" => false
   }
 
-  private def fromInt[T: ClassTag](value:Int):T = {
-    val transformed = classTag[T] match {
-      case t if t == classTag[Double] => value.toDouble
-      case t if t == classTag[String] => value.toString
-      case t if t == classTag[Int] => value
-      case t if t == classTag[Long] => value.toLong
-      case t if t == classTag[Date] => new Date(value.toLong)
-      case t if t == classTag[Boolean] => value > 0
-    }
-    transformed.asInstanceOf[T]
-  }
+}
 
-  private def fromLong[T: ClassTag](value:Long):T = {
-    val transformed = classTag[T] match {
-      case t if t == classTag[Double] => value.toDouble
-      case t if t == classTag[String] => value.toString
-      case t if t == classTag[Int] => value.toInt
-      case t if t == classTag[Long] => value
-      case t if t == classTag[Date] => new Date(value.toLong)
-      case t if t == classTag[Boolean] => value > 0
-    }
-    transformed.asInstanceOf[T]
-  }
 
-  private def fromDate[T: ClassTag](value:Date):T = {
-    val transformed = classTag[T] match {
-      // case t if t == classTag[Double] => value.toDouble
-      case t if t == classTag[String] => new DateTime(value).toString(ISODateTimeFormat.dateTime.withZoneUTC())
-      case t if t == classTag[Int] => value.getTime.toInt
-      case t if t == classTag[Long] => value.getTime
-      case t if t == classTag[Date] => value
-      // case t if t == classTag[Boolean] => value
-    }
-    transformed.asInstanceOf[T]
-  }
+class DoubleFeature(value: Option[Double]) extends Feature[Double](value) {
 
-  private def fromBoolean[T: ClassTag](value:Boolean):T = {
-    val transformed = classTag[T] match {
-      case t if t == classTag[Double] => if(value){1.0}else{0.0}
-      case t if t == classTag[String] => value.toString
-      case t if t == classTag[Int] => if(value){1}else{0}
-      case t if t == classTag[Long] => if(value){1.0}else{0}
-      // case t if t == classTag[Date] => new Date(value.toLong)
-      case t if t == classTag[Boolean] => value
-    }
-    transformed.asInstanceOf[T]
-  }
+  def asString: String = value.get.toString
+  def asDouble: Double = value.get
+  def asInt: Int = value.get.toInt
+  def asLong: Long = value.get.toLong
+  def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asBoolean: Boolean = value.get > 0.0
+
+}
+
+class IntFeature(value: Option[Int]) extends Feature[Int](value) {
+
+  def asString: String = value.get.toString
+  def asDouble: Double = value.get.toDouble
+  def asInt: Int = value.get
+  def asLong: Long = value.get.toLong
+  def asDate: Date = new Date(value.get.toLong)
+  def asBoolean: Boolean = value.get > 0
+
+}
+
+class LongFeature(value: Option[Long]) extends Feature[Long](value) {
+
+  def asString: String = value.get.toString
+  def asDouble: Double = value.get.toDouble
+  def asInt: Int = value.get.toInt
+  def asLong: Long = value.get
+  def asDate: Date = new Date(value.get)
+  def asBoolean: Boolean = value.get > 0L
+
+}
+
+class DateFeature(value: Option[Date]) extends Feature[Date](value) {
+
+  def asString: String = new DateTime(value.get).toString(ISODateTimeFormat.dateTime.withZoneUTC())
+  def asDouble: Double = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asInt: Int = value.get.getTime.toInt
+  def asLong: Long = value.get.getTime
+  def asDate: Date = value.get
+  def asBoolean: Boolean = throw new IllegalArgumentException("Unsupported feature conversion")
+
+}
+
+class BooleanFeature(value: Option[Boolean]) extends Feature[Boolean](value) {
+
+  def asString: String = value.get.toString
+  def asDouble: Double = if(value.get) 1.0 else 0.0
+  def asInt: Int = if(value.get) 1 else 0
+  def asLong: Long = if(value.get) 1L else 0L
+  def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asBoolean: Boolean = value.get
+
+}
+
+class DoubleArrayFeature(value: Option[Array[Double]]) extends Feature[Array[Double]](value) {
+
+  def asString: String = ???
+  def asDouble: Double = ???
+  def asInt: Int = ???
+  def asLong: Long = ???
+  def asDate: Date = ???
+  def asBoolean: Boolean = ???
+  override def asDoubleArray: Array[Double] = value.get
+
+}
+
+class EmptyFeature extends Feature[Any](None) {
+
+  def asString: String = null.asInstanceOf[String]
+  def asDouble: Double = null.asInstanceOf[Double]
+  def asInt: Int = null.asInstanceOf[Int]
+  def asLong: Long = null.asInstanceOf[Long]
+  def asDate: Date = null.asInstanceOf[Date]
+  def asBoolean: Boolean = null.asInstanceOf[Boolean]
 
 }

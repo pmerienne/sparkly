@@ -1,14 +1,10 @@
 package sparkly.component.preprocess
 
+import breeze.linalg._
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.FeatureType.NUMBER
-import sparkly.core._
 import sparkly.core.PropertyType._
-import sparkly.core.OutputStreamMetadata
-import sparkly.core.InputStreamMetadata
-import sparkly.core.Context
-import scala.Some
-import sparkly.core.PropertyMetadata
+import sparkly.core._
 
 class Normalizer extends Component {
 
@@ -29,11 +25,10 @@ class Normalizer extends Component {
   }
 
   def normalize(instance: Instance): Instance = {
-    val originalFeatures = instance.inputFeatures("Features").as[Double]
-    val magnitude = math.sqrt(originalFeatures.map(feature => feature * feature).reduce(_+_))
-
-    val updatedFeatures = originalFeatures.map(feature => feature / magnitude)
-
-    instance.inputFeatures("Features", updatedFeatures)
+    val originalFeatures = instance.inputFeatures("Features").asDenseVector
+    val squareSum = sum(originalFeatures.map(x => x * x))
+    val magnitude = math.sqrt(squareSum)
+    val updatedFeatures = originalFeatures.map(_ / magnitude)
+    instance.inputFeatures("Features", updatedFeatures.toArray)
   }
 }

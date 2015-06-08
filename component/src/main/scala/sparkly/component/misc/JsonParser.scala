@@ -5,16 +5,10 @@ import java.util
 import io.gatling.jsonpath.JsonPath
 import org.apache.spark.streaming.dstream.DStream
 import org.codehaus.jackson.map.ObjectMapper
-import sparkly.core._
+import sparkly.core.PropertyType._
+import sparkly.core.{Context, InputStreamMetadata, OutputStreamMetadata, PropertyMetadata, PropertyType, _}
 
 import scala.util.Try
-import sparkly.core.PropertyType._
-import sparkly.core.OutputStreamMetadata
-import sparkly.core.InputStreamMetadata
-import sparkly.core.PropertyType
-import sparkly.core.Context
-import sparkly.core.PropertyMetadata
-import scala.Some
 
 class JsonParser extends Component {
 
@@ -34,7 +28,7 @@ class JsonParser extends Component {
     val parallelism = context.property("Parallelism").or(context.sc.defaultParallelism, on = (parallelism: Int) => parallelism < 1)
 
     val output = context.dstream("Input", "Output").repartition(parallelism).map{ instance =>
-      val values = JsonParser.extractValues(instance.inputFeature("JSON").as[String], queries)
+      val values = JsonParser.extractValues(instance.inputFeature("JSON").asString, queries)
       instance.outputFeatures("Values", values)
     }
 

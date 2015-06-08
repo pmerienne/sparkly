@@ -64,9 +64,8 @@ trait ClassifierSpec extends ComponentSpec with BeforeAndAfterEach {
     }
 
     val errorCount = results
-      .map{ instance => (instance.rawFeatures(labelName) != "0", instance.outputFeature("Label").as[Boolean])}
-      .filter{ case (expected, actual) => expected != actual}
-      .size
+      .map{ instance => (instance.rawFeatures(labelName) != "0", instance.outputFeature("Label").asBoolean)}
+      .count{case (expected, actual) => expected != actual}
 
     val validationError = errorCount.toDouble / results.size.toDouble
     println(s"Validation error : ${validationError}")

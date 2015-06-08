@@ -34,14 +34,14 @@ class BasicFilter extends Component {
     Map("Out" -> out)
   }
 
-  def createPredicate(properties: Map[String, Property]): (Feature[Any]) => Boolean = properties("Operator").as[String] match {
-    case "IS NULL" => (f: Feature[Any]) => f.isEmpty
-    case "IS NOT NULL" => (f: Feature[Any]) => f.isDefined
-    case "=" => (f: Feature[Any]) => f.as[String] == properties("Operand").as[String]
-    case ">" => (f: Feature[Any]) => f.as[String] > properties("Operand").as[String]
-    case ">=" => (f: Feature[Any]) => f.as[String] >= properties("Operand").as[String]
-    case "<" => (f: Feature[Any]) => f.as[String] < properties("Operand").as[String]
-    case "<=" => (f: Feature[Any]) => f.as[String] <= properties("Operand").as[String]
-    case "!=" => (f: Feature[Any]) => f.as[String] != properties("Operand").as[String]
+  def createPredicate(properties: Map[String, Property]): (Feature[_]) => Boolean = properties("Operator").as[String] match {
+    case "IS NULL" => (f: Feature[_]) => f.isEmpty
+    case "IS NOT NULL" => (f: Feature[_]) => f.isDefined
+    case "=" => (f: Feature[_]) => f.asString == properties("Operand").as[String]
+    case ">" => (f: Feature[_]) => f.asString > properties("Operand").as[String]
+    case ">=" => (f: Feature[_]) => f.asString >= properties("Operand").as[String]
+    case "<" => (f: Feature[_]) => f.asString < properties("Operand").as[String]
+    case "<=" => (f: Feature[_]) => f.asString <= properties("Operand").as[String]
+    case "!=" => (f: Feature[_]) => f.asString != properties("Operand").as[String]
   }
 }

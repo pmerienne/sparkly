@@ -32,7 +32,7 @@ class FeatureStatisticsMonitoring extends Component {
 
     dstream
       .repartition(partitions)
-      .mapPartitions(instances => Iterator(FeatureSummary(instances.map(_.inputFeature("Number feature").or(Double.NaN)))))
+      .mapPartitions(instances => Iterator(FeatureSummary(instances.map(_.inputFeature("Number feature").asDoubleOr(Double.NaN)))))
       .reduceByWindow((stat1, stat2) => stat1.merge(stat2), Milliseconds(windowDuration), dstream.slideDuration)
       .foreachRDD((rdd, time) => {
         val stats = Try(rdd.take(1)(0)).getOrElse(FeatureSummary.zero())

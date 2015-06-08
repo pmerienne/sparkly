@@ -38,7 +38,7 @@ class Join extends Component {
     }
 
     val outputStream = joinedStream.map{ case (joinFeatures: FeatureList, nonJoinFeatures1: FeatureList, nonJoinFeatures2: FeatureList) =>
-      val features = joinFeatures.asRaw ++ nonJoinFeatures1.asRaw ++ nonJoinFeatures2.asRaw
+      val features = joinFeatures.asRawOr(null) ++ nonJoinFeatures1.asRawOr(null) ++ nonJoinFeatures2.asRawOr(null)
       val namedFeatures = outputMapper.featuresNames("Join and Non-join features") zip features
       new Instance(namedFeatures.toMap)
     }

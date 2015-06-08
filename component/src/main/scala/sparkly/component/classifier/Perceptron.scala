@@ -8,7 +8,7 @@ import scala.Predef._
 import sparkly.core.PropertyType._
 
 
-class Perceptron extends ClassifierComponent[Boolean] {
+class Perceptron extends ClassifierComponent {
 
   override def metadata = super.metadata.copy(name = "Perceptron classifier", category = "Classifier",
     properties = Map (
@@ -18,7 +18,7 @@ class Perceptron extends ClassifierComponent[Boolean] {
     )
   )
 
-  override def initModel(context: Context): ClassifierModel[Boolean] = {
+  override def initModel(context: Context): OneClassClassifierModel = {
     val bias = context.properties("Bias").as[Double]
     val learningRate = context.properties("Learning rate").as[Double]
     val featureCount = context.inputSize("Train", "Features")
@@ -29,7 +29,7 @@ class Perceptron extends ClassifierComponent[Boolean] {
   override def modelName(context: Context) = context.properties("Name").as[String]
 }
 
-case class PerceptronModel(bias: Double, learningRate: Double, weights: Vector[Double]) extends ClassifierModel[Boolean] {
+case class PerceptronModel(bias: Double, learningRate: Double, weights: Vector[Double]) extends OneClassClassifierModel {
 
   override def classify(features: DenseVector[Double]): Boolean = {
     features.t * weights + bias > 0
