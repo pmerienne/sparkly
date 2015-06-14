@@ -30,22 +30,22 @@ case class FeatureList(values: List[Feature[_]] = List()) {
   def asBooleanList(default: => Boolean) = values.map(_.asBooleanOr(default))
 
   def asDoubleList = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
-    case arr: DoubleArrayFeature => list ++= arr.asDoubleArray
+    case arr: VectorFeature => list ++= arr.asDoubleArray
     case _ => list += f.asDouble
   }}.toList
 
   def asDoubleList(default: => Double) = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
-    case arr: DoubleArrayFeature => list ++= arr.get
+    case arr: VectorFeature => list ++= arr.get
     case _ => list += f.asDoubleOr(default)
   }}.toList
 
   def asDoubleArray: Array[Double] = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
-    case arr: DoubleArrayFeature => list ++= arr.asDoubleArray
+    case arr: VectorFeature => list ++= arr.asDoubleArray
     case _ => list += f.asDouble
   }}.toArray
 
   def asDoubleArray(default: => Double): Array[Double] = values.foldLeft(ListBuffer[Double]()){(list, f) => f match {
-    case arr: DoubleArrayFeature => list ++= arr.get
+    case arr: VectorFeature => list ++= arr.get
     case _ => list += f.asDoubleOr(default)
   }}.toArray
 
@@ -62,7 +62,7 @@ object Feature {
     case Some(l: Long) => new LongFeature(Some(l))
     case Some(d: Date) => new DateFeature(Some(d))
     case Some(b: Boolean) => new BooleanFeature(Some(b))
-    case Some(arr: Array[Double]) => new DoubleArrayFeature(Some(arr))
+    case Some(arr: Array[Double]) => new VectorFeature(Some(arr))
     case Some(null) => new EmptyFeature()
     case None => new EmptyFeature()
     case _ => ???
@@ -76,7 +76,7 @@ object Feature {
       case v: Long => new LongFeature(Option(v))
       case v: Date => new DateFeature(Option(v))
       case v: Boolean => new BooleanFeature(Option(v))
-      case arr: Array[Double] => new DoubleArrayFeature(Option(arr))
+      case arr: Array[Double] => new VectorFeature(Option(arr))
       case _ => ???
     }
   } else {
@@ -195,14 +195,14 @@ class BooleanFeature(value: Option[Boolean]) extends Feature[Boolean](value) {
 
 }
 
-class DoubleArrayFeature(value: Option[Array[Double]]) extends Feature[Array[Double]](value) {
+class VectorFeature(value: Option[Array[Double]]) extends Feature[Array[Double]](value) {
 
-  def asString: String = ???
-  def asDouble: Double = ???
-  def asInt: Int = ???
-  def asLong: Long = ???
-  def asDate: Date = ???
-  def asBoolean: Boolean = ???
+  def asString: String = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asDouble: Double = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asInt: Int = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asLong: Long = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asBoolean: Boolean = throw new IllegalArgumentException("Unsupported feature conversion")
   override def asDoubleArray: Array[Double] = value.get
 
 }

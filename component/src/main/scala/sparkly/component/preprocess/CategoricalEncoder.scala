@@ -1,7 +1,7 @@
 package sparkly.component.preprocess
 
 import org.apache.spark.streaming.dstream.DStream
-import sparkly.core.FeatureType.{CATEGORICAL, DOUBLE_ARRAY}
+import sparkly.core.FeatureType.{CATEGORICAL, VECTOR}
 import sparkly.core.PropertyType.INTEGER
 import sparkly.core._
 import org.apache.spark.Logging
@@ -15,7 +15,7 @@ class CategoricalEncoder extends Component with Logging {
       "Input" -> InputStreamMetadata(namedFeatures = Map("Feature" -> CATEGORICAL))
     ),
     outputs = Map (
-      "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures = Map("Encoded feature" -> DOUBLE_ARRAY))
+      "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures = Map("Encoded feature" -> VECTOR))
     ),
     properties = Map(
       "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level."),
