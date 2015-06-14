@@ -1,7 +1,7 @@
 package sparkly.component.preprocess
 
 import org.apache.spark.streaming.dstream.DStream
-import sparkly.core.FeatureType.{CATEGORICAL, VECTOR}
+import sparkly.core.FeatureType.{CATEGORICAL, CONTINUOUS}
 import sparkly.core.PropertyType.INTEGER
 import sparkly.core._
 import org.apache.spark.Logging
@@ -10,21 +10,25 @@ class CategoricalEncoder extends Component with Logging {
 
   def metadata = ComponentMetadata (
     name = "Categorical encoder", category = "Pre-processor",
-    description = "Encode categorical features using One-hot/One-of-k encoding scheme",
+    description =
+      """
+        |Encode categorical features using One-hot/One-of-k encoding scheme.
+        |It will transform a categorical feature into 'k' binary features (0.0 and 1.0), with only one active.
+        |'k' is the number of distinct categories and it's specified in the output configurations.
+      """.stripMargin,
     inputs = Map (
       "Input" -> InputStreamMetadata(namedFeatures = Map("Feature" -> CATEGORICAL))
     ),
     outputs = Map (
-      "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures = Map("Encoded feature" -> VECTOR))
+      "Output" -> OutputStreamMetadata(from = Some("Input"), listedFeatures = Map("Encoded features" -> CONTINUOUS))
     ),
     properties = Map(
-      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level."),
-      "Distinct categories (n)" -> PropertyMetadata(INTEGER, description = "Number of distinct categories. This component will transform a feature into an array of n binary features, with only one active.")
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to use default level.")
     )
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
-    val n = context.property("Distinct categories (n)").as[Int]
+    val n = context.outputSize("Output", "Encoded features")
     val partitions = context.property("Parallelism").as[Int] match {
       case positive if positive > 0 => positive
       case _ => context.sc.defaultParallelism
@@ -47,7 +51,7 @@ class CategoricalEncoder extends Component with Logging {
         logError(s"Got $index categories but encoder is limited to $n categories")
       }
 
-      instance.outputFeature("Encoded feature", encoded)
+      instance.outputFeatures("Encoded feature", encoded)
     }
 
     Map("Output" -> out)
