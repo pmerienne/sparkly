@@ -51,7 +51,7 @@ case class OutputStreamMetadata (
 
 object FeatureType extends Enumeration {
   type FeatureType = Value
-  val CATEGORICAL, CONTINUOUS, STRING, DOUBLE, INTEGER, LONG, NUMBER, BOOLEAN , DATE, DOUBLE_ARRAY, ANY = Value
+  val CATEGORICAL, CONTINUOUS, STRING, DOUBLE, INTEGER, LONG, NUMBER, BOOLEAN , DATE, VECTOR, ANY = Value
 }
 
 object ComponentMetadata {

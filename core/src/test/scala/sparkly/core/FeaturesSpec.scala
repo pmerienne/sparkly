@@ -43,6 +43,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(42.42).asLong should be (42L)
     intercept[IllegalArgumentException] {Feature(42.42).asDate}
     Feature(42.42).asBoolean should be (true)
+    Feature(42.42).asDoubleArray should be (Array(42.42))
   }
 
   "Int feature" should "should be converted to other types" in {
@@ -52,6 +53,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(42).asLong should be (42L)
     Feature(0).asDate should be (new Date(0))
     Feature(42).asBoolean should be (true)
+    Feature(42).asDoubleArray should be (Array(42.0))
   }
 
   "Long feature" should "should be converted to other types" in {
@@ -63,6 +65,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(42L).asLong should be (42L)
     Feature(now.getTime).asDate should be (now)
     Feature(42L).asBoolean should be (true)
+    Feature(42L).asDoubleArray should be (Array(42.0))
   }
 
   "Date feature" should "should be converted to other types" in {
@@ -77,14 +80,21 @@ class FeaturesSpec extends FlatSpec with Matchers {
   }
 
   "Boolean feature" should "should be converted to other types" in {
-    val now = new Date()
-
     Feature(true).asString should be ("true")
     Feature(true).asDouble should be (1.0)
     Feature(true).asInt should be (1)
     Feature(true).asLong should be (1L)
     Feature(true).asBoolean should be (true)
     intercept[IllegalArgumentException] {Feature(true).asDate}
+  }
+
+  "Vector feature" should "should not be converted to other types" in {
+    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asString}
+    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asDouble}
+    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asInt}
+    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asLong}
+    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asBoolean}
+    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asDate}
   }
 }
 
@@ -126,7 +136,6 @@ object FeatureBench extends PerformanceTest.Quickbenchmark {
     }
 
     // measurements: 0.180018, 0.163212, 0.159869, 0.179342, 0.176651, 0.169216, 0.162564, 0.165148, 0.167879, 0.16181, 0.165431, 0.171603, 0.166883, 0.162235, 0.164847, 0.163242, 0.170135, 0.167671, 0.170806, 0.175881, 0.158467, 0.156768, 0.158827, 0.168882, 0.207305, 0.169775, 0.167177, 0.164204, 0.167666, 0.164733, 0.162241, 0.163021, 0.160916, 0.165994, 0.171687, 0.213967
-    // measurements: 0.235089, 0.235186, 0.241765, 0.234767, 0.226867, 0.231637, 0.230374, 0.232235, 0.228573, 0.23158, 0.236087, 0.234177, 0.235056, 0.234048, 0.234021, 0.235329, 0.269151, 0.266956, 0.317678, 0.262207, 0.268339, 0.275051, 0.281728, 0.265305, 0.257291, 0.275795, 0.299442, 0.295703, 0.375818, 0.283334, 0.259005, 0.290008, 1.207408, 0.255131, 0.243132, 0.247455
     measure method "asDoubleArray with 1 array" in {
       using(doubleArrayGen) in { data =>
         data.asDoubleArray
