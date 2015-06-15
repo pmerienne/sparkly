@@ -2,8 +2,10 @@ package sparkly.testing
 
 import _root_.kafka.producer._
 import _root_.kafka.server._
-import _root_.kafka.utils.TestUtils
+import kafka.utils.{ZKStringSerializer, TestUtils}
+import kafka.admin.AdminUtils
 import kafka.server.KafkaConfig
+import org.I0Itec.zkclient.ZkClient
 import org.apache.curator.test._
 import scala.util.Random
 import kafka.producer.KeyedMessage
@@ -14,28 +16,28 @@ import kafka.serializer._
 import java.util.concurrent.Executors
 import scala.collection.mutable.ListBuffer
 
-trait EmbeddedZkKafka extends FlatSpec with BeforeAndAfterEach {
+trait EmbeddedKafka extends FlatSpec with BeforeAndAfterEach {
 
-  var embeddedZkKafkaCluster: EmbeddedZkKafkaCluster = _
+  var kafkaServer: KafkaServer = _
 
   override def beforeEach() {
     super.beforeEach()
-    embeddedZkKafkaCluster = new EmbeddedZkKafkaCluster()
-    embeddedZkKafkaCluster.startZkKafkaCluster()
+    kafkaServer = new KafkaServer()
+    kafkaServer.startZkKafkaCluster()
   }
 
   override def afterEach() {
     super.afterEach()
-    embeddedZkKafkaCluster.stopZkKafkaCluster()
+    kafkaServer.stopZkKafkaCluster()
   }
 
 }
 
-class EmbeddedZkKafkaCluster(val kafkaPort: Int = 9092, val zkPort: Int = 2181) {
+class KafkaServer(val kafkaPort: Int = 9092, val zkPort: Int = 2181) {
 
-  val zkServer = new TestingZooKeeperServer(EmbeddedZkKafkaCluster.getZkConfig(zkPort))
-  val kafkaServer = new KafkaServerStartable(EmbeddedZkKafkaCluster.getKafkaConfig(kafkaPort, zkServer.getInstanceSpec.getConnectString))
-  val producer = new Producer[String, String](EmbeddedZkKafkaCluster.getKafkaProducerConfig(kafkaBroker, zkServer.getInstanceSpec.getConnectString))
+  val zkServer = new TestingZooKeeperServer(KafkaServer.getZkConfig(zkPort))
+  val kafkaServer = new KafkaServerStartable(KafkaServer.getKafkaConfig(kafkaPort, zkServer.getInstanceSpec.getConnectString))
+  val producer = new Producer[String, String](KafkaServer.getKafkaProducerConfig(kafkaBroker, zkServer.getInstanceSpec.getConnectString))
   val connectors = ListBuffer[ConsumerConnector]()
 
   def startZkKafkaCluster() {
@@ -53,14 +55,23 @@ class EmbeddedZkKafkaCluster(val kafkaPort: Int = 9092, val zkPort: Int = 2181) 
   def kafkaBroker = s"localhost:${kafkaPort}"
   def zkConnectString = zkServer.getInstanceSpec.getConnectString
 
-  def sendMessage(topic: String, key: String, message: String) {
+  def send(topic: String, key: String, message: String) {
     val keyedMessage = new KeyedMessage[String, String](topic, key, message)
     producer.send(keyedMessage)
   }
 
+  def send(topic: String, message: String, others: String*) {
+    (message :: others.toList).foreach(str => producer.send(new KeyedMessage[String, String](topic, str)))
+  }
+
+  def createTopic(topic: String, numPartitions: Int = 1, replicationFactor: Int = 1): Unit = {
+    val zkClient = new ZkClient(zkServer.getInstanceSpec.getConnectString, 10000, 10000, ZKStringSerializer)
+    AdminUtils.createTopic(zkClient, topic, numPartitions, replicationFactor)
+  }
+
   def listen(topic: String, groupId: String): ListBuffer[Array[Byte]]= {
     val data = ListBuffer[Array[Byte]]()
-    val connector = Consumer.create(EmbeddedZkKafkaCluster.createConsumerConfig(zkConnectString, groupId))
+    val connector = Consumer.create(KafkaServer.createConsumerConfig(zkConnectString, groupId))
     connectors += connector
 
     val streams = connector
@@ -87,7 +98,7 @@ class EmbeddedZkKafkaCluster(val kafkaPort: Int = 9092, val zkPort: Int = 2181) 
 
 }
 
-object EmbeddedZkKafkaCluster {
+object KafkaServer {
 
   def getKafkaConfig(kafkaPort: Int, zkConnectString: String): KafkaConfig = {
     val props = TestUtils.createBrokerConfigs(1).iterator.next

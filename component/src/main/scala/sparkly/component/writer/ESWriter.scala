@@ -1,18 +1,15 @@
 package sparkly.component.writer
 
-import com.datastax.spark.connector.util.Logging
+import org.elasticsearch.common.settings.ImmutableSettings
+
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s._
-import org.apache.spark.TaskContext
+
+import org.apache.spark.{Logging, TaskContext}
 import org.apache.spark.streaming.dstream._
-import org.elasticsearch.common.settings.ImmutableSettings
+
 import sparkly.core._
 import sparkly.core.PropertyType._
-import sparkly.core.InputStreamMetadata
-import scala.Some
-import sparkly.core.PropertyType
-import sparkly.core.Context
-import sparkly.core.PropertyMetadata
 
 class ESWriter extends Component {
 

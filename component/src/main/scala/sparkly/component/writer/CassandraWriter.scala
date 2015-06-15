@@ -24,7 +24,7 @@ class CassandraWriter extends Component {
       "Keyspace" -> PropertyMetadata(PropertyType.STRING),
       "Table" -> PropertyMetadata(PropertyType.STRING),
       "Hosts" -> PropertyMetadata(PropertyType.STRING, description = "Comma separated list of hosts"),
-      "Native port" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(DefaultNativePort), description = "Cassandra native port"),
+      "Port" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(DefaultPort), description = "Cassandra native port"),
       "Username" -> PropertyMetadata(PropertyType.STRING, mandatory = false, defaultValue = Some("")),
       "Password" -> PropertyMetadata(PropertyType.STRING, mandatory = false, defaultValue = Some("")),
       "Consistency" -> PropertyMetadata(PropertyType.STRING, defaultValue = Some(WriteConf.DefaultConsistencyLevel.name), acceptedValues = ConsistencyLevel.values().map(_.name).toList),
@@ -50,9 +50,9 @@ class CassandraWriter extends Component {
     val authConf = if(username.isEmpty) NoAuthConf else PasswordAuthConf(username, password)
 
     val writeConf = WriteConf(consistencyLevel = ConsistencyLevel.valueOf(context.property("Consistency").as[String]))
-    val connector = CassandraConnector(
+    val connector = CassandraConnector (
       hosts = context.property("Hosts").as[String].split(",").map(InetAddress.getByName).toSet,
-      nativePort = context.property("Native port").as[Int],
+      port = context.property("Port").as[Int],
       authConf = authConf,
       minReconnectionDelayMillis = context.property("Reconnection delay millis (min)").as[Int],
       maxReconnectionDelayMillis = context.property("Reconnection delay millis (max)").as[Int],

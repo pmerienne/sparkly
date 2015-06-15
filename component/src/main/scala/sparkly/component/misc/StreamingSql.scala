@@ -1,8 +1,9 @@
 package sparkly.component.misc
 
+import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.expressions.Row
-import org.apache.spark.sql.catalyst.types.{StringType, StructField, StructType}
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core._
 
@@ -19,7 +20,6 @@ class StreamingSql extends Component {
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
-    val sqlContext = new SQLContext(context.ssc.sparkContext)
     val query = context.property("Query").as[String]
     val outputFields = context.outputFeatureNames("Output", "Fields")
 
@@ -28,15 +28,33 @@ class StreamingSql extends Component {
 
     val output = inputs
       .transform { rdd =>
-        (1 to STREAM_COUNT).foreach{i =>
-          sqlContext.applySchema(rdd.filter(_._1 == "stream" + i).map(instance => Row.fromSeq(instance._2.inputFeatures("Fields").asStringList)), schemas(i - 1)).registerTempTable("stream" + i)
+        val sqlContext = SQLContextSingleton.getInstance(rdd.sparkContext)
+
+        (1 to STREAM_COUNT).foreach{ i =>
+          // TODO filter(_._1 == "stream" + i) is not efficient
+          val schema = schemas(i - 1)
+          val rowRDD = rdd.filter(_._1 == "stream" + i).map(instance => Row.fromSeq(instance._2.inputFeatures("Fields").asStringList))
+          sqlContext.createDataFrame(rowRDD, schema).registerTempTable("stream" + i)
         }
 
-      val results = sqlContext.sql(query).map(row => Instance((outputFields zip row.toList).toMap))
+        val results = sqlContext.sql(query).map(row => Instance((outputFields zip row.toSeq).toMap))
         results.take(1) // We need such kind of operations however there's not output to transform!
         results
       }
 
     Map("Output" -> output)
+  }
+}
+
+/** Lazily instantiated singleton instance of SQLContext */
+object SQLContextSingleton {
+
+  @transient private var instance: SQLContext = _
+
+  def getInstance(sparkContext: SparkContext): SQLContext = {
+    if (instance == null) {
+      instance = new SQLContext(sparkContext)
+    }
+    instance
   }
 }

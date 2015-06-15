@@ -3,34 +3,17 @@ package sparkly.component.source
 import sparkly.testing._
 import sparkly.core._
 
-class KafkaSourceSpec extends ComponentSpec {
-
-  var embeddedZkKafkaCluster: EmbeddedZkKafkaCluster = _
-
-  override def beforeEach() {
-    super.beforeEach()
-    embeddedZkKafkaCluster = new EmbeddedZkKafkaCluster()
-    embeddedZkKafkaCluster.startZkKafkaCluster()
-  }
-
-  override def afterEach() {
-    super.afterEach()
-    embeddedZkKafkaCluster.stopZkKafkaCluster()
-  }
+class KafkaSourceSpec extends ComponentSpec with EmbeddedKafka {
 
   "Kafka source" should "stream message from a topic" in {
     // Given
-    val messages = List("Hello", "How are you?", "Does it work?")
-
     val configuration = ComponentConfiguration (
       clazz = classOf[KafkaSource].getName,
       name = "Kafka source",
       properties = Map (
-        "Topic" -> "test-topic",
+        "Topics" -> "test-topic",
         "Group Id" -> "kafka-source-test",
-        "Consumers threads" -> "2",
-        "Zookeeper quorum" -> embeddedZkKafkaCluster.zkConnectString,
-        "Storage level" -> "Memory Only"
+        "Metadata broker list" -> kafkaServer.kafkaBroker
       ),
       outputs = Map (
         "Output" -> StreamConfiguration(mappedFeatures = Map("Message" -> "Message"))
@@ -38,9 +21,9 @@ class KafkaSourceSpec extends ComponentSpec {
     )
 
     // When
+    kafkaServer.createTopic("test-topic")
     val component = deployComponent(configuration)
-    Thread.sleep(1000)
-    messages.foreach(message => embeddedZkKafkaCluster.sendMessage("test-topic", "key", message))
+    kafkaServer.send("test-topic", "Hello", "How are you?", "Does it work?")
 
     // Then
     eventually {

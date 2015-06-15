@@ -1,14 +1,14 @@
 package sparkly.component.writer
 
-import sparkly.core._
-import org.apache.spark.streaming.dstream.DStream
-import kafka.producer._
 import java.util.Properties
-import org.apache.spark.TaskContext
-import sparkly.core.PropertyType._
-import scala.Some
-import com.datastax.spark.connector.util.Logging
+
+import kafka.producer._
+import org.apache.spark.{Logging, TaskContext}
+import org.apache.spark.streaming.dstream.DStream
+
+import sparkly.core._
 import sparkly.common._
+import sparkly.core.PropertyType._
 
 class KafkaWriter extends Component {
 
@@ -53,7 +53,7 @@ class KafkaWriter extends Component {
   }
 }
 
-class KafkaJobWriter(serializer: Serializer[Map[String, Any]], topic: String, brokerList: String, maxRetry: Int, retryBackoffMs: Long) extends Serializable with Logging{
+class KafkaJobWriter(serializer: Serializer[Map[String, Any]], topic: String, brokerList: String, maxRetry: Int, retryBackoffMs: Long) extends Serializable with Logging {
 
   def write(taskContext: TaskContext, data: Iterator[Map[String, Any]]) {
     val producer = createProducer()
