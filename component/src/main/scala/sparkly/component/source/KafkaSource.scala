@@ -2,13 +2,11 @@ package sparkly.component.source
 
 import sparkly.core._
 import sparkly.core.PropertyType._
-import sparkly.core.OutputStreamMetadata
-import sparkly.core.ComponentMetadata
-import sparkly.core.PropertyMetadata
-import scala.Some
+
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
-import org.apache.spark.storage.StorageLevel
+
+import kafka.serializer.StringDecoder
 
 class KafkaSource extends Component {
 
@@ -19,28 +17,27 @@ class KafkaSource extends Component {
       "Output" -> OutputStreamMetadata(namedFeatures = Map("Message" -> FeatureType.STRING))
     ),
     properties = Map(
-      "Topic" -> PropertyMetadata(STRING),
+      "Topics" -> PropertyMetadata(STRING, description = "Comma separated list of topics"),
       "Group Id" -> PropertyMetadata(STRING),
-      "Consumers threads" -> PropertyMetadata(INTEGER, defaultValue = Some(1)),
-      "Zookeeper quorum" -> PropertyMetadata(STRING, defaultValue = Some(";"), description = "Format hostname:port,hostname:port,...")
+      "Metadata broker list" -> PropertyMetadata(STRING, defaultValue = Some("localhost:9092"), description = "Format hostname:port,hostname:port,...")
     )
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
-
-    val inputTopic = context.property("Topic").as[String]
+    val topics = context.property("Topics").as[String].split(",").toSet
     val group = context.property("Group Id").as[String]
-    val consumers = context.property("Consumers threads").as[Int]
-    val zkQuorum = context.property("Zookeeper quorum").as[String]
-
+    val brokers = context.property("Metadata broker list").as[String]
     val featureName = context.outputFeatureName("Output", "Message")
 
-    val streams = (1 to consumers) map { _ =>
-      KafkaUtils.createStream(context.ssc, zkQuorum, group, Map(inputTopic -> 1), StorageLevel.MEMORY_AND_DISK_SER).map(_._2)
-    }
+    val kafkaParams = Map (
+      "metadata.broker.list" -> brokers,
+      "group.id" -> group
+    )
 
-    val unifiedStream = context.ssc.union(streams)
+    val out = KafkaUtils
+      .createDirectStream[String, String, StringDecoder, StringDecoder](context.ssc, kafkaParams, topics)
+      .map{case (key, message) => Instance(featureName -> message)}
 
-    Map("Output" -> unifiedStream.map(message => Instance(featureName -> message)))
+    Map("Output" -> out)
   }
 }

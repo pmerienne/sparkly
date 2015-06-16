@@ -3,7 +3,7 @@ package sparkly.component.writer
 import sparkly.testing._
 import sparkly.core._
 
-class KafkaWriterSpec extends ComponentSpec with EmbeddedZkKafka {
+class KafkaWriterSpec extends ComponentSpec with EmbeddedKafka {
 
   "Kafka writer" should "write features to kafka" in {
 
@@ -15,7 +15,7 @@ class KafkaWriterSpec extends ComponentSpec with EmbeddedZkKafka {
       ),
       properties = Map (
         "Topic" -> "sensor",
-        "Metadata broker list" -> embeddedZkKafkaCluster.kafkaBroker,
+        "Metadata broker list" -> kafkaServer.kafkaBroker,
         "Serializer" -> "Json",
         "Max retry" -> "10",
         "Retry backoff (ms)" -> "500",
@@ -24,7 +24,7 @@ class KafkaWriterSpec extends ComponentSpec with EmbeddedZkKafka {
     )
 
     // When
-    val kafkaData = embeddedZkKafkaCluster.listen("sensor", "test")
+    val kafkaData = kafkaServer.listen("sensor", "test")
 
     val component = deployComponent(configuration)
     component.inputs("In").push(
