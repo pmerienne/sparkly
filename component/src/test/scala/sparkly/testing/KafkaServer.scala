@@ -47,8 +47,9 @@ class KafkaServer(val kafkaPort: Int = 9092, val zkPort: Int = 2181) {
 
   def stopZkKafkaCluster() {
     connectors.foreach(_.shutdown())
+    producer.close()
     kafkaServer.shutdown()
-    zkServer.stop()
+    zkServer.close()
     kafkaServer.awaitShutdown()
   }
 
@@ -67,6 +68,7 @@ class KafkaServer(val kafkaPort: Int = 9092, val zkPort: Int = 2181) {
   def createTopic(topic: String, numPartitions: Int = 1, replicationFactor: Int = 1): Unit = {
     val zkClient = new ZkClient(zkServer.getInstanceSpec.getConnectString, 10000, 10000, ZKStringSerializer)
     AdminUtils.createTopic(zkClient, topic, numPartitions, replicationFactor)
+    zkClient.close()
   }
 
   def listen(topic: String, groupId: String): ListBuffer[Array[Byte]]= {
@@ -134,6 +136,6 @@ object KafkaServer {
 
   def randomPort(min: Int, max: Int): Int = {
     val range = min to max
-    range(Random.nextInt(range length))
+    range(Random.nextInt(range.length))
   }
 }

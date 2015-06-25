@@ -40,7 +40,7 @@ class LocalClusterService(
     streamingContext.foreach{ ssc =>
       try {
         ssc.stop(stopSparkContext = true, stopGracefully = stopGracefully)
-        ssc.awaitTermination(5000)
+        ssc.awaitTerminationOrTimeout(5000)
         streamingContext = None
       } catch {
         case e: Exception => println("Unable to stop streaming context")  // TODO : should log!!
