@@ -29,7 +29,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
     super.afterEach()
     ssc.foreach{ssc =>
       ssc.stop()
-      ssc.awaitTermination(2000)
+      ssc.awaitTerminationOrTimeout(2000)
     }
     pipelineDirectory.deleteRecursively()
   }

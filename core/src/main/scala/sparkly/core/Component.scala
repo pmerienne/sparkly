@@ -4,7 +4,6 @@ package sparkly.core
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.PropertyType._
-import sparkly.utils.ScalaUtils._
 
 import scala.util.Try
 import org.apache.spark.metrics.SparklyMonitoringSource
@@ -134,7 +133,7 @@ case class Property (
 
   def or[V](default: V, on: (V) => Boolean = (value: V) => isEmpty ) = {
     val value = Try(get).getOrElse(null).asInstanceOf[V]
-    (on(value)) ? default | value
+    if(on(value)) default else value
   }
 }
 
