@@ -1,5 +1,6 @@
 package sparkly.testing
 
+import com.google.common.util.concurrent.RateLimiter
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
@@ -22,7 +23,7 @@ class MockStream extends Component {
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
     componentId = context.componentId
     sc = Some(context.ssc.sparkContext)
-    Map(MockStream.OUTPUT_NAME ->  context.ssc.queueStream(queue))
+    Map(MockStream.OUTPUT_NAME ->  context.ssc.queueStream(queue, oneAtATime = false))
   }
 
   def push(instances: Instance*): Unit = push(instances.toList)
@@ -33,12 +34,34 @@ class MockStream extends Component {
   }
 
   def push(rate: Int, generator: () => Instance): Unit = Future {
+    val (limiter, batchSize) = createRateLimiter(rate)
+
     while(true) {
-      val instances = (1 to rate).map(i => generator()).toList
+      limiter.acquire()
+      val instances = (1 to batchSize).map(i => generator()).toList
       push(instances)
-      Thread.sleep(1000)
     }
   }
+
+  def push(rate: Int, it: Iterator[Instance]): Unit = Future {
+    val (limiter, batchSize) = createRateLimiter(rate)
+
+    while(it.hasNext) {
+      limiter.acquire()
+      val instances = (1 to batchSize).flatMap(i => if(it.hasNext) Some(it.next()) else None).toList
+      if(!instances.isEmpty) {
+        push(instances)
+      }
+    }
+  }
+
+  private def createRateLimiter(rate: Int): (RateLimiter, Int) = {
+    val batchDurationSeconds = ComponentSpec.batchDurationMs.toDouble / 1000.0
+    val batchSize = (rate.toDouble * ComponentSpec.batchDurationMs.toDouble / 1000.0).toInt
+    val limiter = RateLimiter.create(1 / batchDurationSeconds)
+    (limiter, batchSize)
+  }
+
 }
 
 object MockStream {

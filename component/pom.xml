@@ -45,14 +45,6 @@
 
 		<!-- Math/Analytics/DM lib -->
 		<dependency>
-			<groupId>org.scalanlp</groupId>
-			<artifactId>breeze_${scala.version}</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.scalanlp</groupId>
-			<artifactId>breeze-natives_${scala.version}</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.twitter</groupId>
 			<artifactId>algebird-core_${scala.version}</artifactId>
 		</dependency>
