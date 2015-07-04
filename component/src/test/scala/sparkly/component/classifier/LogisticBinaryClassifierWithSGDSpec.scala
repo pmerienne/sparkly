@@ -26,7 +26,7 @@ class LogisticBinaryClassifierWithSGDSpec extends ComponentSpec {
     // When
     val component = deployComponent(configuration)
 
-    val training = Source.fromInputStream(getClass.getResourceAsStream("/spam.data")).getLines().map{ line =>
+    val training = Source.fromInputStream(getClass.getResourceAsStream("/dataset/spam.data")).getLines().map{ line =>
       val fields = line.split(";").zipWithIndex
       val values = fields.map{case (value, index) => s"f$index" -> value.toDouble}.toMap
       Instance(values)

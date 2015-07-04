@@ -1,42 +1,35 @@
 package sparkly.it
 
-import java.io.File
-import java.nio.file.Files
-
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FlatSpec, Matchers}
-import sparkly.component.classifier.Perceptron
-import sparkly.component.preprocess.Normalizer
-import sparkly.component.source.CsvFileDirectorySource
+import sparkly.component.classifier._
+import sparkly.component.preprocess._
 import sparkly.core._
-import sparkly.testing._
 
 import scala.reflect.io.Directory
+import sparkly.component.source.dataset.SpamDataset
+import sparkly.component.source.dataset.SpamDataset.{labelName, featureNames}
+import org.apache.spark.metrics.sink.MonitoringTestingData
 
-class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
+class PipelineIT extends FlatSpec with Matchers with Eventually {
 
   implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(20, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
 
   val pipelineDirectory = Directory.makeTemp()
   val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString, "local[8]", "test-cluster")
-  val workingDirectory = Directory.makeTemp()
 
   "Pipeline" should "build and connect components together" in {
     val pipelineConfig = PipelineConfiguration (
       name = "test",
       components = List (
         ComponentConfiguration (
-          id = "csv_source",
+          id = "spam_source",
           name = "Train data",
-          clazz = classOf[CsvFileDirectorySource].getName,
-          properties = Map (
-            "Directory" -> workingDirectory.toString,
-            "Process only new files" -> "false",
-            "Filename pattern" -> "spam.data"
-          ),
+          clazz = classOf[SpamDataset].getName,
+          properties = Map ("Throughput (instance/second)" -> "5000"),
           outputs = Map (
-            "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (labelName::featureNames)))
+            "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (labelName :: featureNames)))
           )
         ),
         ComponentConfiguration (
@@ -51,36 +44,33 @@ class PipelineIT extends FlatSpec with Matchers with Eventually with SpamData {
           id = "perceptron",
           name = "Learner",
           clazz = classOf[Perceptron].getName,
-          properties = Map (
-            "Bias" -> "1.0",
-            "Learning rate" -> "1.0"
-          ),
           inputs = Map (
             "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> labelName), selectedFeatures = Map("Features" -> featureNames)),
-            "Prediction query" -> StreamConfiguration(selectedFeatures = Map("Features" -> featureNames))
+            "Predict" -> StreamConfiguration(selectedFeatures = Map("Features" -> featureNames))
           ),
           outputs = Map (
-            "Prediction result" -> StreamConfiguration(mappedFeatures = Map("Label" -> "prediction")),
-            "Accuracy" -> StreamConfiguration(mappedFeatures = Map("Accuracy" -> "Accuracy"))
-          )
+            "Predictions" -> StreamConfiguration(mappedFeatures = Map("Label" -> "prediction"))
+          ),
+          monitorings = Map("Accuracy" -> MonitoringConfiguration(active = true))
         )
       ),
       connections = List (
-        ConnectionConfiguration("csv_source", "Instances", "normalizer", "Input"),
+        ConnectionConfiguration("spam_source", "Instances", "normalizer", "Input"),
         ConnectionConfiguration("normalizer", "Output", "perceptron", "Train")
       ),
       batchDurationMs = 200
     )
 
-    val (ssc, build) = streamingContextFactory.createStreamingContext(pipelineConfig)
+    val (ssc, _) = streamingContextFactory.createStreamingContext(pipelineConfig)
 
     try {
-      val accuracies = InspectedStream(build.outputs(("perceptron" ,"Accuracy")))
       ssc.start()
-      Files.copy(getClass.getResourceAsStream("/spam.data"), new File(workingDirectory.toString, "spam.data").toPath())
+
       eventually {
-        accuracies.instances.last.rawFeatures("Accuracy").asInstanceOf[Double] should be > 0.80
+        val accuracy = MonitoringTestingData.latest[Map[String, Double]]("perceptron-accuracy").data("Accuracy")
+        accuracy should be > 0.80
       }
+
     } finally {
       ssc.stop()
     }

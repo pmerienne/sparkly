@@ -8,12 +8,12 @@ import sparkly.component.source.CsvFileDirectorySource
 import sparkly.core._
 import sparkly.dao._
 import sparkly.config.SparklyConfig._
-import sparkly.testing.SpamData
 import sparkly.component.debug.Log
 import sparkly.service.ClusterState._
 import scala.reflect.io.Directory
+import sparkly.component.source.dataset.SpamDataset
 
-class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with SpamData with BeforeAndAfterEach {
+class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
   implicit val pipelineRepository = mock[PipelineRepository]
   implicit val pipelineValidationService = mock[PipelineValidationService]
@@ -80,16 +80,11 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
     name = "test",
     components = List (
       ComponentConfiguration (
-        id = "csv_source",
+        id = "spam_source",
         name = "Train data",
-        clazz = classOf[CsvFileDirectorySource].getName,
-        properties = Map(
-          "Directory" -> "src/test/resources",
-          "Process only new files" -> "false",
-          "Filename pattern" -> "spam.data"
-        ),
+        clazz = classOf[SpamDataset].getName,
         outputs = Map(
-          "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (labelName :: featureNames)))
+          "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (SpamDataset.labelName :: SpamDataset.featureNames)))
         )
       ),
       ComponentConfiguration (
@@ -97,12 +92,12 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
         name = "Debug",
         clazz = classOf[Log].getName,
         inputs = Map(
-          "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> List(labelName)))
+          "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> List(SpamDataset.labelName)))
         )
       )
     ),
     connections = List(
-      ConnectionConfiguration("csv_source", "Instances", "debug", "Input")
+      ConnectionConfiguration("spam_source", "Instances", "debug", "Input")
     )
   )
 }

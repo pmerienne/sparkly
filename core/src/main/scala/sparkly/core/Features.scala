@@ -112,11 +112,8 @@ class StringFeature(value: Option[String]) extends Feature[String](value) {
   def asLong: Long = value.get.toLong
   def asDate: Date = DateTime.parse(value.get, ISODateTimeFormat.dateTimeParser.withZoneUTC()).toDate
   def asBoolean: Boolean = value.get match {
-    case "true" => true
-    case "false" => false
-    case "1" => true
-    case "0" => false
-    case "-1" => false
+    case "true" | "1" => true
+    case "false" | "0" | "-1" => false
   }
 
 }

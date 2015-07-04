@@ -2,18 +2,16 @@ package sparkly.component.classifier
 
 import sparkly.core._
 import org.apache.spark.streaming.dstream.DStream
-import sparkly.core.Context
-import sparkly.core.InputStreamMetadata
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.classification.StreamingLogisticRegressionWithSGD
 import org.apache.spark.mllib.regression.LabeledPoint
 import scala.util.Try
 import sparkly.component.common.RunningAccuracy
 
-class LogisticBinaryClassifierWithSGD  extends Component {
+class LogisticBinaryClassifierWithSGD extends Component {
 
   override def metadata: ComponentMetadata = ComponentMetadata (
-    name = "Logistic binary classifier",
+    name = "Logistic binary classifier", category = "Classifier",
     description =
       """
         |Binary classifier based on a logistic regression model with SGD.
