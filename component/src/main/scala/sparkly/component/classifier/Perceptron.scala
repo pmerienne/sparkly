@@ -12,7 +12,7 @@ import org.apache.spark.rdd.RDD
 class Perceptron extends Component {
 
   override def metadata: ComponentMetadata = ComponentMetadata (
-    name = "Perceptron classifier",
+    name = "Perceptron classifier", category = "Classifier",
     description =
       """
         |Binary classifier based on an averaged kernel-based perceptron.

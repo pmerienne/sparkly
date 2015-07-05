@@ -85,6 +85,8 @@ case class Context (
 
   def hadoopConfiguration() = ssc.sparkContext.hadoopConfiguration
 
+  def isActive(monitoring: String): Boolean = monitorings.getOrElse(monitoring, false)
+
   def createMonitoring[T](name: String): Monitoring[T] = {
     val monitoring = new Monitoring[T](name)
     add(monitoring)

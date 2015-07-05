@@ -62,10 +62,10 @@ class DatasetReceiver(file: String, features: List[(String, FeatureType)], throu
 
   private def createDatasetIterator(): Iterator[Instance] = {
     Source
-      .fromInputStream(getClass.getResourceAsStream("/dataset/" + file))
+      .fromInputStream(getClass.getResourceAsStream(file))
       .getLines()
       .map{ line =>
-        val raw = (features.map(_._1), line.split(";").toList).zipped
+        val raw = (features.map(_._1), line.split(",").toList).zipped
         val values = convert(raw.toMap)
         Instance(values)
       }
