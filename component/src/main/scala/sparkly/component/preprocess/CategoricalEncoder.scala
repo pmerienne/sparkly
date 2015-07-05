@@ -51,7 +51,7 @@ class CategoricalEncoder extends Component with Logging {
         logError(s"Got $index categories but encoder is limited to $n categories")
       }
 
-      instance.outputFeatures("Encoded feature", encoded)
+      instance.outputFeatures("Encoded features", encoded)
     }
 
     Map("Output" -> out)

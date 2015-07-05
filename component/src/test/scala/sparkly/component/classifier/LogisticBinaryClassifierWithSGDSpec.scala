@@ -4,6 +4,7 @@ import sparkly.testing._
 import sparkly.core._
 
 import scala.io.Source
+import sparkly.component.source.dataset.SpamDataset
 
 class LogisticBinaryClassifierWithSGDSpec extends ComponentSpec {
 
@@ -13,7 +14,7 @@ class LogisticBinaryClassifierWithSGDSpec extends ComponentSpec {
       name = "LogisticBinaryClassifierWithSGD",
       clazz = classOf[LogisticBinaryClassifierWithSGD].getName,
       inputs = Map(
-        "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> "f0"), selectedFeatures = Map("Features" -> List.range(1, 56).map(index => s"f${index}"))),
+        "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> SpamDataset.labelName), selectedFeatures = Map("Features" -> SpamDataset.featureNames)),
         "Predict" -> StreamConfiguration(selectedFeatures = Map("Features" -> List.range(1, 56).map(index => s"f${index}")))
       ),
       outputs = Map("Predictions" -> StreamConfiguration(mappedFeatures = Map("Label" -> "prediction"))),
@@ -25,13 +26,7 @@ class LogisticBinaryClassifierWithSGDSpec extends ComponentSpec {
 
     // When
     val component = deployComponent(configuration)
-
-    val training = Source.fromInputStream(getClass.getResourceAsStream("/dataset/spam.data")).getLines().map{ line =>
-      val fields = line.split(";").zipWithIndex
-      val values = fields.map{case (value, index) => s"f$index" -> value.toDouble}.toMap
-      Instance(values)
-    }
-    component.inputs("Train").push(2000, training)
+    component.inputs("Train").push(2000, SpamDataset.iterator())
 
     // Then
     eventually {
