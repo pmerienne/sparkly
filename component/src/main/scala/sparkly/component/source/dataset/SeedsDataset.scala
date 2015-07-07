@@ -14,7 +14,7 @@ class SeedsDataset extends DatasetSource {
         |The examined group comprised kernels belonging to three different varieties of wheat: Kama, Rosa and Canadian, 70 elements each.
         |
         |The data set can be used for the tasks of classification and cluster analysis.
-        |
+        |For more information, see https://archive.ics.uci.edu/ml/datasets/seeds
       """.stripMargin
   )
 

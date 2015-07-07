@@ -12,6 +12,8 @@ class SpamDataset extends DatasetSource {
         |Spam dataset containing a collection of spam and non-spam emails.
         |Data is encoded into 57 continuous features.
         |
+        |The data set can be used for the tasks of classification.
+        |For more information, see https://archive.ics.uci.edu/ml/datasets/Spambase
       """.stripMargin
   )
 
