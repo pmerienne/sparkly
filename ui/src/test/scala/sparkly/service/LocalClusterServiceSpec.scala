@@ -84,7 +84,7 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
         name = "Train data",
         clazz = classOf[SpamDataset].getName,
         outputs = Map(
-          "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (SpamDataset.labelName :: SpamDataset.featureNames)))
+          "Instances" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features"))
         )
       ),
       ComponentConfiguration (
@@ -92,7 +92,7 @@ class LocalClusterServiceSpec extends FlatSpec with Matchers with MockitoSugar w
         name = "Debug",
         clazz = classOf[Log].getName,
         inputs = Map(
-          "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> List(SpamDataset.labelName)))
+          "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("Label")))
         )
       )
     ),

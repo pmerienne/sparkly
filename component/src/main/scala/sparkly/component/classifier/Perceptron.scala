@@ -18,8 +18,8 @@ class Perceptron extends Component {
         |Binary classifier based on an averaged kernel-based perceptron.
       """.stripMargin,
     inputs = Map (
-      "Train" -> InputStreamMetadata(namedFeatures = Map("Label" -> FeatureType.BOOLEAN), listedFeatures = Map("Features" -> FeatureType.CONTINUOUS)),
-      "Predict" -> InputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.CONTINUOUS))
+      "Train" -> InputStreamMetadata(namedFeatures = Map("Label" -> FeatureType.BOOLEAN, "Features" -> FeatureType.VECTOR)),
+      "Predict" -> InputStreamMetadata(namedFeatures = Map("Features" -> FeatureType.VECTOR))
     ),outputs = Map (
       "Predictions" -> OutputStreamMetadata(from = Some("Predict"), namedFeatures = Map("Label" -> FeatureType.BOOLEAN))
     ), properties = Map (
@@ -34,15 +34,13 @@ class Perceptron extends Component {
     val bias = context.properties("Bias").as[Double]
     val threshold = context.properties("Threshold").as[Double]
     val learningRate = context.properties("Learning rate").as[Double]
-    val featureCount = context.inputSize("Train", "Features")
-    val initialWeights = DenseVector.rand[Double](featureCount) .* (1.0 / featureCount)
 
-    var model = PerceptronModel(bias, threshold, learningRate, initialWeights, RunningAccuracy[Boolean]())
+    var model = PerceptronModel(bias, threshold, learningRate, RunningAccuracy[Boolean]())
 
     // Update model
     context.dstream("Train").map{ i =>
       val label = i.inputFeature("Label").asBoolean
-      val features = i.inputFeatures("Features").asDenseVector
+      val features = i.inputFeature("Features").asVector
       (label, features)
     }.foreachRDD{ (rdd, time) =>
         model = model.update(rdd)
@@ -52,7 +50,7 @@ class Perceptron extends Component {
 
     // Predict
     val predictions = context.dstream("Predict", "Predictions").map{ i =>
-      val features = i.inputFeatures("Features").asDenseVector
+      val features = i.inputFeature("Features").asVector
       val label = model.predict(features)
       i.outputFeature("Label", label)
     }
@@ -61,10 +59,10 @@ class Perceptron extends Component {
   }
 }
 
-case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double, weights: DenseVector[Double], accuracy: RunningAccuracy[Boolean]) {
+case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double, accuracy: RunningAccuracy[Boolean], weights: DenseVector[Double] = null) {
 
-  def update(rdd: RDD[(Boolean, DenseVector[Double])]): PerceptronModel = {
-    var model = this
+  def update(rdd: RDD[(Boolean, DenseVector[Double])]): PerceptronModel = if(rdd.isEmpty) this else {
+    var model = if(weights == null) this.init(rdd.first()._2) else this
     rdd.collect().foreach{ case (label, features) =>
       model = model.update(label, features)
     }
@@ -72,7 +70,8 @@ case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double
   }
 
   def predict(features: DenseVector[Double]): Boolean = {
-    features.t * weights + bias > 0
+    val w = if(weights == null) initialWeights(features) else weights
+    features.t * w + bias > 0
   }
 
   private def update(label: Boolean, features: DenseVector[Double]): PerceptronModel = {
@@ -86,5 +85,14 @@ case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double
 
     val newAccuracy = accuracy.update(prediction, label)
     this.copy(weights = newWeights, accuracy = newAccuracy)
+  }
+
+  private def init(features: DenseVector[Double]): PerceptronModel = {
+    this.copy(weights = initialWeights(features))
+  }
+
+  private def initialWeights(features: DenseVector[Double]): DenseVector[Double] = {
+    val featureCount = features.length
+    DenseVector.rand[Double](featureCount) .* (1.0 / featureCount)
   }
 }

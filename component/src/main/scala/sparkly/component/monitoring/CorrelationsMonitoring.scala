@@ -32,7 +32,7 @@ class CorrelationsMonitoring extends Component {
     dstream
       .repartition(partitions)
       .mapPartitions{ instances =>
-        val features = instances.map(_.inputFeatures("Number features")).filter(!_.containsUndefined).map(_.asDenseVector)
+        val features = instances.map(_.inputFeatures("Number features")).filter(!_.containsUndefined).map(_.toDenseVector(0.0))
         if(features.isEmpty) Iterator() else Iterator(PearsonCorrelations(features))
       }
       .reduceByWindow(_+_, _-_, Milliseconds(windowDuration), dstream.slideDuration)

@@ -14,8 +14,8 @@ class PerceptronSpec extends ComponentSpec {
       name = "Perceptron",
       clazz = classOf[Perceptron].getName,
       inputs = Map(
-        "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> SpamDataset.labelName), selectedFeatures = Map("Features" -> SpamDataset.featureNames)),
-        "Predict" -> StreamConfiguration(selectedFeatures = Map("Features" -> SpamDataset.featureNames))
+        "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features")),
+        "Predict" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features"))
       ),
       outputs = Map("Predictions" -> StreamConfiguration(mappedFeatures = Map("Label" -> "prediction"))),
       monitorings = Map("Accuracy" -> MonitoringConfiguration(active = true))
