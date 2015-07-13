@@ -2,7 +2,8 @@ package sparkly.component.classifier
 
 import sparkly.core._
 import org.apache.spark.streaming.dstream.DStream
-import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.linalg.{Vector, Vectors}
+import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.mllib.classification.StreamingLogisticRegressionWithSGD
 import org.apache.spark.mllib.regression.LabeledPoint
 import scala.util.Try
@@ -17,8 +18,8 @@ class LogisticBinaryClassifierWithSGD extends Component {
         |Binary classifier based on a logistic regression model with SGD.
       """.stripMargin,
     inputs = Map (
-      "Train" -> InputStreamMetadata(namedFeatures = Map("Label" -> FeatureType.BOOLEAN), listedFeatures = Map("Features" -> FeatureType.CONTINUOUS)),
-      "Predict" -> InputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.CONTINUOUS))
+      "Train" -> InputStreamMetadata(namedFeatures = Map("Label" -> FeatureType.BOOLEAN, "Features" -> FeatureType.VECTOR)),
+      "Predict" -> InputStreamMetadata(namedFeatures = Map("Features" -> FeatureType.VECTOR))
     ),outputs = Map (
       "Predictions" -> OutputStreamMetadata(from = Some("Predict"), namedFeatures = Map("Label" -> FeatureType.BOOLEAN))
     ), properties = Map (
@@ -34,21 +35,19 @@ class LogisticBinaryClassifierWithSGD extends Component {
     val iterations = context.properties("Iterations").as[Int]
     val miniBatchFraction = context.properties("Batch fraction").as[Double]
     val regularization = context.properties("Regularization").as[Double]
-    val initialWeights = Vectors.zeros(context.inputSize("Train", "Features"))
 
-    val model = new StreamingLogisticRegressionWithSGD()
+    val model = new SparklyStreamingLogisticRegressionWithSGD()
       .setStepSize(stepSize)
       .setNumIterations(iterations)
       .setMiniBatchFraction(miniBatchFraction)
       .setRegParam(regularization)
-      .setInitialWeights(initialWeights)
 
     var runningAccuracy = RunningAccuracy[Double]()
     val accuracyMonitoring = context.createMonitoring[Map[String, Double]]("Accuracy")
 
     val train = context.dstream("Train").map{ i =>
       val label = i.inputFeature("Label").asDouble
-      val features = Vectors.dense(i.inputFeatures("Features").asDoubleArray)
+      val features = i.inputFeature("Features").asVector.toSpark
       LabeledPoint(label, features)
     }.cache()
 
@@ -68,11 +67,26 @@ class LogisticBinaryClassifierWithSGD extends Component {
     // Predict
     val predictions = context
       .dstream("Predict", "Predictions").map{ i =>
-        val features = Vectors.dense(i.inputFeatures("Features").asDoubleArray)
+        val features = i.inputFeature("Features").asVector.toSpark
         val label = model.latestModel().predict(features) > 0.5
         i.outputFeature("Label", label)
       }
 
     Map("Predictions" -> predictions)
   }
+}
+
+class SparklyStreamingLogisticRegressionWithSGD extends StreamingLogisticRegressionWithSGD {
+
+  override def trainOn(data: DStream[LabeledPoint]): Unit = {
+    data.foreachRDD { (rdd, time) => if (!rdd.isEmpty) {
+        val initialWeights = model match {
+          case Some(m) => m.weights
+          case None => Vectors.zeros(rdd.first().features.size)
+        }
+        model = Some(algorithm.run(rdd, initialWeights))
+      }
+    }
+  }
+
 }

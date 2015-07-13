@@ -5,15 +5,13 @@ import sparkly.core._
 
 class SpamDatasetSpec extends ComponentSpec {
 
-  val features: List[String] = SpamDataset.labelName :: SpamDataset.featureNames
-
   "SpamDataset" should "stream spam data" in {
     val configuration = ComponentConfiguration(
       clazz = classOf[SpamDataset].getName,
       name = "SpamDataset",
-      outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = features.map(name => (name, name)).toMap)),
+      outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features"))),
       properties = Map(
-        "Throughput (instance/second)" -> "5000"
+        "Throughput (instance/second)" -> "6000"
       )
     )
 
@@ -22,7 +20,7 @@ class SpamDatasetSpec extends ComponentSpec {
     eventually {
       component.outputs("Instances").instances.size should be (4601)
       component.outputs("Instances").instances.foreach{ instance =>
-        instance.rawFeatures.keys should contain only (features: _*)
+        instance.rawFeatures.keys should contain only ("Label", "Features")
       }
     }
   }
@@ -31,9 +29,9 @@ class SpamDatasetSpec extends ComponentSpec {
     val configuration = ComponentConfiguration(
       clazz = classOf[SpamDataset].getName,
       name = "SpamDataset",
-      outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = features.map(name => (name, name)).toMap)),
+      outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features"))),
       properties = Map(
-        "Throughput (instance/second)" -> "10000",
+        "Throughput (instance/second)" -> "6000",
         "Loop" -> "True"
       )
     )
@@ -41,9 +39,9 @@ class SpamDatasetSpec extends ComponentSpec {
     val component = deployComponent(configuration)
 
     eventually {
-      component.outputs("Instances").instances.size should be > 8000
+      component.outputs("Instances").instances.size should be > 5000
       component.outputs("Instances").instances.foreach{ instance =>
-        instance.rawFeatures.keys should contain only (features: _*)
+        instance.rawFeatures.keys should contain only ("Label", "Features")
       }
     }
   }

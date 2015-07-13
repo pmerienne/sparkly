@@ -2,6 +2,7 @@ package sparkly.component.preprocess
 
 import sparkly.testing._
 import sparkly.core._
+import breeze.linalg.DenseVector
 
 class NormalizerSpec extends ComponentSpec {
 
@@ -11,22 +12,25 @@ class NormalizerSpec extends ComponentSpec {
       clazz = classOf[Normalizer].getName,
       name = "Normalizer",
       inputs = Map (
-        "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> List("f1", "f2", "f3")))
+        "Input" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features"))
+      ),
+      outputs = Map (
+        "Output" -> StreamConfiguration(mappedFeatures = Map("Normalized features" -> "Normalized features"))
       )
     )
 
     // When
     val component = deployComponent(configuration)
     component.inputs("Input").push (
-      Instance("f1" -> 0, "f2" -> 3, "f3" -> 4),
-      Instance("f1" -> 6, "f2" -> 0, "f3" -> 8)
+      Instance("Features" -> DenseVector(Array(0.0, 3.0, 4.0))),
+      Instance("Features" -> DenseVector(Array(6.0, 0.0, 8.0)))
     )
 
     // Then
     eventually {
       component.outputs("Output").features should contain only (
-        Map("f1" -> 0.0, "f2" -> 0.6, "f3" -> 0.8),
-        Map("f1" -> 0.6, "f2" -> 0.0, "f3" -> 0.8)
+        Map("Features" -> DenseVector(Array(0.0, 3.0, 4.0)), "Normalized features" -> DenseVector(Array(0.0, 0.6, 0.8))),
+        Map("Features" -> DenseVector(Array(6.0, 0.0, 8.0)), "Normalized features" -> DenseVector(Array(0.6, 0.0, 0.8)))
       )
     }
   }

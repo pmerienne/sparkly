@@ -3,6 +3,7 @@ package sparkly.component.clustering
 import sparkly.core._
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
+import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.mllib.clustering.StreamingKMeans
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
@@ -16,8 +17,8 @@ class KMeans extends Component {
         |Clustering based on MLlib's KMeansModel with a Kmeans ++ initialization.
       """.stripMargin,
     inputs = Map (
-      "Train" -> InputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.CONTINUOUS)),
-      "Predict" -> InputStreamMetadata(listedFeatures = Map("Features" -> FeatureType.CONTINUOUS))
+      "Train" -> InputStreamMetadata(namedFeatures = Map("Features" -> FeatureType.VECTOR)),
+      "Predict" -> InputStreamMetadata(namedFeatures = Map("Features" -> FeatureType.VECTOR))
     ),outputs = Map (
       "Predicted" -> OutputStreamMetadata(from = Some("Predict"), namedFeatures = Map("Cluster" -> FeatureType.INTEGER))
     ), properties = Map (
@@ -35,14 +36,14 @@ class KMeans extends Component {
       .setK(k)
       .setDecayFactor(decayFactor)
 
-    val train = context.dstream("Train").map(i => Vectors.dense(i.inputFeatures("Features").asDoubleArray)).cache()
+    val train = context.dstream("Train").map(i => i.inputFeature("Features").asVector.toSpark).cache()
 
     // Train
     model.trainOn(train)
 
     // Predict
     val predictions = context.dstream("Predict", "Predicted").map{ i =>
-      val features = Vectors.dense(i.inputFeatures("Features").asDoubleArray)
+      val features = i.inputFeature("Features").asVector.toSpark
       val cluster = model.latestModel().predict(features)
       i.outputFeature("Cluster", cluster)
     }

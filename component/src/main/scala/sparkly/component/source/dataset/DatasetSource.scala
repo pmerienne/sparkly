@@ -27,13 +27,35 @@ abstract class DatasetSource extends Component {
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
     val throughput = context.property("Throughput (instance/second)").as[Int]
     val loop = context.property("Loop").as[Boolean]
-    val stream: DStream[Instance] = context.ssc.receiverStream(new DatasetReceiver(file, features, throughput, loop))
+    val stream: DStream[Instance] = context.ssc.receiverStream(new DatasetReceiver(file, parse, throughput, loop))
     Map("Instances" -> stream)
   }
 
+  def parse(line: String): Instance = {
+    val raw = (features.map(_._1), line.split(",").toList).zipped
+    val values = convert(raw.toMap)
+    Instance(values)
+  }
+
+  private def convert(raw: Map[String, String]): Map[String, Any] = {
+    val featureTypes = features.toMap
+    raw.map{ case (name, str) =>
+      val value = featureTypes(name) match {
+        case FeatureType.CONTINUOUS | FeatureType.DOUBLE => str.toDouble
+        case FeatureType.INTEGER => str.toInt
+        case FeatureType.LONG => str.toLong
+        case FeatureType.BOOLEAN => str match {
+          case "true" | "1" => true
+          case "false" | "0" | "-1" => false
+        }
+        case _ => str
+      }
+      (name, value)
+    }
+  }
 }
 
-class DatasetReceiver(file: String, features: List[(String, FeatureType)], throughput: Int, loop: Boolean) extends Receiver[Instance](StorageLevel.MEMORY_ONLY) with Logging {
+class DatasetReceiver(file: String, parse: (String) => Instance, throughput: Int, loop: Boolean) extends Receiver[Instance](StorageLevel.MEMORY_ONLY) with Logging {
 
 
   def onStart() {
@@ -64,27 +86,7 @@ class DatasetReceiver(file: String, features: List[(String, FeatureType)], throu
     Source
       .fromInputStream(getClass.getResourceAsStream(file))
       .getLines()
-      .map{ line =>
-        val raw = (features.map(_._1), line.split(",").toList).zipped
-        val values = convert(raw.toMap)
-        Instance(values)
-      }
+      .map(line => parse(line))
   }
 
-  private def convert(raw: Map[String, String]): Map[String, Any] = {
-    val featureTypes = features.toMap
-    raw.map{ case (name, str) =>
-      val value = featureTypes(name) match {
-        case FeatureType.CONTINUOUS | FeatureType.DOUBLE => str.toDouble
-        case FeatureType.INTEGER => str.toInt
-        case FeatureType.LONG => str.toLong
-        case FeatureType.BOOLEAN => str match {
-          case "true" | "1" => true
-          case "false" | "0" | "-1" => false
-        }
-        case _ => str
-      }
-      (name, value)
-    }
-  }
 }

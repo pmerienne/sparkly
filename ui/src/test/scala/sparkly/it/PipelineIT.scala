@@ -9,7 +9,6 @@ import sparkly.core._
 
 import scala.reflect.io.Directory
 import sparkly.component.source.dataset.SpamDataset
-import sparkly.component.source.dataset.SpamDataset.{labelName, featureNames}
 import org.apache.spark.metrics.sink.MonitoringTestingData
 
 class PipelineIT extends FlatSpec with Matchers with Eventually {
@@ -29,24 +28,23 @@ class PipelineIT extends FlatSpec with Matchers with Eventually {
           clazz = classOf[SpamDataset].getName,
           properties = Map ("Throughput (instance/second)" -> "5000"),
           outputs = Map (
-            "Instances" -> StreamConfiguration(selectedFeatures = Map("Features" -> (labelName :: featureNames)))
+            "Instances" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features"))
           )
         ),
         ComponentConfiguration (
           id = "normalizer",
           name = "Normalizer",
           clazz = classOf[Normalizer].getName,
-          inputs = Map (
-            "Input" -> StreamConfiguration(selectedFeatures = Map("Features" -> featureNames))
-          )
+          inputs = Map ("Input" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features"))),
+          outputs = Map ("Output" -> StreamConfiguration(mappedFeatures = Map("Normalized features" -> "Normalized features")))
         ),
         ComponentConfiguration (
           id = "perceptron",
           name = "Learner",
           clazz = classOf[Perceptron].getName,
           inputs = Map (
-            "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> labelName), selectedFeatures = Map("Features" -> featureNames)),
-            "Predict" -> StreamConfiguration(selectedFeatures = Map("Features" -> featureNames))
+            "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Normalized features")),
+            "Predict" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Normalized features"))
           ),
           outputs = Map (
             "Predictions" -> StreamConfiguration(mappedFeatures = Map("Label" -> "prediction"))

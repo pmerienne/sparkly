@@ -31,6 +31,8 @@ class Join extends Component {
     val stream1 = context.dstream("Stream 1").map(instance => (instance.inputFeatures("Join features"), instance.inputFeatures("Non-join features")))
     val stream2 = context.dstream("Stream 2").map(instance => (instance.inputFeatures("Join features"), instance.inputFeatures("Non-join features")))
 
+    def emptyFeatureList(size: Int): FeatureList = FeatureList(List.fill(size)(Feature(None)))
+
     val joinedStream = joinType match {
       case "Inner join" => stream1.join(stream2, numPartitions = parallelism).map(data => (data._1, data._2._1, data._2._2))
       case "Left join" => stream1.leftOuterJoin(stream2, numPartitions = parallelism).map(data => (data._1, data._2._1, data._2._2.getOrElse(emptyFeatureList(rightFeatureSize))))
@@ -45,6 +47,4 @@ class Join extends Component {
 
     Map("Output" -> outputStream)
   }
-
-  private def emptyFeatureList(size: Int): FeatureList = FeatureList(List.fill(size)(Feature(None)))
 }

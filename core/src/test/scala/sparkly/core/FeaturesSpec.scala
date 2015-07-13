@@ -6,6 +6,7 @@ import org.scalameter.api._
 import org.scalatest._
 
 import scala.util.Random
+import breeze.linalg.DenseVector
 
 class FeaturesSpec extends FlatSpec with Matchers {
 
@@ -24,7 +25,6 @@ class FeaturesSpec extends FlatSpec with Matchers {
     val list = FeatureList(List( Feature("42"), Feature(43.43), Feature(44), Feature(45L), Feature(true)))
 
     list.asDoubleList should contain inOrderOnly (42.0, 43.43, 44.0, 45.0, 1.0)
-    list.asDoubleArray should contain inOrderOnly (42.0, 43.43, 44.0, 45.0, 1.0)
   }
 
   "String feature" should "should be converted to other types" in {
@@ -43,7 +43,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(42.42).asLong should be (42L)
     intercept[IllegalArgumentException] {Feature(42.42).asDate}
     Feature(42.42).asBoolean should be (true)
-    Feature(42.42).asDoubleArray should be (Array(42.42))
+    intercept[IllegalArgumentException] {Feature(42.42).asVector}
   }
 
   "Int feature" should "should be converted to other types" in {
@@ -53,7 +53,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(42).asLong should be (42L)
     Feature(0).asDate should be (new Date(0))
     Feature(42).asBoolean should be (true)
-    Feature(42).asDoubleArray should be (Array(42.0))
+    intercept[IllegalArgumentException] {Feature(42).asVector}
   }
 
   "Long feature" should "should be converted to other types" in {
@@ -65,7 +65,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(42L).asLong should be (42L)
     Feature(now.getTime).asDate should be (now)
     Feature(42L).asBoolean should be (true)
-    Feature(42L).asDoubleArray should be (Array(42.0))
+    intercept[IllegalArgumentException] {Feature(42L).asVector}
   }
 
   "Date feature" should "should be converted to other types" in {
@@ -77,6 +77,7 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(beginningOfTime).asLong should be (0L)
     Feature(beginningOfTime).asDate should be (beginningOfTime)
     intercept[IllegalArgumentException] {Feature(beginningOfTime).asBoolean}
+    intercept[IllegalArgumentException] {Feature(beginningOfTime).asVector}
   }
 
   "Boolean feature" should "should be converted to other types" in {
@@ -86,15 +87,19 @@ class FeaturesSpec extends FlatSpec with Matchers {
     Feature(true).asLong should be (1L)
     Feature(true).asBoolean should be (true)
     intercept[IllegalArgumentException] {Feature(true).asDate}
+    intercept[IllegalArgumentException] {Feature(true).asVector}
   }
 
   "Vector feature" should "should not be converted to other types" in {
-    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asString}
-    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asDouble}
-    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asInt}
-    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asLong}
-    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asBoolean}
-    intercept[IllegalArgumentException] {Feature(Array.fill(4)(0.0)).asDate}
+    val vector = DenseVector(Array.fill(4)(0.0))
+    val feature = Feature(vector)
+    intercept[IllegalArgumentException] {feature.asString}
+    intercept[IllegalArgumentException] {feature.asDouble}
+    intercept[IllegalArgumentException] {feature.asInt}
+    intercept[IllegalArgumentException] {feature.asLong}
+    intercept[IllegalArgumentException] {feature.asBoolean}
+    intercept[IllegalArgumentException] {feature.asDate}
+    feature.asVector should be (vector)
   }
 }
 
@@ -135,6 +140,7 @@ object FeatureBench extends PerformanceTest.Quickbenchmark {
       }
     }
 
+    /*
     // measurements: 0.180018, 0.163212, 0.159869, 0.179342, 0.176651, 0.169216, 0.162564, 0.165148, 0.167879, 0.16181, 0.165431, 0.171603, 0.166883, 0.162235, 0.164847, 0.163242, 0.170135, 0.167671, 0.170806, 0.175881, 0.158467, 0.156768, 0.158827, 0.168882, 0.207305, 0.169775, 0.167177, 0.164204, 0.167666, 0.164733, 0.162241, 0.163021, 0.160916, 0.165994, 0.171687, 0.213967
     measure method "asDoubleArray with 1 array" in {
       using(doubleArrayGen) in { data =>
@@ -155,5 +161,6 @@ object FeatureBench extends PerformanceTest.Quickbenchmark {
         data.asDoubleArray
       }
     }
+    */
   }
 }

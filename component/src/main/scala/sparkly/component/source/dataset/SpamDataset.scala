@@ -3,6 +3,7 @@ package sparkly.component.source.dataset
 import sparkly.core.FeatureType._
 import sparkly.core.Instance
 import scala.io.Source
+import breeze.linalg.DenseVector
 
 class SpamDataset extends DatasetSource {
 
@@ -18,18 +19,21 @@ class SpamDataset extends DatasetSource {
   )
 
   def file: String = SpamDataset.file
-  def features: List[(String, FeatureType)] = (SpamDataset.labelName -> BOOLEAN) :: SpamDataset.featureNames.map(name => (name, DOUBLE))
+  def features: List[(String, FeatureType)] = List("Label" -> BOOLEAN, "Features" -> VECTOR)
 
+  override def parse(line: String): Instance = SpamDataset.parse(line)
 }
 
 object SpamDataset {
   val file: String = "/dataset/spam.csv"
-  val labelName = "Label"
-  val featureNames = List.range(1, 56).map(index => (s"f${index}"))
-  val labelAndFeatures = labelName :: featureNames
 
-  def iterator(): Iterator[Instance] = Source.fromInputStream(getClass.getResourceAsStream(file)).getLines().map{ line =>
-    val values = (labelAndFeatures, line.split(",").map(_.toDouble)).zipped.toMap
-    Instance(values)
+  def iterator(): Iterator[Instance] = Source.fromInputStream(getClass.getResourceAsStream(file)).getLines().map(line => parse(line))
+
+  def parse(line: String): Instance = {
+    val (head :: tail) = line.split(",").toList
+    val label = head == "1"
+    val features = DenseVector[Double](tail.map(_.toDouble).toArray)
+
+    Instance(Map("Label" -> label, "Features" -> features))
   }
 }
