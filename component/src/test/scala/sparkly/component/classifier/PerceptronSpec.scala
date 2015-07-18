@@ -3,7 +3,6 @@ package sparkly.component.classifier
 import sparkly.testing._
 import sparkly.core._
 
-import scala.io.Source
 import sparkly.component.source.dataset.SpamDataset
 
 class PerceptronSpec extends ComponentSpec {

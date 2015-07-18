@@ -10,8 +10,9 @@ class IrisDatasetSpec extends ComponentSpec {
       clazz = classOf[IrisDataset].getName,
       name = "IrisDataset",
       outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = IrisDataset.featureNames.map(name => (name, name)).toMap)),
-      properties = Map(
-        "Throughput (instance/second)" -> "5000"
+      properties = Map (
+        "Throughput (instance/second)" -> "5000",
+        "Loop" -> "false"
       )
     )
 

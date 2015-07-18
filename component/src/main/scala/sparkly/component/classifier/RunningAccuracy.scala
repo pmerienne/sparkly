@@ -1,4 +1,4 @@
-package sparkly.component.common
+package sparkly.component.classifier
 
 import org.apache.spark.rdd.RDD
 import scala.reflect.ClassTag
@@ -11,7 +11,7 @@ case class RunningAccuracy[T : ClassTag](successCount: Long = 0, total: Long = 0
   }
 
   def update(actual: RDD[T], expected: RDD[T]): RunningAccuracy[T] = {
-    expected.zip(actual)
+    this + expected.zip(actual)
       .map{case (e, a) =>  if(e == a) RunningAccuracy[T](1, 1) else RunningAccuracy[T](0, 1)}
       .reduce(_ + _)
   }

@@ -10,8 +10,9 @@ class SpamDatasetSpec extends ComponentSpec {
       clazz = classOf[SpamDataset].getName,
       name = "SpamDataset",
       outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features"))),
-      properties = Map(
-        "Throughput (instance/second)" -> "6000"
+      properties = Map (
+        "Throughput (instance/second)" -> "6000",
+        "Loop" -> "false"
       )
     )
 

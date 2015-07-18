@@ -20,7 +20,7 @@ abstract class DatasetSource extends Component {
     outputs = Map("Instances" -> OutputStreamMetadata(namedFeatures = features.toMap)),
     properties = Map(
       "Throughput (instance/second)" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(1000)),
-      "Loop" -> PropertyMetadata(PropertyType.BOOLEAN, defaultValue = Some(false))
+      "Loop" -> PropertyMetadata(PropertyType.BOOLEAN, defaultValue = Some(true))
     )
   )
 

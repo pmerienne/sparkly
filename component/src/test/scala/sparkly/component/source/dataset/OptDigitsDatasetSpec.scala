@@ -12,7 +12,8 @@ class OptDigitsDatasetSpec extends ComponentSpec {
       name = "OptDigitsDataset",
       outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features"))),
       properties = Map(
-        "Throughput (instance/second)" -> "5000"
+        "Throughput (instance/second)" -> "5000",
+        "Loop" -> "false"
       )
     )
 

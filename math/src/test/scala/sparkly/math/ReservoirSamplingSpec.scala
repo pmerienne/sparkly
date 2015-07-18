@@ -11,7 +11,7 @@ class ReservoirSamplingSpec extends FlatSpec with Matchers {
     // Given
     val data1 = List.fill(10000)(Random.nextGaussian())
     val data2 = List.fill(10000)(Random.nextGaussian())
-    val reservoir = ReservoirSampling[Double](100)
+    val reservoir = ReservoirSampling[Double](1000)
 
     // When
     val samples = reservoir.addAll(data1).addAll(data2).samples
@@ -26,8 +26,8 @@ class ReservoirSamplingSpec extends FlatSpec with Matchers {
     // Given
     val data1 = List.fill(7000)(Random.nextGaussian())
     val data2 = List.fill(3000)(Random.nextGaussian())
-    val reservoir1 = ReservoirSampling[Double](100, data1)
-    val reservoir2 = ReservoirSampling[Double](100, data2)
+    val reservoir1 = ReservoirSampling[Double](1000, data1)
+    val reservoir2 = ReservoirSampling[Double](1000, data2)
 
     // When
     val samples = (reservoir1 + reservoir2).samples

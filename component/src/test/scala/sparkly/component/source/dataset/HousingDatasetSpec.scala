@@ -11,7 +11,8 @@ class HousingDatasetSpec extends ComponentSpec {
       name = "HousingDataset",
       outputs = Map("Instances" -> StreamConfiguration(mappedFeatures = HousingDataset.featureNames.map(name => (name, name)).toMap)),
       properties = Map(
-        "Throughput (instance/second)" -> "5000"
+        "Throughput (instance/second)" -> "5000",
+        "Loop" -> "false"
       )
     )
 

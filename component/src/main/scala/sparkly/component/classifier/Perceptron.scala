@@ -3,7 +3,6 @@ package sparkly.component.classifier
 import scala.Some
 
 import sparkly.core._
-import sparkly.component.common.RunningAccuracy
 import breeze.linalg._
 
 import org.apache.spark.streaming.dstream.DStream
