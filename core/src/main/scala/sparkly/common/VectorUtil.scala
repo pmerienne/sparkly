@@ -9,5 +9,11 @@ object VectorUtil {
 
   implicit class BreezeVectorPublications(val breezeVector : breeze.linalg.Vector[Double]) extends AnyVal {
     def toSpark : Vector = Vectors.fromBreeze(breezeVector)
+
+    def toDenseSpark : Vector = breezeVector match {
+      case v: breeze.linalg.DenseVector[Double] => v.toSpark
+      case _ => breezeVector.toDenseVector.toSpark
+    }
+
   }
 }

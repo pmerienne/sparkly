@@ -1,8 +1,7 @@
 package sparkly.core
 
 import java.util.Date
-import breeze.linalg.DenseVector
-import org.apache.spark.mllib.linalg.{VectorUtil, Vector}
+import breeze.linalg.{DenseVector, Vector}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.util.Try
@@ -32,7 +31,7 @@ case class FeatureList(values: List[Feature[_]] = List()) {
   def asDoubleList(default: => Double) = values.map(_.asDoubleOr(default))
 
   def asVectorList = values.map(_.asVector)
-  def asVectorList(default: => DenseVector[Double]) = values.map(_.asVectorOr(default))
+  def asVectorList(default: => Vector[Double]) = values.map(_.asVectorOr(default))
 
   def toDenseVector(default: => Double) = {
     val result = new Array[Double](values.size)
@@ -50,7 +49,7 @@ object Feature {
     case Some(l: Long) => new LongFeature(Some(l))
     case Some(d: Date) => new DateFeature(Some(d))
     case Some(b: Boolean) => new BooleanFeature(Some(b))
-    case Some(v: DenseVector[Double]) => new VectorFeature(Some(v))
+    case Some(v: Vector[Double]) => new VectorFeature(Some(v))
     case Some(null) => new EmptyFeature()
     case None => new EmptyFeature()
     case _ => ???
@@ -64,7 +63,7 @@ object Feature {
       case v: Long => new LongFeature(Option(v))
       case v: Date => new DateFeature(Option(v))
       case v: Boolean => new BooleanFeature(Option(v))
-      case v: DenseVector[Double] => new VectorFeature(Option(v))
+      case v: Vector[Double] => new VectorFeature(Option(v))
       case _ => throw new IllegalArgumentException(s"Unsupported feature type ${value.getClass}")
     }
   } else {
@@ -89,7 +88,7 @@ abstract class Feature[T](val value: Option[T]) extends Serializable {
   def asLong: Long
   def asDate: Date
   def asBoolean: Boolean
-  def asVector: DenseVector[Double]
+  def asVector: Vector[Double]
 
   def asStringOr(default: => String): String = if (isEmpty) default else Try(asString).getOrElse(default)
   def asDoubleOr(default: => Double): Double = if (isEmpty) default else Try(asDouble).getOrElse(default)
@@ -97,7 +96,7 @@ abstract class Feature[T](val value: Option[T]) extends Serializable {
   def asLongOr(default: => Long): Long = if (isEmpty) default else Try(asLong).getOrElse(default)
   def asDateOr(default: => Date): Date = if (isEmpty) default else Try(asDate).getOrElse(default)
   def asBooleanOr(default: => Boolean): Boolean = if (isEmpty) default else Try(asBoolean).getOrElse(default)
-  def asVectorOr(default: => DenseVector[Double]): DenseVector[Double] = if (isEmpty) default else Try(asVector).getOrElse(default)
+  def asVectorOr(default: => Vector[Double]): Vector[Double] = if (isEmpty) default else Try(asVector).getOrElse(default)
 
 
   override def equals(o: Any) = o match {
@@ -121,7 +120,7 @@ class StringFeature(value: Option[String]) extends Feature[String](value) {
     case "true" | "1" => true
     case "false" | "0" | "-1" => false
   }
-  def asVector: DenseVector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asVector: Vector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
 
 }
 
@@ -134,7 +133,7 @@ class DoubleFeature(value: Option[Double]) extends Feature[Double](value) {
   def asLong: Long = value.get.toLong
   def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
   def asBoolean: Boolean = value.get > 0.0
-  def asVector: DenseVector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asVector: Vector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
 
 }
 
@@ -146,7 +145,7 @@ class IntFeature(value: Option[Int]) extends Feature[Int](value) {
   def asLong: Long = value.get.toLong
   def asDate: Date = new Date(value.get.toLong)
   def asBoolean: Boolean = value.get > 0
-  def asVector: DenseVector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asVector: Vector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
 
 }
 
@@ -158,7 +157,7 @@ class LongFeature(value: Option[Long]) extends Feature[Long](value) {
   def asLong: Long = value.get
   def asDate: Date = new Date(value.get)
   def asBoolean: Boolean = value.get > 0L
-  def asVector: DenseVector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asVector: Vector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
 
 }
 
@@ -170,7 +169,7 @@ class DateFeature(value: Option[Date]) extends Feature[Date](value) {
   def asLong: Long = value.get.getTime
   def asDate: Date = value.get
   def asBoolean: Boolean = throw new IllegalArgumentException("Unsupported feature conversion")
-  def asVector: DenseVector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asVector: Vector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
 
 }
 
@@ -182,11 +181,11 @@ class BooleanFeature(value: Option[Boolean]) extends Feature[Boolean](value) {
   def asLong: Long = if(value.get) 1L else 0L
   def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
   def asBoolean: Boolean = value.get
-  def asVector: DenseVector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
+  def asVector: Vector[Double] = throw new IllegalArgumentException("Unsupported feature conversion")
 
 }
 
-class VectorFeature(value: Option[DenseVector[Double]]) extends Feature[DenseVector[Double]](value) {
+class VectorFeature(value: Option[Vector[Double]]) extends Feature[Vector[Double]](value) {
 
   def asString: String = throw new IllegalArgumentException("Unsupported feature conversion")
   def asDouble: Double = throw new IllegalArgumentException("Unsupported feature conversion")
@@ -194,7 +193,7 @@ class VectorFeature(value: Option[DenseVector[Double]]) extends Feature[DenseVec
   def asLong: Long = throw new IllegalArgumentException("Unsupported feature conversion")
   def asDate: Date = throw new IllegalArgumentException("Unsupported feature conversion")
   def asBoolean: Boolean = throw new IllegalArgumentException("Unsupported feature conversion")
-  def asVector: DenseVector[Double] = value.get
+  def asVector: Vector[Double] = value.get
 }
 
 class EmptyFeature extends Feature[Any](None) {
@@ -205,6 +204,6 @@ class EmptyFeature extends Feature[Any](None) {
   def asLong: Long = null.asInstanceOf[Long]
   def asDate: Date = null.asInstanceOf[Date]
   def asBoolean: Boolean = null.asInstanceOf[Boolean]
-  def asVector: DenseVector[Double] = null.asInstanceOf[DenseVector[Double]]
+  def asVector: Vector[Double] = null.asInstanceOf[Vector[Double]]
 
 }

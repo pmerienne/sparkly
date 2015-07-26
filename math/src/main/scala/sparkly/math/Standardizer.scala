@@ -8,7 +8,7 @@ object Standardizer {
     Standardizer(size, 0, DenseVector.fill(size, 0.0), DenseVector.fill(size, 0.0))
   }
 
-  def apply(size: Int, data: Iterator[DenseVector[Double]]): Standardizer = {
+  def apply(size: Int, data: Iterator[Vector[Double]]): Standardizer = {
     var standardizer = Standardizer(size, 0, DenseVector.fill(size, 0.0), DenseVector.fill(size, 0.0))
     data.foreach { vector =>
       standardizer = standardizer.update(vector)
@@ -19,8 +19,8 @@ object Standardizer {
 
 case class Standardizer(size: Int, n: Long, mu: DenseVector[Double], mu2: DenseVector[Double]) {
 
-  def standardize(value: DenseVector[Double]): DenseVector[Double] = (value - mu) / stddev
-  def inverse(standardized: DenseVector[Double]): DenseVector[Double] = (standardized :* stddev) + mu
+  def standardize(value: Vector[Double]): Vector[Double] = (value - mu) / stddev
+  def inverse(standardized: Vector[Double]): Vector[Double] = (standardized :* stddev) + mu
 
   def stddev(): DenseVector[Double] = {
     if (n == 0) {
@@ -30,7 +30,7 @@ case class Standardizer(size: Int, n: Long, mu: DenseVector[Double], mu2: DenseV
     }
   }
 
-  def update(values: DenseVector[Double]): Standardizer = {
+  def update(values: Vector[Double]): Standardizer = {
     val newN = this.n + 1
     val newDelta = values - this.mu
     val newMu = this.mu + (newDelta :/ newN.toDouble)

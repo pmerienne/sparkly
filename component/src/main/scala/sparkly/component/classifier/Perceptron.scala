@@ -58,9 +58,9 @@ class Perceptron extends Component {
   }
 }
 
-case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double, accuracy: RunningAccuracy[Boolean], weights: DenseVector[Double] = null) {
+case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double, accuracy: RunningAccuracy[Boolean], weights: Vector[Double] = null) {
 
-  def update(rdd: RDD[(Boolean, DenseVector[Double])]): PerceptronModel = if(rdd.isEmpty) this else {
+  def update(rdd: RDD[(Boolean, Vector[Double])]): PerceptronModel = if(rdd.isEmpty) this else {
     var model = if(weights == null) this.init(rdd.first()._2) else this
     rdd.collect().foreach{ case (label, features) =>
       model = model.update(label, features)
@@ -68,12 +68,12 @@ case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double
     model
   }
 
-  def predict(features: DenseVector[Double]): Boolean = {
+  def predict(features: Vector[Double]): Boolean = {
     val w = if(weights == null) initialWeights(features) else weights
     features.t * w + bias > 0
   }
 
-  private def update(label: Boolean, features: DenseVector[Double]): PerceptronModel = {
+  private def update(label: Boolean, features: Vector[Double]): PerceptronModel = {
     val prediction = predict(features)
     val newWeights = if( prediction != label) {
       val correction = learningRate * (if (label) 1.0 else -1.0)
@@ -86,11 +86,11 @@ case class PerceptronModel(bias: Double, threshold: Double, learningRate: Double
     this.copy(weights = newWeights, accuracy = newAccuracy)
   }
 
-  private def init(features: DenseVector[Double]): PerceptronModel = {
+  private def init(features: Vector[Double]): PerceptronModel = {
     this.copy(weights = initialWeights(features))
   }
 
-  private def initialWeights(features: DenseVector[Double]): DenseVector[Double] = {
+  private def initialWeights(features: Vector[Double]): Vector[Double] = {
     val featureCount = features.length
     DenseVector.rand[Double](featureCount) .* (1.0 / featureCount)
   }
