@@ -18,7 +18,7 @@ class VectorExtractor extends Component {
 
     val out = context.dstream("Input", "Output").map { instance =>
       val vector = instance.inputFeature("Vector").asVector
-      val data = vector.slice(0, size).toArray
+      val data = vector.toArray.slice(0, size)
       instance.outputFeatures("Features", data)
     }
 

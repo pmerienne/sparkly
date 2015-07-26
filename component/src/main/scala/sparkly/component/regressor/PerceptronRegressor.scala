@@ -63,7 +63,7 @@ object PerceptronRegressorModel {
 
 case class PerceptronRegressorModel(bias: Double, learningRate: Double, weights: DenseVector[Double], rmse: RunningRmsd) {
 
-  def update(rdd: RDD[(Double, DenseVector[Double])]): PerceptronRegressorModel = if(rdd.isEmpty) this else {
+  def update(rdd: RDD[(Double, Vector[Double])]): PerceptronRegressorModel = if(rdd.isEmpty) this else {
     var model = if(weights == null) this.init(rdd.first()._2) else this
     rdd.collect().foreach{ case (label, features) =>
       model = model.update(label, features)
@@ -71,12 +71,12 @@ case class PerceptronRegressorModel(bias: Double, learningRate: Double, weights:
     model
   }
 
-  def predict(features: DenseVector[Double]): Double = {
+  def predict(features: Vector[Double]): Double = {
     val w = if(weights == null) initialWeights(features) else weights
     features.t * w + bias
   }
 
-  private def update(label: Double, features: DenseVector[Double]): PerceptronRegressorModel = {
+  private def update(label: Double, features: Vector[Double]): PerceptronRegressorModel = {
     val prediction = predict(features)
     val error = label - prediction
     val newWeights = weights + (features :* (learningRate * error))
@@ -85,11 +85,11 @@ case class PerceptronRegressorModel(bias: Double, learningRate: Double, weights:
     this.copy(weights = newWeights, rmse = newRmse)
   }
 
-  private def init(features: DenseVector[Double]): PerceptronRegressorModel = {
+  private def init(features: Vector[Double]): PerceptronRegressorModel = {
     this.copy(weights = initialWeights(features))
   }
 
-  private def initialWeights(features: DenseVector[Double]): DenseVector[Double] = {
+  private def initialWeights(features: Vector[Double]): DenseVector[Double] = {
     val featureCount = features.length
     DenseVector.rand[Double](featureCount, rand = Rand.gaussian) .* (1.0 / featureCount)
   }

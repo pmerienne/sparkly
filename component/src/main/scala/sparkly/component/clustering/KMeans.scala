@@ -36,7 +36,7 @@ class KMeans extends Component {
       .setK(k)
       .setDecayFactor(decayFactor)
 
-    val train = context.dstream("Train").map(i => i.inputFeature("Features").asVector.toSpark).cache()
+    val train = context.dstream("Train").map(i => i.inputFeature("Features").asVector.toDenseSpark).cache()
 
     // Train
     model.trainOn(train)
