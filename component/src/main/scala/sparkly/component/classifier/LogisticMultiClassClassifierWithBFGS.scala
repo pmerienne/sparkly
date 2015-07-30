@@ -24,8 +24,8 @@ class LogisticMultiClassClassifierWithBFGS extends Component {
       "Classes" -> PropertyMetadata(PropertyType.INTEGER, description = "Number of corrections used in the LBFGS update. 3 < numCorrections < 10 is recommended."),
       "Corrections" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(10), description = "Number of corrections used in the LBFGS update. 3 < numCorrections < 10 is recommended."),
       "Convergence tolerance" -> PropertyMetadata(PropertyType.DECIMAL, defaultValue = Some(1E-3), description = "Convergence tolerance of iterations for L-BFGS. Smaller value will lead to higher accuracy with the cost of more iterations."),
-      "Iterations" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(10), description = "Number of iterations of gradient descent to run per batch"),
-      "Regularization" -> PropertyMetadata(PropertyType.DECIMAL, defaultValue = Some(0.0), description = "Regularization parameter")
+      "Iterations" -> PropertyMetadata(PropertyType.INTEGER, defaultValue = Some(20), description = "Number of iterations of gradient descent to run per batch"),
+      "Regularization" -> PropertyMetadata(PropertyType.DECIMAL, defaultValue = Some(0.1), description = "Regularization parameter")
     ),
     monitorings = Map("Accuracy" -> MonitoringMetadata(ChartType.LINES, values = List("Accuracy"), primaryValues = List("Accuracy"), unit = "%"))
   )

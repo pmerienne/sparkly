@@ -10,8 +10,10 @@ class ReutersDataset extends DatasetSource {
     name = "Reuters", category = "Dataset", description =
       """
         |This is a sample of the most widely used test collection for text categorization.
-        | The data was originally collected and labeled by Carnegie Group, Inc. and Reuters, Ltd. in the course of developing the CONSTRUE text categorization system.
+        |The data set contains 9 classes of different size.
+        |The data was originally collected and labeled by Carnegie Group, Inc. and Reuters, Ltd. in the course of developing the CONSTRUE text categorization system.
         |
+        |The data set can be used for text mining tasks.
         |For more information, see http://www.daviddlewis.com/resources/testcollections/reuters21578/readme.txt
       """.stripMargin
   )
