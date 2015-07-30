@@ -30,8 +30,8 @@ object OptDigitsDataset {
   def iterator(): Iterator[Instance] = Source.fromInputStream(getClass.getResourceAsStream(file)).getLines().map(line => parse(line))
 
   def parse(line: String): Instance = {
-    val values = line.split(",").map(_.toInt)
-    val label = values(64)
+    val values = line.split(",").map(_.toDouble)
+    val label = values(64).toInt
     val features = DenseVector(values.slice(0, 64))
 
     Instance(Map("Label" -> label, "Features" -> features))
