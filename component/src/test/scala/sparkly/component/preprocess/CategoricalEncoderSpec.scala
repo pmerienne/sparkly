@@ -41,7 +41,7 @@ class CategoricalEncoderSpec extends ComponentSpec {
     }
   }
 
-  "CategoricalEncoder" should "add 0 filled array when there's too much categories feature into double " in {
+  "CategoricalEncoder" should "add 0 filled array when there's too much categories feature" in {
     // Given
     val configuration = ComponentConfiguration(
       clazz = classOf[CategoricalEncoder].getName,
