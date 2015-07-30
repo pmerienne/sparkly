@@ -6,13 +6,13 @@ import sparkly.core._
 import scala.io.Source
 import sparkly.component.source.dataset.SpamDataset
 
-class LogisticBinaryClassifierWithSGDSpec extends ComponentSpec {
+class LogisticBinaryClassifierWithBFGSSpec extends ComponentSpec {
 
-  "LogisticBinaryClassifierWithSGD" should "train on spam data" in {
+  "LogisticBinaryClassifierWithBFGS" should "train on spam data" in {
     // Given
     val configuration = ComponentConfiguration (
-      name = "LogisticBinaryClassifierWithSGD",
-      clazz = classOf[LogisticBinaryClassifierWithSGD].getName,
+      name = "LogisticBinaryClassifierWithBFGS",
+      clazz = classOf[LogisticBinaryClassifierWithBFGS].getName,
       inputs = Map(
         "Train" -> StreamConfiguration(mappedFeatures = Map("Label" -> "Label", "Features" -> "Features")),
         "Predict" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features"))

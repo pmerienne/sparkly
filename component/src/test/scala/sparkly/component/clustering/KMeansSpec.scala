@@ -1,10 +1,8 @@
-package sparkly.component.classifier
+package sparkly.component.clustering
 
-import sparkly.testing._
-import sparkly.core._
-import sparkly.component.clustering.KMeans
 import sparkly.component.source.dataset.SeedsDataset
-import scala.io.Source
+import sparkly.core._
+import sparkly.testing._
 
 class KMeansSpec extends ComponentSpec {
 
