@@ -5,32 +5,32 @@ import breeze.numerics._
 
 object Standardizer {
   def apply(size: Int): Standardizer = {
-    Standardizer(size, 0, DenseVector.fill(size, 0.0), DenseVector.fill(size, 0.0))
+    Standardizer(size, 0, DenseVector.zeros[Double](size), DenseVector.zeros[Double](size))
   }
 
   def apply(size: Int, data: Iterator[Vector[Double]]): Standardizer = {
-    var standardizer = Standardizer(size, 0, DenseVector.fill(size, 0.0), DenseVector.fill(size, 0.0))
+    var standardizer = Standardizer(size, 0, DenseVector.zeros[Double](size), DenseVector.zeros[Double](size))
     data.foreach { vector =>
-      standardizer = standardizer.update(vector)
+      standardizer = standardizer.add(vector)
     }
     standardizer
   }
 }
 
-case class Standardizer(size: Int, n: Long, mu: DenseVector[Double], mu2: DenseVector[Double]) {
+case class Standardizer(size: Int, n: Long, mu: Vector[Double], mu2: Vector[Double]) {
 
   def standardize(value: Vector[Double]): Vector[Double] = (value - mu) / stddev
   def inverse(standardized: Vector[Double]): Vector[Double] = (standardized :* stddev) + mu
 
-  def stddev(): DenseVector[Double] = {
+  lazy val stddev: Vector[Double] = {
     if (n == 0) {
       DenseVector.fill(size, Double.PositiveInfinity)
     } else {
-      sqrt(mu2 :/ n.toDouble)
+      sqrt(mu2.toDenseVector :/ n.toDouble).map(v => if(v == 0.0) Double.PositiveInfinity else v)
     }
   }
 
-  def update(values: Vector[Double]): Standardizer = {
+  def add(values: Vector[Double]): Standardizer = {
     val newN = this.n + 1
     val newDelta = values - this.mu
     val newMu = this.mu + (newDelta :/ newN.toDouble)
@@ -57,4 +57,5 @@ case class Standardizer(size: Int, n: Long, mu: DenseVector[Double], mu2: DenseV
       Standardizer(this.size, n, mu, mu2)
     }
   }
+
 }

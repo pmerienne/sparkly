@@ -60,7 +60,7 @@ case class TextTokenizer(language: String = "", minNGram: Int = 1, maxNGram: Int
   }
 
   private def createTokenStream(content: String): TokenStream = {
-    val text = if (ignorePattern.isEmpty) content else content.replaceAll(ignorePattern, "")
+    val text = if (ignorePattern == null || ignorePattern.isEmpty) content else content.replaceAll(ignorePattern, "")
     val analyzer = analyzers.create(language)
 
     val tokenStream = analyzer.tokenStream("", text)

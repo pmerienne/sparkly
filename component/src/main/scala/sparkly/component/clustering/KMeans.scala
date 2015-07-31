@@ -2,7 +2,7 @@ package sparkly.component.clustering
 
 import sparkly.core._
 import org.apache.spark.streaming.dstream.DStream
-import org.apache.spark.mllib.linalg.{Vector, Vectors}
+import org.apache.spark.mllib.linalg._
 import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.mllib.clustering.StreamingKMeans
 import scala.util.Random
