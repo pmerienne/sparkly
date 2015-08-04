@@ -1,10 +1,13 @@
 package sparkly.component.preprocess
 
+import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.streaming.dstream.DStream
+import scala.util.Try
+import scala.Some
 import sparkly.core.FeatureType.VECTOR
 import sparkly.core._
 import sparkly.math._
-import scala.util.Try
+import sparkly.core.PropertyType._
 
 class StandardScaler extends Component {
 
@@ -13,18 +16,23 @@ class StandardScaler extends Component {
     description = "Standardize continuous features by removing the mean and scaling to unit variance",
     inputs = Map (
       "Input" -> InputStreamMetadata(namedFeatures = Map("Features" -> VECTOR))
-    ),
-    outputs = Map (
+    ), outputs = Map (
       "Output" -> OutputStreamMetadata(from = Some("Input"), namedFeatures = Map("Standardized features" -> VECTOR))
+    ), properties = Map (
+      "Parallelism" -> PropertyMetadata(INTEGER, defaultValue = Some(-1), description = "Level of parallelism to use. -1 to avoid repartitioning.")
     )
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
+    val partitions = context.property("Parallelism").as[Int]
+    val stream = if(partitions < 1) context.dstream("Input", "Output") else context.dstream("Input", "Output").repartition(partitions)
+
     var size: Int = -1
     var standardizer: Standardizer = null
 
-    val features = context.dstream("Input", "Output").map(i => i.inputFeature("Features").asVector)
+    val features = stream.map(i => i.inputFeature("Features").asVector)
 
+    // Init if needed
     features.foreachRDD{ rdd => if(standardizer == null && !rdd.isEmpty) {
       size = rdd.first().length
       standardizer = Standardizer(size)
@@ -39,8 +47,8 @@ class StandardScaler extends Component {
         }
       }
 
-    val out = context.dstream("Input", "Output").map{ instance =>
-      val features = standardizer.standardize(instance.inputFeature("Features").asVector)
+    val out = stream.map{ instance =>
+      val features = standardizer.standardize(instance.inputFeature("Features").asVector.toDenseBreeze)
       instance.outputFeature("Standardized features", features)
     }
 

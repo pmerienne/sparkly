@@ -4,7 +4,6 @@ import breeze.linalg._
 import breeze.numerics._
 
 import scala.collection.mutable
-import sparkly.component.common.Cache
 
 object TfIdfModel {
   def apply(vocabularySize: Int): TfIdfModel = {
@@ -18,11 +17,11 @@ object TfIdfModel {
 
 case class TfIdfModel(vocabularySize: Int, minDocFreq: Double, documentCount: Double, inverseFrequencies: SparseVector[Double]) {
 
-  val idf = new Cache[SparseVector[Double]](() => {
+  lazy val idf = {
     val raw = inverseFrequencies :/ documentCount
     val cleaned = if(minDocFreq > 0.0) raw.mapActiveValues(f => if(f < minDocFreq) 1.0 else f) else raw
     log(cleaned)
-  })
+  }
 
   def add(terms: List[String]): TfIdfModel = {
     val termsCount = mutable.HashMap.empty[Int, Double]
@@ -41,7 +40,7 @@ case class TfIdfModel(vocabularySize: Int, minDocFreq: Double, documentCount: Do
   }
 
   def tfIdf(terms: List[String]): SparseVector[Double] = {
-    tf(terms) :* idf.get()
+    tf(terms) :* idf
   }
 
   def tf(terms: List[String]): SparseVector[Double] = {

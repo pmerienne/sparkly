@@ -17,7 +17,6 @@ class StandardizerSpec extends FlatSpec with Matchers {
       DenseVector(data)
     }
 
-
     // When
     val standardizer = Standardizer(features, originalValues.iterator)
 
@@ -31,6 +30,27 @@ class StandardizerSpec extends FlatSpec with Matchers {
       (values.sum / values.size) should be (0.0 +- 0.1)
       mean(values) should be (0.0 +- 0.1)
       stddev(values) should be (1.0 +- 0.1)
+    }
+  }
+
+  "Standardizer" should "support zeros" in {
+    // Given
+    val size = 1000
+    val features = 5
+
+    val originalValues = (1 to size).map{i => DenseVector.fill(features, 0.0)}
+
+
+    // When
+    val standardizer = Standardizer(features, originalValues.iterator)
+
+    val standardizedValues = originalValues.map{ vector =>
+      standardizer.standardize(vector)
+    }
+
+    // Then
+    standardizedValues.foreach{ values =>
+      values should be (DenseVector.fill(features, 0.0))
     }
   }
 
@@ -73,26 +93,26 @@ class StandardizerSpec extends FlatSpec with Matchers {
 object StandardizerBench extends PerformanceTest.Quickbenchmark {
 
   val features = 10
-  val size = 10000
+  val size = 1000
   val partitions = 10
 
   val dataGen = Gen.single("data")(List.fill(size)(DenseVector.rand[Double](features)))
-  val standardizerGen = Gen.single("standarizer")(List.fill(partitions){
+  val standardizersGen = Gen.single("standarizers")(List.fill(partitions){
     val data = List.fill(size)(DenseVector.rand[Double](features))
     Standardizer(features, data.iterator)
   })
 
-  performance of "FeatureReservoirSampling" in {
-    // measurements: 0.387005, 0.339995, 0.435124, 0.341314, 0.340185, 0.342308, 0.364161, 0.379414, 0.343344, 0.340182, 0.340852, 0.34115, 0.371088, 0.371049, 0.414009, 0.428819, 0.342322, 0.420277, 0.345605, 0.465765, 0.39953, 0.443903, 0.343658, 0.433997, 0.487961, 0.764875, 0.81152, 0.783078, 0.873337, 0.8011, 0.765952, 0.554938, 0.524392, 0.592608, 0.592292, 1.116209
+  performance of "Standardizer" in {
+    // measurements: 0.575953, 0.60234, 0.574791, 0.618202, 0.626917, 0.612827, 0.612999, 0.638166, 0.574349, 0.620476, 0.573802, 0.626458, 0.620899, 0.612716, 0.624323, 0.576051, 0.574292, 0.595316, 0.596243, 0.620427, 0.596297, 0.581722, 0.575218, 0.594954, 0.574666, 0.574794, 0.597933, 0.581155, 0.621791, 0.595727, 0.575189, 0.600994, 0.573918, 0.576952, 0.593637, 0.623014
     measure method "create" in {
       using(dataGen) in { data =>
         Standardizer(features, data.iterator)
       }
     }
 
-    // measurements: 0.057963, 0.057834, 0.057804, 0.057735, 0.057923, 0.05795, 0.062904, 0.057818, 0.05775, 0.057819, 0.057821, 0.058073, 0.057717, 0.057625, 0.057807, 0.057803, 0.057706, 0.057881, 0.058123, 0.058244, 0.058419, 0.057966, 0.058103, 0.05797, 0.058209, 0.058227, 0.057909, 0.057766, 0.058315, 0.140962, 0.078868, 0.078579, 0.079885, 0.090037, 0.08056, 0.14698
+    // measurements: 0.10569, 0.107639, 0.105685, 0.105437, 0.105964, 0.107985, 0.078667, 0.076938, 0.077075, 0.077589, 0.078871, 0.076337, 0.07632, 0.076318, 0.076238, 0.076252, 0.076575, 0.081308, 0.076806, 0.076838, 0.076788, 0.07666, 0.077027, 0.077809, 0.081978, 0.076966, 0.076781, 0.077551, 0.076957, 0.077357, 0.077268, 0.077018, 0.077865, 0.077705, 0.078634, 0.10284
     measure method "merge" in {
-      using(standardizerGen) in { standardizers =>
+      using(standardizersGen) in { standardizers =>
         standardizers.reduce(_ + _)
       }
     }
