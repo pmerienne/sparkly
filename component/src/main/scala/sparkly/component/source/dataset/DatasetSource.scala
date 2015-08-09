@@ -9,6 +9,7 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.receiver.Receiver
 import scala.io.Source
 import com.google.common.util.concurrent.RateLimiter
+import java.io.{FileInputStream, File}
 
 abstract class DatasetSource extends Component {
 
@@ -83,10 +84,8 @@ class DatasetReceiver(file: String, parse: (String) => Instance, throughput: Int
   }
 
   private def createDatasetIterator(): Iterator[Instance] = {
-    Source
-      .fromInputStream(getClass.getResourceAsStream(file))
-      .getLines()
-      .map(line => parse(line))
+    val is = if(new File(file).exists) new FileInputStream(file) else getClass.getResourceAsStream(file)
+    Source.fromInputStream(is).getLines().map(line => parse(line))
   }
 
 }

@@ -1,7 +1,7 @@
-package sparkly.math
+package sparkly.math.stat
 
-import org.scalatest._
 import org.scalameter.api._
+import org.scalatest._
 
 import scala.util.Random
 

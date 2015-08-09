@@ -1,9 +1,9 @@
 package sparkly.component.preprocess
 
 import org.apache.spark.streaming.dstream.DStream
+import sparkly.math.stat.ReservoirSampling
 import scala.Some
 import sparkly.core._
-import sparkly.math.ReservoirSampling
 
 class ClassBalancer extends Component {
 

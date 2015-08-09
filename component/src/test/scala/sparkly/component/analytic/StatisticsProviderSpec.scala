@@ -126,6 +126,6 @@ class StatisticsProviderSpec extends ComponentSpec {
     }
 
     Thread sleep 1000
-    component.outputs("Output").count() should be (7)
+    component.outputs("Output").size() should be (7)
   }
 }

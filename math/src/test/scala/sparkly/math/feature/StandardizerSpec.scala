@@ -1,9 +1,10 @@
-package sparkly.math
+package sparkly.math.feature
 
-import org.scalatest._
-import scala.util.Random
 import breeze.linalg.DenseVector
 import org.scalameter.api._
+import org.scalatest._
+
+import scala.util.Random
 
 class StandardizerSpec extends FlatSpec with Matchers {
 

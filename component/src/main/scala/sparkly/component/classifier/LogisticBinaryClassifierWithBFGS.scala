@@ -5,6 +5,7 @@ import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.mllib.classification._
 import org.apache.spark.mllib.regression.LabeledPoint
+import sparkly.math.classification.RunningAccuracy
 
 class LogisticBinaryClassifierWithBFGS extends Component {
 

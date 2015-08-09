@@ -2,6 +2,7 @@ package sparkly.component.preprocess
 
 import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.streaming.dstream.DStream
+import sparkly.math.feature.Standardizer
 import scala.util.Try
 import scala.Some
 import sparkly.core.FeatureType.VECTOR

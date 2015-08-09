@@ -88,7 +88,7 @@
 				<version>${spark.version}</version>
 			</dependency>
 
-			<!-- Spark-Cassandra-Connector -->
+			<!-- Spark libs-->
 			<dependency>
 				<groupId>com.datastax.spark</groupId>
 				<artifactId>spark-cassandra-connector_${scala.version}</artifactId>

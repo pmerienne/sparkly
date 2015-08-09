@@ -1,6 +1,7 @@
-package sparkly.component.classifier
+package sparkly.math.classification
 
 import org.apache.spark.rdd.RDD
+
 import scala.reflect.ClassTag
 
 case class RunningAccuracy[T : ClassTag](successCount: Long = 0, total: Long = 0) {

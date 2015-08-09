@@ -1,6 +1,7 @@
-package sparkly.math
+package sparkly.math.stat
 
 import java.nio.ByteBuffer
+
 import org.apache.mahout.math.stats.TDigest
 
 class FeatureSummary(val count: Long, val missing: Long, val stats: FeatureStatistic) extends Serializable {

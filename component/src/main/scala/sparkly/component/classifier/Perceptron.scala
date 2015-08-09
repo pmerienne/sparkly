@@ -1,5 +1,7 @@
 package sparkly.component.classifier
 
+import sparkly.math.classification.RunningAccuracy
+
 import scala.Some
 
 import sparkly.core._

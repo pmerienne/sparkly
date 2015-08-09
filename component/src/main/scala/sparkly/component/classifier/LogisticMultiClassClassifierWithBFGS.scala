@@ -5,6 +5,7 @@ import org.apache.spark.mllib.linalg.VectorUtil._
 import org.apache.spark.mllib.regression._
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core._
+import sparkly.math.classification.RunningAccuracy
 
 class LogisticMultiClassClassifierWithBFGS extends Component {
 

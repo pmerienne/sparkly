@@ -10,16 +10,20 @@ import scala.reflect.io.Directory
 import scala.util.Try
 import org.apache.spark.metrics.sink.MonitoringTestingData
 
+
 object ComponentSpec {
   val batchDurationMs = 200
 }
 
 trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with Eventually {
 
-  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, org.scalatest.time.Seconds)), interval = scaled(Span(100, Millis)))
+  def patienceMs = 10000
 
+  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(patienceMs, Milliseconds)), interval = scaled(Span(patienceMs / 100, Millis)))
+
+  val cores = 8
   var pipelineDirectory = Directory.makeTemp("sparkly-component-test")
-  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), "local[8]", "test-cluster")
+  val streamingContextFactory = new StreamingContextFactory(pipelineDirectory.toString(), s"local[$cores]", "test-cluster")
 
   var ssc: Option[StreamingContext] = None
 
@@ -33,6 +37,7 @@ trait ComponentSpec extends FlatSpec with Matchers with BeforeAndAfterEach with 
     ssc.foreach{ssc =>
       try {
         ssc.stop()
+        System.clearProperty("spark.driver.port")
         ssc.awaitTerminationOrTimeout(2000)
       } catch {
         case e: Exception => e.printStackTrace()// Use logger

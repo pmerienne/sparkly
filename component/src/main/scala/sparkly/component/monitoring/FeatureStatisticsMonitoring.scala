@@ -4,9 +4,9 @@ import org.apache.spark.streaming._
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.PropertyType._
 import sparkly.core._
+import sparkly.math.stat.FeatureSummary
 
 import scala.util.Try
-import sparkly.math.FeatureSummary
 
 class FeatureStatisticsMonitoring extends Component {
 

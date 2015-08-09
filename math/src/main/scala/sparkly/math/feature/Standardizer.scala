@@ -1,4 +1,4 @@
-package sparkly.math
+package sparkly.math.feature
 
 import breeze.linalg._
 import breeze.numerics._
