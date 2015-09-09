@@ -1,5 +1,7 @@
 package sparkly.component.regressor
 
+import sparkly.math.regression.RunningRmsd
+
 import scala.Some
 import sparkly.core._
 import breeze.linalg._

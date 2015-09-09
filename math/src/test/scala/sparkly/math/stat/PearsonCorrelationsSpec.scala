@@ -1,7 +1,8 @@
-package sparkly.math
+package sparkly.math.stat
 
-import org.scalatest._
 import breeze.linalg._
+import org.scalatest._
+
 import scala.util.Random
 
 class PearsonCorrelationsSpec extends FlatSpec with Matchers {

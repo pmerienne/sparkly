@@ -1,4 +1,4 @@
-package sparkly.math
+package sparkly.math.stat
 
 import scala.util.Random
 

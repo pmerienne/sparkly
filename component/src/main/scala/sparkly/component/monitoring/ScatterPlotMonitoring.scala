@@ -5,6 +5,7 @@ import org.apache.spark.streaming.dstream.DStream
 import sparkly.core.PropertyType._
 import sparkly.core._
 import sparkly.math._
+import sparkly.math.stat.{ReservoirSampling, Bin, Histogram}
 
 import scala.util.Try
 

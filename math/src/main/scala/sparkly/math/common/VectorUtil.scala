@@ -20,4 +20,30 @@ object VectorUtil {
       case _ => breezeVector.toDenseVector
     }
   }
+
+  implicit class RichFloatArray(val arr: Array[Float]) extends AnyVal {
+    def dot(other: Array[Float]): Float = {
+      require(arr.length == other.length, "Trying to compute dot on arrays with different lengths")
+      var sum = 0f
+      val len = arr.length
+      var i = 0
+      while (i < len) {
+        sum += arr(i) * other(i)
+        i += 1
+      }
+      sum
+    }
+
+    def *(scalar: Float): Array[Float] = arr.map(f => f * scalar)
+
+    def -(other: Array[Float]): Array[Float] = {
+      require(arr.length == other.length, "Trying to compute dot on arrays with different lengths")
+      (arr, other).zipped.map{ case (a, b) => a - b}
+    }
+
+    def +(other: Array[Float]): Array[Float] = {
+      require(arr.length == other.length, "Trying to compute dot on arrays with different lengths")
+      (arr, other).zipped.map{ case (a, b) => a + b}
+    }
+  }
 }

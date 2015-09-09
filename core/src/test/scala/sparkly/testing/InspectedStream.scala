@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
 
 case class InspectedStream(instances: ListBuffer[Instance]) {
   def features() = instances.map(_.rawFeatures)
-  def count() = instances.size
+  def size() = instances.size
 }
 
 

@@ -1,12 +1,11 @@
 package sparkly.component.regressor
 
-import scala.Some
-import scala.util.Random
+import org.apache.spark.mllib.regression.LabeledPoint
 import sparkly.core._
+import sparkly.math.regression._
 import org.apache.spark.streaming.dstream.DStream
-import org.apache.spark.mllib.regression._
-import org.apache.spark.mllib.linalg._
 import org.apache.spark.mllib.linalg.VectorUtil._
+import sparkly.math.regression.StreamingLinearRegressorWithSGD
 
 class LinearRegressorWithSGD extends Component {
 
@@ -35,7 +34,7 @@ class LinearRegressorWithSGD extends Component {
     val iterations = context.properties("Iterations").as[Int]
     val miniBatchFraction = context.properties("Batch fraction").as[Double]
 
-    val model = new SparklyStreamingLinearRegressorWithSGD(context.createMonitoring[Map[String, Double]]("NRMSD"))
+    val model = new StreamingLinearRegressorWithSGD()
       .setStepSize(stepSize)
       .setNumIterations(iterations)
       .setMiniBatchFraction(miniBatchFraction)
@@ -44,9 +43,23 @@ class LinearRegressorWithSGD extends Component {
       val label = i.inputFeature("Label").asDouble
       val features = i.inputFeature("Features").asVector.toSpark
       LabeledPoint(label, features)
+    }.cache()
+
+    // Prequential-testing
+    if(context.isActive("NRMSD")) {
+      val monitoring = context.createMonitoring[Map[String, Double]]("NRMSD")
+      var rmsd = RunningRmsd()
+
+      train.foreachRDD{ (rdd, time) => if(!rdd.isEmpty && model.isInitiated){
+        val actual = model.predict(rdd.map(_.features))
+        val expected = rdd.map(_.label)
+        rmsd = rmsd.update(actual, expected)
+        monitoring.add(time.milliseconds, Map("RMSD" -> rmsd.value, "NRMSD" -> rmsd.normalized))
+      }}
     }
 
-    model.testThenTrainOn(train)
+    // Train
+    model.trainOn(train)
 
     val predictions = context
       .dstream("Predict", "Predictions").map{ i =>
@@ -58,44 +71,4 @@ class LinearRegressorWithSGD extends Component {
     Map("Predictions" -> predictions)
   }
 
-}
-
-
-class SparklyStreamingLinearRegressorWithSGD(monitoring: Monitoring[Map[String, Double]]) extends StreamingLinearRegressionWithSGD {
-
-  var rmsd: RunningRmsd = RunningRmsd()
-
-  def testThenTrainOn(data: DStream[LabeledPoint]): Unit = {
-    data.foreachRDD { (rdd, time) => if (!rdd.isEmpty) {
-      rdd.cache()
-
-      // Test
-      model match {
-        case Some(m) => {
-          val actual = m.predict(rdd.map(_.features))
-          val expected = rdd.map(_.label)
-          rmsd = rmsd.update(actual, expected)
-          monitoring.add(time.milliseconds, Map("RMSD" -> rmsd.value, "NRMSD" -> rmsd.normalized))
-        }
-        case None => // Do nothing
-      }
-
-      // Train
-      val weights = model match {
-        case Some(m) => m.weights
-        case None => initWeights(rdd.first.features)
-      }
-      model = Some(algorithm.run(rdd, weights))
-    }}
-  }
-
-  def predict(features: Vector): Double = model match {
-    case Some(m) => m.predict(features)
-    case None => 0.0
-  }
-
-  private def initWeights(features: Vector): Vector = {
-    val size = features.size
-    Vectors.dense(Array.fill(size)(Random.nextDouble))
-  }
 }

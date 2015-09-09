@@ -2,9 +2,9 @@ package sparkly.component.monitoring
 
 import sparkly.core._
 import sparkly.core.PropertyType._
+import sparkly.math.stat.PearsonCorrelations
 import scala.Some
 import org.apache.spark.streaming.dstream.DStream
-import sparkly.math.PearsonCorrelations
 import org.apache.spark.streaming.Milliseconds
 import scala.util.Try
 import breeze.linalg.DenseMatrix

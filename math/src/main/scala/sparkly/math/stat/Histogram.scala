@@ -1,7 +1,7 @@
-package sparkly.math
+package sparkly.math.stat
 
-import scala.collection.mutable.{ListBuffer, ArrayBuffer}
 import scala.annotation.tailrec
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 object Histogram {
   def apply(compression: Int, data: Iterable[Double]): Histogram = {
