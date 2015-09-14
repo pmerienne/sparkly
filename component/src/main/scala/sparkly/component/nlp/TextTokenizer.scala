@@ -38,8 +38,13 @@ import org.apache.lucene.analysis.ckb.SoraniAnalyzer
 import org.apache.lucene.analysis.th.ThaiAnalyzer
 import org.apache.lucene.analysis.hu.HungarianAnalyzer
 import org.apache.lucene.analysis.util.CharArraySet
+import org.apache.spark.SparkContext
 
-case class TextTokenizer(language: String = "", minNGram: Int = 1, maxNGram: Int = 1, ignorePattern: String = "") {
+import org.json4s._
+import org.json4s.jackson.Serialization
+import org.json4s.jackson.Serialization.{read, write}
+
+case class TextTokenizer(language: String = "", minNGram: Int = 1, maxNGram: Int = 1, ignorePatterns: List[String] = List(), replacePatterns: Map[String, String] = Map()) {
 
   val analyzers = new AnalyzerFactory()
 
@@ -60,7 +65,9 @@ case class TextTokenizer(language: String = "", minNGram: Int = 1, maxNGram: Int
   }
 
   private def createTokenStream(content: String): TokenStream = {
-    val text = if (ignorePattern == null || ignorePattern.isEmpty) content else content.replaceAll(ignorePattern, "")
+    val cleaned = ignorePatterns.foldLeft(content){ case (current, ignorePattern) => current.replaceAll(ignorePattern, "")}
+    val text = replacePatterns.foldLeft(cleaned){ case (current, (pattern, replacement)) => current.replaceAll(pattern, replacement)}
+
     val analyzer = analyzers.create(language)
 
     val tokenStream = analyzer.tokenStream("", text)

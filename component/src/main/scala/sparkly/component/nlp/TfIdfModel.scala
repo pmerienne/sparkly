@@ -15,12 +15,13 @@ object TfIdfModel {
   }
 }
 
-case class TfIdfModel(vocabularySize: Int, minDocFreq: Double, documentCount: Double, inverseFrequencies: SparseVector[Double]) {
+case class TfIdfModel(vocabularySize: Int, minDocFreq: Double, documentCount: Double, termsFrequencies: SparseVector[Double]) {
 
-  lazy val idf = {
-    val raw = inverseFrequencies :/ documentCount
-    val cleaned = if(minDocFreq > 0.0) raw.mapActiveValues(f => if(f < minDocFreq) 1.0 else f) else raw
-    log(cleaned)
+  lazy val idf = if(minDocFreq > 0.0) {
+    val minFrequency = documentCount * minDocFreq
+    termsFrequencies.mapActiveValues{ f => if(f < minFrequency) 0.0 else Math.log(documentCount / f)}
+  } else {
+    termsFrequencies.mapActiveValues{ f => Math.log(documentCount / f)}
   }
 
   def add(terms: List[String]): TfIdfModel = {
@@ -32,11 +33,11 @@ case class TfIdfModel(vocabularySize: Int, minDocFreq: Double, documentCount: Do
 
     val (indices, values) = termsCount.toSeq.sortBy(_._1).unzip
     val termsInverseFrequencies = new SparseVector[Double](indices.toArray, values.toArray, vocabularySize)
-    this.copy(documentCount = documentCount + 1.0, inverseFrequencies = inverseFrequencies :+ termsInverseFrequencies)
+    this.copy(documentCount = documentCount + 1.0, termsFrequencies = termsFrequencies :+ termsInverseFrequencies)
   }
 
   def +(other: TfIdfModel): TfIdfModel = {
-    this.copy(documentCount = this.documentCount + other.documentCount, inverseFrequencies = this.inverseFrequencies + other.inverseFrequencies)
+    this.copy(documentCount = this.documentCount + other.documentCount, termsFrequencies = this.termsFrequencies + other.termsFrequencies)
   }
 
   def tfIdf(terms: List[String]): SparseVector[Double] = {
