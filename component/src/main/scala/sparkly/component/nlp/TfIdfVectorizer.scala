@@ -32,7 +32,7 @@ class TfIdfVectorizer extends Component {
     val minNGram = context.property("Min n-gram").as[Int]
     val maxNGram = context.property("Max n-gram").as[Int]
     val ignorePattern = context.property("Ignore pattern").or("")
-    val tokenizer = TextTokenizer(language, minNGram, maxNGram, ignorePattern)
+    val tokenizer = TextTokenizer(language, minNGram, maxNGram, List(ignorePattern))
 
     val partitions = context.property("Parallelism").as[Int]
     val stream = if(partitions < 1) context.dstream("Input", "Output") else context.dstream("Input", "Output").repartition(partitions)

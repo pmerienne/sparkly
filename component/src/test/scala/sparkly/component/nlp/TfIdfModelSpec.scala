@@ -6,7 +6,7 @@ import sparkly.component.source.dataset.ReutersDataset
 
 class TfIdfModelSpec extends FlatSpec with Matchers {
 
-  val tokenizer = TextTokenizer(language = "English", ignorePattern = "[1-9](\\w+)*")
+  val tokenizer = TextTokenizer(language = "English", ignorePatterns = List("[1-9](\\w+)*"))
 
   "TfIdfModel" should "compute features frequencies from text" in {
     // Given

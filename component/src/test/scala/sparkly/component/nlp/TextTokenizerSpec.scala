@@ -1,6 +1,10 @@
 package sparkly.component.nlp
 
 import org.scalatest._
+import java.nio.file.{Paths, Files}
+import org.apache.spark.{SparkConf, SparkContext}
+import scala.reflect.io.File
+import java.util.UUID
 
 class TextTokenizerSpec extends FlatSpec with Matchers {
 
@@ -54,13 +58,26 @@ class TextTokenizerSpec extends FlatSpec with Matchers {
 
   "TextTokenizer" should "remove patterns" in {
     // Given
-    val tokenizer = TextTokenizer(language = "English", ignorePattern = "[1-9](\\w+)*")
-    val text = "I bought 3 apples 4U"
+    val tokenizer = TextTokenizer(language = "English", ignorePatterns = List("[1-9](\\w+)*", "#(\\w+)*", "&amp;"))
+    val text = "I bought 3 Apples &amp; 4 oranges 4U #food"
 
     // When
     val tokens = tokenizer.tokenize(text)
 
     // Then
-    tokens should be (List("i", "bought", "appl"))
+    tokens should be (List("i", "bought", "appl", "orang"))
   }
+
+  "TextTokenizer" should "replace patterns" in {
+    // Given
+    val tokenizer = TextTokenizer(language = "English", replacePatterns = Map("([a-z])\\1{1,}" -> "$1"))
+    val text = "wazuuup"
+
+    // When
+    val tokens = tokenizer.tokenize(text)
+
+    // Then
+    tokens should be (List("wazup"))
+  }
+
 }
