@@ -15,12 +15,13 @@ import twitter4j.conf._
 class TwitterSource extends Component {
 
   def metadata = ComponentMetadata (
-    name = "Tweet source", description = "Use twitter as a stream source", category = "Data Sources",
+    name = "Tweet source", description = "Use twitter as a stream source", category = "Twitter",
     properties = Map(
       "Consumer key" -> PropertyMetadata(STRING),
       "Consumer secret" -> PropertyMetadata(STRING),
       "Access token" -> PropertyMetadata(STRING),
-      "Access token secret" -> PropertyMetadata(STRING)
+      "Access token secret" -> PropertyMetadata(STRING),
+      "Keywords" -> PropertyMetadata(STRING, description = "Comma-separated list of keywords to track", mandatory = false)
     ),
     outputs = Map(
       "Tweets" -> OutputStreamMetadata(namedFeatures = Map (
@@ -32,8 +33,9 @@ class TwitterSource extends Component {
     )
   )
 
-
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
+    val keywords = context.property("Keywords").or("").split(",").map(_.trim).toSeq
+
     val properties = new Properties()
     properties.put("oauth.consumerKey", context.property("Consumer key").as[String])
     properties.put("oauth.consumerSecret", context.property("Consumer secret").as[String])
@@ -43,7 +45,7 @@ class TwitterSource extends Component {
     val auth = new OAuthAuthorization(new PropertyConfiguration(properties))
 
     val tweets = TwitterUtils
-      .createStream(context.ssc, Some(auth))
+      .createStream(context.ssc, Some(auth), filters = keywords)
       .map(status => Instance(
         "User id" -> status.getUser.getId,
         "Text" -> status.getText,
