@@ -11,22 +11,18 @@ class KMeansSpec extends ComponentSpec {
     val configuration = ComponentConfiguration (
       name = "Kmeans",
       clazz = classOf[KMeans].getName,
-      inputs = Map (
-        "Train" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features")),
-        "Predict" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features"))
-      ),
-      outputs = Map("Predicted" -> StreamConfiguration(mappedFeatures = Map("Cluster" -> "Cluster"))),
+      inputs = Map ("Input" -> StreamConfiguration(mappedFeatures = Map("Features" -> "Features"))),
+      outputs = Map("Output" -> StreamConfiguration(mappedFeatures = Map("Cluster" -> "Cluster"))),
       properties = Map ("Clusters" -> "3")
     )
 
     // When
     val component = deployComponent(configuration)
-    component.inputs("Train").push(2000, SeedsDataset.iterator())
-    component.inputs("Predict").push(2000, SeedsDataset.iterator())
+    component.inputs("Input").push(2000, SeedsDataset.iterator())
 
     // Then
     eventually {
-      val predictions = component.outputs("Predicted").instances.map(i => (i.rawFeature("Variety").asInt, i.rawFeature("Cluster").asInt)).toList
+      val predictions = component.outputs("Output").instances.map(i => (i.rawFeature("Variety").asInt, i.rawFeature("Cluster").asInt)).toList
       accuracy(predictions) should be > 0.80
     }
   }

@@ -1,24 +1,30 @@
 package sparkly.math.clustering
 
-import org.apache.spark.mllib.clustering.StreamingKMeans
+import org.apache.spark.mllib.clustering.{StreamingKMeansModel, StreamingKMeans}
 import org.apache.spark.mllib.linalg._
 import org.apache.spark.streaming.dstream.DStream
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+import org.apache.spark.rdd.RDD
+import sparkly.math.stat.RandomWeighted
 
 class StreamingKMeansPP extends StreamingKMeans {
 
   override def trainOn(data: DStream[Vector]) {
-    data.foreachRDD { (rdd, time) => if (!rdd.isEmpty) {
+    data.foreachRDD(rdd => update(rdd))
+  }
+
+  def update(data: RDD[Vector]): Unit = {
+    if (!data.isEmpty) {
       // KMeans++ init
       if (model.clusterCenters == null) {
-        val data = rdd.collect()
-        val centers = initCentroids(data)
+        val samples = data.collect()
+        val centers = initCentroids(samples)
         setInitialCenters(centers, Array.fill(k)(0.0))
       }
 
-      model = model.update(rdd, decayFactor, timeUnit)
-    }}
+      model = model.update(data, decayFactor, timeUnit)
+    }
   }
 
   private def initCentroids(data: Array[Vector]): Array[Vector] = {
@@ -29,11 +35,11 @@ class StreamingKMeansPP extends StreamingKMeans {
 
     (1 until k).foreach{ index =>
       val dxs = points.map { point =>
-        val nearestCentroid = centers.map(c => (c, Vectors.sqdist(c, point)))
-        (point, nearestCentroid.maxBy(_._2)._2)
+        val nearestCentroid = centers.map(c => (c, Vectors.sqdist(c, point))).minBy(_._2)
+        (point, nearestCentroid._2 * nearestCentroid._2)
       }
-      val farthest = dxs.maxBy(_._2)
-      val center = dxs.find{ case (candidate, dx) => Random.nextDouble > (0.75 * Math.pow(dx / farthest._2, 2))}.getOrElse(farthest)._1
+
+      val center = RandomWeighted(dxs).randomElement()
       points -= center
       centers += center
     }

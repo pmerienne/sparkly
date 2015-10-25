@@ -2,53 +2,61 @@ package sparkly.math.clustering
 
 import org.apache.spark.mllib.linalg._
 
-case class ClusterOutlierDetector(k: Int, alpha: Double, beta: Int) {
-  require(k > 0)
+case class ClusterOutlierDetector(alpha: Double, beta: Option[Double] = None, k: Option[Int] = None) {
   require(0.0 < alpha && alpha < 1.0)
-  require(beta > 1)
 
-  def findOutlierClusters(centers: Array[Vector], weight: Array[Double]): Set[Int] = {
-    val clusters = (centers zip weight).zipWithIndex.map{case ((center, weight), index) => ClusterInfo(index, center, weight)}
-    val size = clusters.size
-    val sortedClusters = clusters.sortBy(_.weight).reverse
+  def findOutlierClusters(centers: Array[Vector], weights: Array[Double]): Set[Int] = {
+    val clusters = (centers zip weights).zipWithIndex.map{case ((center, weight), index) => ClusterInfo(index, center, weight)}
 
-    // Check alpha rule
-    val d = firstOutlierIndex(sortedClusters)
-    if(d < 0 || d >= size)
-      return Set()
+    val (normalClusters, outlierCandidates) = alphaSplit(clusters)
+    val outlierClusters = betaFilter(normalClusters, outlierCandidates)
 
-    val normalClusters = sortedClusters.slice(0, d)
-    val outlierClusters = sortedClusters.slice(d, size)
-
-    // Check beta rule
-    val normalClustersMeanSize = normalClusters.map(_.weight).sum / d.toDouble
-    val outlierClustersMeanSize = outlierClusters.map(_.weight).sum / (size - d).toDouble
-    if(normalClustersMeanSize / outlierClustersMeanSize < beta)
-      return Set()
-
-    // Get K best outliers
+    // Get best outliers
+    val outliers_count = k.getOrElse(outlierClusters.size)
     val topOutliers = outlierClusters
-      .map(outlier => (outlier.index, degree(outlier, normalClusters)))
+      .map(outlier => (outlier.index, minDistance(outlier, normalClusters) / outlier.weight))
       .sortBy(_._2).reverse
-      .take(k)
       .map(_._1)
+      .take(outliers_count)
 
-    // re-map to non sorted clusters ...
     topOutliers.toSet
   }
 
-  private def firstOutlierIndex(sortedClusters: Array[ClusterInfo]): Int = {
+  private def alphaSplit(clusters: Array[ClusterInfo]): (Array[ClusterInfo], Array[ClusterInfo]) = {
+    val sortedClusters = clusters.sortBy(_.weight).reverse
+
+    // Find split index
     val runningWeightSums = sortedClusters.map(_.weight).scanLeft(0.0)(_ + _)
     val bound = alpha * runningWeightSums.last
-    runningWeightSums.indexWhere(sum => sum >= bound)
+    val alphaIndex = runningWeightSums.indexWhere(sum => sum >= bound)
+
+    if(alphaIndex < 0 || alphaIndex >= clusters.size)
+      return (clusters, Array[ClusterInfo]())
+
+    val normalClusters = sortedClusters.slice(0, alphaIndex)
+    val outlierCandidates = sortedClusters.slice(alphaIndex, clusters.size)
+
+    (normalClusters, outlierCandidates)
   }
 
-  private def degree(outlier: ClusterInfo, normalClusters: Array[ClusterInfo]) = {
-    minDistance(outlier, normalClusters) / outlier.weight
+  private def betaFilter(normalClusters: Array[ClusterInfo], outlierCandidates: Array[ClusterInfo]): Array[ClusterInfo] = if(beta.isEmpty) {
+    outlierCandidates
+  } else {
+    val normalClustersMeanDistance = meanDistance(normalClusters)
+    outlierCandidates.filter(cluster => minDistance(cluster, normalClusters) * beta.get > normalClustersMeanDistance)
   }
 
   private def minDistance(cluster: ClusterInfo, others: Array[ClusterInfo]): Double = {
     others.map(other => Vectors.sqdist(other.center, cluster.center)).min
+  }
+
+  private def meanDistance(clusters: Array[ClusterInfo]): Double = {
+    val distances = clusters.flatMap{ cluster =>
+      val others = clusters.filter(other => other.index != cluster.index)
+      others.map(other => Vectors.sqdist(other.center, cluster.center))
+    }
+
+    distances.sum / distances.size
   }
 }
 
