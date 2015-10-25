@@ -116,8 +116,8 @@ case class Property (
   defaultValue: Option[_] = None,
   selectedValue: Option[String] = None){
 
-  def isDefined(): Boolean = selectedValue.isDefined || defaultValue.isDefined
-  def isEmpty(): Boolean = selectedValue.isEmpty
+  def isDefined(): Boolean = (selectedValue.isDefined && selectedValue.get != null) || defaultValue.isDefined
+  def isEmpty(): Boolean = !isDefined
 
   def get(): Any = selectedValue match {
     case None => defaultValue.getOrElse(null)
@@ -132,6 +132,11 @@ case class Property (
   }
 
   def as[V] = get.asInstanceOf[V]
+
+  def asOption[V] = isDefined() match {
+    case true => Some(as[V])
+    case false => None
+  }
 
   def or[V](default: V, on: (V) => Boolean = (value: V) => isEmpty ) = {
     val value = Try(get).getOrElse(null).asInstanceOf[V]

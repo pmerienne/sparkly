@@ -34,7 +34,7 @@ class TwitterSource extends Component {
   )
 
   override protected def initStreams(context: Context): Map[String, DStream[Instance]] = {
-    val keywords = context.property("Keywords").or("").split(",").map(_.trim).toSeq
+    val keywords = context.property("Keywords").or("").split(",").map(_.trim).filter(!_.isEmpty).toSeq
 
     val properties = new Properties()
     properties.put("oauth.consumerKey", context.property("Consumer key").as[String])

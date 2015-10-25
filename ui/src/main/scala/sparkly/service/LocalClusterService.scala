@@ -11,7 +11,7 @@ class LocalClusterService(
   implicit val pipelineValidationService: PipelineValidationService,
   implicit val pipelineRepository: PipelineRepository) {
 
-  val streamingContextFactory = new StreamingContextFactory(BASE_DISTRIBUTED_DIRECTORY, "local[16]", "local")
+  val streamingContextFactory = new StreamingContextFactory(BASE_DISTRIBUTED_DIRECTORY, "local[*]", "local")
   var streamingContext: Option[StreamingContext] = None
 
   var status: ClusterStatus = ClusterStatus(ClusterState.Stopped, None, None)
