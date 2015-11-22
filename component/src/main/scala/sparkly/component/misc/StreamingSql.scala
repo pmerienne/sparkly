@@ -6,6 +6,8 @@ import org.apache.spark.sql.catalyst.expressions.Row
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.streaming.dstream.DStream
 import sparkly.core._
+import org.apache.spark.rdd.RDD
+import scala.collection.mutable
 
 class StreamingSql extends Component {
   
@@ -24,37 +26,29 @@ class StreamingSql extends Component {
     val outputFields = context.outputFeatureNames("Output", "Fields")
 
     val schemas = (1 to STREAM_COUNT).map(i => StructType(context.inputFeatureNames("Stream" + i, "Fields").map(fieldName => StructField(fieldName, StringType, true))))
-    val inputs = (1 to STREAM_COUNT).map(i => context.dstream("Stream" + i).map(("stream" + i, _))).reduce(_ union _)
+    val sqlContext = new SQLContext(context.sc)
 
-    val output = inputs
-      .transform { rdd =>
-        val sqlContext = SQLContextSingleton.getInstance(rdd.sparkContext)
+    // Create tables
+    val streams = (1 to STREAM_COUNT).map{ i =>
+      context.dstream("Stream" + i).transform { rdd =>
+        val schema = schemas(i - 1)
+        val rowRDD = rdd.map(instance => Row.fromSeq(instance.inputFeatures("Fields").asStringList))
+        sqlContext.createDataFrame(rowRDD, schema).registerTempTable("stream" + i)
 
-        (1 to STREAM_COUNT).foreach{ i =>
-          // TODO filter(_._1 == "stream" + i) is not efficient
-          val schema = schemas(i - 1)
-          val rowRDD = rdd.filter(_._1 == "stream" + i).map(instance => Row.fromSeq(instance._2.inputFeatures("Fields").asStringList))
-          sqlContext.createDataFrame(rowRDD, schema).registerTempTable("stream" + i)
-        }
-
-        val results = sqlContext.sql(query).map(row => Instance((outputFields zip row.toSeq).toMap))
-        results.take(1) // We need such kind of operations however there's not output to transform!
-        results
+        rdd.sparkContext.emptyRDD[Any]
       }
+    }.reduce(_ union _)
+
+    // Query tables
+    val output = streams.transform { rdd =>
+      val results = sqlContext.sql(query).map(row => Instance((outputFields zip row.toSeq).toMap)).cache()
+      results.take(1) // We need such kind of operations however there's not output to transform!
+
+      // Clear table
+      (1 to STREAM_COUNT).foreach(i => sqlContext.dropTempTable("stream" + i))
+      results
+    }
 
     Map("Output" -> output)
-  }
-}
-
-/** Lazily instantiated singleton instance of SQLContext */
-object SQLContextSingleton {
-
-  @transient private var instance: SQLContext = _
-
-  def getInstance(sparkContext: SparkContext): SQLContext = {
-    if (instance == null) {
-      instance = new SQLContext(sparkContext)
-    }
-    instance
   }
 }
